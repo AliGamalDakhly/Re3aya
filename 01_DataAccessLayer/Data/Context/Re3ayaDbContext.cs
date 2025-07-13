@@ -1,10 +1,11 @@
 ﻿using System.Reflection;
 using _01_DataAccessLayer.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace _01_DataAccessLayer.Data.Context
 {
-    internal class Re3ayaDbContext: DbContext
+    internal class Re3ayaDbContext: IdentityDbContext
     {
         DbSet<Model> Models { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
