@@ -13,11 +13,13 @@ namespace _01_DataAccessLayer.Models
 
 
 
-        public int AppUserId { get; set; }
+        public string AppUserId { get; set; }
 
         [ForeignKey("AppUserId")]
         public AppUser AppUser { get; set; }
 
+
         public virtual List<Appointment> Appointments { get; set; }
+        public virtual List<Rating> Ratings { get; set; }
     }
 }

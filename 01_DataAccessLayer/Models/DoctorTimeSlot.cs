@@ -20,5 +20,7 @@ namespace _01_DataAccessLayer.Models
 
         [ForeignKey("TimeSlotId")]
         public virtual TimeSlot TimeSlot { get; set; }
+
+        public virtual Appointment Appointment { get; set; }
     }
 }

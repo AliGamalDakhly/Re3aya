@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _01_DataAccessLayer.Repository.IGenericRepository
+namespace _01_DataAccessLayer.Enums
 {
-    public interface IGenericRepository<T> where T : class
+    public enum Gender
     {
-
+        Male,
+        Female
     }
 }

@@ -11,7 +11,7 @@ namespace _01_DataAccessLayer.Models
     {
         public int AddressId { get; set; }
         public string Location { get; set; }
-        public string? DetailedAddress { get; set; }
+        public string DetailedAddress { get; set; }
 
         public int CityId { get; set; }
         public int DoctorId { get; set; }

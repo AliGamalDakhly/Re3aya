@@ -12,11 +12,11 @@ namespace _01_DataAccessLayer.Models
         public int AdminId { get; set; }
 
         
-        public int AppUserId { get; set; }
+        public string AppUserId { get; set; }
         public int SystemId { get; set; }
 
 
         [ForeignKey("AppUserId")]
-        public AppUser AppUser { get; set; }
+        public virtual AppUser AppUser { get; set; }
     }
 }

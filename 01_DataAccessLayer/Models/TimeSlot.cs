@@ -14,5 +14,7 @@ namespace _01_DataAccessLayer.Models
         public DateTime EndTime { get; set; }
         public WeekDays DayOfWeek { get; set; }
         public bool IsAvailable { get; set; } = true;
+
+        public virtual List<DoctorTimeSlot> DoctorTimeSlots { get; set; }
     }
 }

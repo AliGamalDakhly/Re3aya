@@ -13,7 +13,7 @@ namespace _01_DataAccessLayer.Models
         public int DoctorId { get; set; }
         
         public double Balance { get; set; }
-        public int ExpYears { get; set; }
+        public int? ExpYears { get; set; }
         public string AboutMe { get; set; }
         public float RatingValue { get; set; }
         public double Fees { get; set; }
@@ -23,7 +23,7 @@ namespace _01_DataAccessLayer.Models
 
 
         public int SpecializationId { get; set; }
-        public int AppUserId { get; set; }
+        public string AppUserId { get; set; }
 
 
 
@@ -34,6 +34,8 @@ namespace _01_DataAccessLayer.Models
         public Specialization Specialization { get; set; }
         public virtual List<Address> Addresses { get; set; }
         public virtual List<Rating> Ratings { get; set; }
+        public virtual List<Document> Documents { get; set; } = new List<Document>();
+        public virtual List<DoctorTimeSlot> DoctorTimeSlots { get; set; } 
 
     }
 }

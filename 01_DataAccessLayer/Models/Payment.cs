@@ -16,5 +16,8 @@ namespace _01_DataAccessLayer.Models
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
         public int TransactionId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+
+        public virtual Appointment Appointment { get; set; }
     }
 }
