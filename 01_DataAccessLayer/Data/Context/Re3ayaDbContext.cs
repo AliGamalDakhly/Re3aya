@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _01_DataAccessLayer.Data.Context
 {
-    internal class Re3ayaDbContext: IdentityDbContext<AppUser>
+    public class Re3ayaDbContext: IdentityDbContext<AppUser>
     {
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
