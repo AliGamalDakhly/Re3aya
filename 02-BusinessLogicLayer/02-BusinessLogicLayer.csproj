@@ -8,14 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
     <Folder Include="Validators\" />
-    <Folder Include="Service\IServices\" />
-    <Folder Include="Service\Services\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\01_DataAccessLayer\01-DataAccessLayer.csproj" />
   </ItemGroup>
 
 </Project>
