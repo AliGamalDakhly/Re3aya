@@ -95,37 +95,33 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
         }
 
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(QueryOptions<TEntity> options)
+        public async Task<List<TEntity>> GetAllAsync(QueryOptions<TEntity>? options = null)
         {
             IQueryable<TEntity> query = _dbSet;
 
-            if(options.Filter != null)
-                query.Where(options.Filter);
-
-
-            if(options.Includes != null && options.Includes.Length > 0)
+            if (options != null)
             {
-                foreach (var include in options.Includes)
+                if (options.Filter != null)
+                    query = query.Where(options.Filter);
+
+
+                if (options.Includes != null && options.Includes.Length > 0)
+                    foreach (var include in options.Includes)
+                        query = query.Include(include);
+
+
+                if (options.OrderBy != null)
                 {
-                    query = query.Include(include);
+                    query = options.SortDirection == SortDirection.Ascending
+                        ? query.OrderBy(options.OrderBy)
+                        : query.OrderByDescending(options.OrderBy);
                 }
-            }
 
-            if (options.Skip.HasValue && options.Skip.Value > 0)
-            {
-                query = query.Skip(options.Skip.Value);
-            }
+                if (options.Skip.HasValue && options.Skip.Value > 0)
+                    query = query.Skip(options.Skip.Value);
 
-            if (options.Take.HasValue && options.Take.Value > 0)
-            {
-                query = query.Take(options.Take.Value);
-            }
-
-            if (options.OrderBy != null)
-            {
-                query = options.SortDirection == SortDirection.Ascending
-                    ? query.OrderBy(options.OrderBy)
-                    : query.OrderByDescending(options.OrderBy);
+                if (options.Take.HasValue && options.Take.Value > 0)
+                    query = query.Take(options.Take.Value);
             }
 
             return await query.ToListAsync();
@@ -205,31 +201,17 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
         }
 
 
-        public IEnumerable<TEntity> GetAll(QueryOptions<TEntity> options)
+        public List<TEntity> GetAll(QueryOptions<TEntity> options)
         {
             IQueryable<TEntity> query = _dbSet;
 
             if (options.Filter != null)
-                query.Where(options.Filter);
+               query = query.Where(options.Filter);
 
 
             if (options.Includes != null && options.Includes.Length > 0)
-            {
                 foreach (var include in options.Includes)
-                {
                     query = query.Include(include);
-                }
-            }
-
-            if (options.Skip.HasValue && options.Skip.Value > 0)
-            {
-                query = query.Skip(options.Skip.Value);
-            }
-
-            if (options.Take.HasValue && options.Take.Value > 0)
-            {
-                query = query.Take(options.Take.Value);
-            }
 
             if (options.OrderBy != null)
             {
@@ -237,6 +219,12 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
                     ? query.OrderBy(options.OrderBy)
                     : query.OrderByDescending(options.OrderBy);
             }
+
+            if (options.Skip.HasValue && options.Skip.Value > 0)
+                query = query.Skip(options.Skip.Value);
+
+            if (options.Take.HasValue && options.Take.Value > 0)
+                query = query.Take(options.Take.Value);
 
             return query.ToList();
         }

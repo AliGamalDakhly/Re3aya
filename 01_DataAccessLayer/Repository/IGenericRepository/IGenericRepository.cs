@@ -10,6 +10,7 @@ namespace _01_DataAccessLayer.Repository.IGenericRepository
 {
     public interface IGenericRepository<TEntity, TKey> where TEntity : class
     {
+
         #region Async Methods
         Task<TEntity> AddAsync(TEntity entity);
         Task<TEntity> UpdateAsync(TEntity entity);
@@ -18,11 +19,7 @@ namespace _01_DataAccessLayer.Repository.IGenericRepository
         Task<TEntity> GetByIdAsync(TKey id);
         Task<int> CountAsync(Expression<Func<TEntity, bool>>? filter = null);
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
-        Task<IEnumerable<TEntity>> GetAllAsync(QueryOptions<TEntity> options);
-        // Doctor.GetAll(new QueryOptions{
-        //      Filter = d => d.RatingValue > 5,
-
-        // })
+        Task<List<TEntity>> GetAllAsync(QueryOptions<TEntity>? options = null);
         #endregion
 
         #region Synchronous Methods
@@ -33,25 +30,7 @@ namespace _01_DataAccessLayer.Repository.IGenericRepository
         TEntity GetById(TKey id);
         int Count(Expression<Func<TEntity, bool>>? filter = null);
         bool Exists(Expression<Func<TEntity, bool>> predicate);
-        IEnumerable<TEntity> GetAll(QueryOptions<TEntity> options);
-        #endregion
-
-        #region GetAll Methods Overloads
-        //IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includes);
-        //IEnumerable<T> GetAll(int? skip = null, int? take = null);
-        //IEnumerable<T> GetAll(Expression<Func<T, bool>> filter,
-        //         params Expression<Func<T, object>>[] includes);
-        //IEnumerable<T> GetAll(Expression<Func<T, object>>? orderBy,
-        //        SortDirection orderType = SortDirection.Ascending,
-        //        int? take = null, int? skip = null);
-        //IEnumerable<T> GetAll(Expression<Func<T, bool>> filter,
-        //        Expression<Func<T, object>>? orderBy, SortDirection orderType = SortDirection.Ascending,
-        //        params Expression<Func<T, object>>[] includes);
-
-        //IEnumerable<T> GetAll(Expression<Func<T, bool>> filter,
-        //        Expression<Func<T, object>>? orderBy, SortDirection sortDirection = SortDirection.Ascending,
-        //        int? take = null, int? skip = null,
-        //        params Expression<Func<T, object>>[] includes);
+        List<TEntity> GetAll(QueryOptions<TEntity> options);
         #endregion
 
     }

@@ -7,7 +7,9 @@ namespace _01_DataAccessLayer.Data.Context
 {
     public class Re3ayaDbContext: IdentityDbContext<AppUser>
     {
-        
+        public Re3ayaDbContext(DbContextOptions<Re3ayaDbContext> options): base(options)
+        {
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Server=db23185.public.databaseasp.net; Database=db23185; User Id=db23185; Password=Ali123456_; Encrypt=True; TrustServerCertificate=True; MultipleActiveResultSets=True;")
