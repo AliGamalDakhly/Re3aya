@@ -13,12 +13,12 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be injected by DI container
         private readonly IUnitOfWork _unitOfWork;
         // this will be used to access the repository methods
-        private readonly IGenericRepository<Government, int> _Governmentcontext;
+        private readonly IGenericRepository<Government, int> _governmentContext;
         private readonly IGenericRepository<City, int> _cityContext;
         public AddressService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _Governmentcontext = _unitOfWork.Repository<Government, int>();
+            _governmentContext = _unitOfWork.Repository<Government, int>();
             _cityContext = _unitOfWork.Repository<City, int>();
         }
 
@@ -31,7 +31,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<Government> AddGovernmentAsync(Government government)
         {
-            var addedGovernment = await _Governmentcontext.AddAsync(government);
+            var addedGovernment = await _governmentContext.AddAsync(government);
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
             return addedGovernment;
         }
@@ -45,7 +45,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<int> CountGovernmentsAsync(Expression<Func<Government, bool>>? filter)
         {
-            return await _Governmentcontext.CountAsync(filter);
+            return await _governmentContext.CountAsync(filter);
         }
 
         public async Task<bool> ExistsCityAsync(Expression<Func<City, bool>> predicate)
@@ -55,12 +55,12 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<bool> ExistsGovernmentAsync(Expression<Func<Government, bool>> predicate)
         {
-            return await _Governmentcontext.ExistsAsync(predicate);
+            return await _governmentContext.ExistsAsync(predicate);
         }
 
         public async Task<List<Government>> GetAllGovernmentsAsync(QueryOptions<Government>? options)
         {
-            return await _Governmentcontext.GetAllAsync(options);
+            return await _governmentContext.GetAllAsync(options);
         }
 
         public async Task<List<City>> GetAllCitiesAsync(QueryOptions<City>? options)
@@ -75,7 +75,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<Government> GetGovernmentByIdAsync(int id)
         {
-            return await _Governmentcontext.GetByIdAsync(id);
+            return await _governmentContext.GetByIdAsync(id);
         }
 
         public async Task<bool> UpdateCityAsync(City city)
@@ -99,12 +99,12 @@ namespace _02_BusinessLogicLayer.Service.Services
         {
 
             // we first get the entity from DB.
-            var existingGovernment = await _Governmentcontext.GetByIdAsync(government.GovernmentId);
+            var existingGovernment = await _governmentContext.GetByIdAsync(government.GovernmentId);
             if (existingGovernment == null)
                 return false;
             //-------- dont forget to update all fields of your entity ---------
             existingGovernment.Name = government.Name;
-            await _Governmentcontext.UpdateAsync(existingGovernment);
+            await _governmentContext.UpdateAsync(existingGovernment);
             await _unitOfWork.CompleteAsync();
             return true;
         }
