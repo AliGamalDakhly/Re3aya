@@ -1,5 +1,3 @@
-
-using System;
 using _01_DataAccessLayer.Data.Context;
 using _01_DataAccessLayer.Repository.GenericRepository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
@@ -30,6 +28,7 @@ namespace _03_APILayer
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Re3ayaDbConnectionString")));
 
             builder.Services.AddScoped<ISpecializationService, SpecialzationService>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
 
             var app = builder.Build();
 
