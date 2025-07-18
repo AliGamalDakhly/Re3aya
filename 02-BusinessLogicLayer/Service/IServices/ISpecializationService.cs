@@ -6,18 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
+using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 
 namespace _02_BusinessLogicLayer.Service.IServices
 {
     public interface ISpecializationService
     {
-        Task<Specialization> AddAsync(Specialization specialization);
-        Task<bool> UpdateAsync(Specialization specialization);
-        Task<Specialization> GetByIdAsync(int id);
+        Task<SpecializationDTO> AddAsync(SpecializationDTO specializationDTO);
+        Task<bool> UpdateAsync(SpecializationDTO specializationDTO, int id);
+        Task<SpecializationDTO> GetByIdAsync(int id);
         Task<bool> DeleteByIdAsync(int id);// change int with primary key type of your entity
-        Task<bool> DeleteAsync(Specialization specialization);
+        Task<bool> DeleteAsync(SpecializationDTO specializationDTO);
         Task<int> CountAsync(Expression<Func<Specialization, bool>>? filter = null);
         Task<bool> ExistsAsync(Expression<Func<Specialization, bool>> predicate);
-        Task<List<Specialization>> GetAllAsync(QueryOptions<Specialization>? options = null);
+        Task<List<SpecializationDTO>> GetAllAsync(QueryOptions<SpecializationDTO>? options = null);
     }
 }
