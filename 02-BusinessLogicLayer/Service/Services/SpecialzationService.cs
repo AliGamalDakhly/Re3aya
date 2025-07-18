@@ -87,6 +87,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         public async Task<bool> ExistsAsync(Expression<Func<Specialization, bool>> predicate)
         {
             return await _context.ExistsAsync(predicate);
+           
         }
 
         public async Task<List<SpecializationDTO>> GetAllAsync(QueryOptions<SpecializationDTO> options)
