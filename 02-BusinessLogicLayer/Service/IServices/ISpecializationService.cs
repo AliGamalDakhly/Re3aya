@@ -19,6 +19,6 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> DeleteAsync(SpecializationDTO specializationDTO);
         Task<int> CountAsync(Expression<Func<Specialization, bool>>? filter = null);
         Task<bool> ExistsAsync(Expression<Func<Specialization, bool>> predicate);
-        Task<List<SpecializationDTO>> GetAllAsync(QueryOptions<SpecializationDTO>? options = null);
+        Task<List<SpecializationDTO>> GetAllAsync(QueryOptions<Specialization>? options = null);
     }
 }
