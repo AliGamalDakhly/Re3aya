@@ -65,10 +65,14 @@ namespace _02_BusinessLogicLayer.Mapping
             //......
 
             // Mapping of Specilization Entity (Ali)
+
             CreateMap<Specialization, SpecializationDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
+            CreateMap<SpecializationDTO, Specialization>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
 
 
