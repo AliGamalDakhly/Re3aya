@@ -12,6 +12,7 @@ namespace _01_DataAccessLayer.Models
         public int DoctorTimeSlotId { get; set; }
         public int DoctorId { get; set; }
         public int TimeSlotId { get; set; }
+        public bool IsAvailable { get; set; } = true;
 
 
 

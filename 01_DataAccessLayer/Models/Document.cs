@@ -13,7 +13,7 @@ namespace _01_DataAccessLayer.Models
         public int DocumentId { get; set; }
         public DocumentType DocumentType { get; set; }
         public string FilePath { get; set; }
-        public DateTime UploadedAt { get; set; }
+        public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
         public bool IsVerified { get; set; }
 
 

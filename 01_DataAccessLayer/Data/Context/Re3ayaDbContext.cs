@@ -12,8 +12,7 @@ namespace _01_DataAccessLayer.Data.Context
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=db23185.public.databaseasp.net; Database=db23185; User Id=db23185; Password=Ali123456_; Encrypt=True; TrustServerCertificate=True; MultipleActiveResultSets=True;")
-                          .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
