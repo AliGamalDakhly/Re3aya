@@ -1,6 +1,7 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
+using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using AutoMapper;
 using Microsoft.Identity.Client;
 using System;
@@ -63,6 +64,10 @@ namespace _02_BusinessLogicLayer.Mapping
             //......
             //......
 
+            // Mapping of Specilization Entity (Ali)
+            CreateMap<Specialization, SpecializationDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
 
 
