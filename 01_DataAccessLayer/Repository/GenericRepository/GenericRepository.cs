@@ -46,7 +46,7 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
 
         public async Task<bool> DeleteByIdAsync(TKey id)
         {
-            if(id == null)
+            if (id == null)
                 throw new ArgumentNullException(nameof(id), "Id cannot be null");
 
             var entity = await _dbSet.FindAsync(id);
@@ -60,16 +60,16 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
 
         public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? filter = null)
         {
-            if(filter != null)
-               return await _dbSet.CountAsync(filter);
+            if (filter != null)
+                return await _dbSet.CountAsync(filter);
 
             return await _dbSet.CountAsync();
         }
-        
+
 
         public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            if(predicate != null)
+            if (predicate != null)
                 return await _dbSet.AnyAsync(predicate);
 
             return await _dbSet.AnyAsync();
@@ -87,7 +87,7 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
 
         public Task<TEntity> UpdateAsync(TEntity entity)
         {
-            if(entity == null)
+            if (entity == null)
                 throw new ArgumentNullException(nameof(entity), "Entity cannot be null");
 
             _dbSet.Update(entity);
@@ -155,7 +155,7 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
             if (id == null)
                 throw new ArgumentNullException(nameof(id), "Id cannot be null");
 
-            var entity =  _dbSet.Find(id);
+            var entity = _dbSet.Find(id);
             if (entity == null)
                 return false;
 
@@ -169,7 +169,7 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
             if (filter != null)
                 return _dbSet.Count(filter);
 
-            return  _dbSet.Count();
+            return _dbSet.Count();
         }
 
 
@@ -206,7 +206,7 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
             IQueryable<TEntity> query = _dbSet;
 
             if (options.Filter != null)
-               query = query.Where(options.Filter);
+                query = query.Where(options.Filter);
 
 
             if (options.Includes != null && options.Includes.Length > 0)
