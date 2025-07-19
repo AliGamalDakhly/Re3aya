@@ -35,6 +35,7 @@ namespace _03_APILayer
             builder.Services.AddScoped<IPatientService, PatientService>();
             builder.Services.AddScoped<ISpecializationService, SpecialzationService>();
             builder.Services.AddScoped<IAddressService, AddressService>();
+            builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
 
             
             
