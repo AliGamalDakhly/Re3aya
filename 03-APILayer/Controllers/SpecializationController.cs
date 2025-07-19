@@ -28,24 +28,9 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                // Create Empty List Of DTOs 
-                List<SpecializationDTO> SpecilizationDTOs = new List<SpecializationDTO>();
-
-                // Get All Specializations From DB
-                List<Specialization> specializations =
+                // Get All Specializations From Service
+                List<SpecializationDTO> SpecilizationDTOs = 
                     await _specializationService.GetAllAsync();
-
-                // Map Each Specialization To SpecializationDTO
-                foreach (Specialization specialization in specializations)
-                {
-                    SpecializationDTO SpecilizationDTO = new SpecializationDTO
-                    {
-                        Name = specialization.Name,
-                        Description = specialization.Description
-                    };
-
-                    SpecilizationDTOs.Add(SpecilizationDTO);
-                }
 
                 // Return List Of SpecializationDTOs
                 return Ok(SpecilizationDTOs);
@@ -64,16 +49,9 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                // Create a new Specialization object and map the properties from the DTO
-                Specialization specialization = new Specialization
-                {
-                    Name = specializationFromReq.Name,
-                    Description = specializationFromReq.Description
-                };
-
                 // Call the service to add the specialization int DB
-                Specialization addedSpecialization =
-                    await _specializationService.AddAsync(specialization);
+                SpecializationDTO addedSpecialization =
+                    await _specializationService.AddAsync(specializationFromReq);
 
                 // Check if the addition was successful
                 if (addedSpecialization != null)
@@ -95,17 +73,10 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                // Map the properties from the DTO to a new Specialization object with ID sent in URL
-                Specialization specialization = new Specialization
-                {
-                    SpecializationId = id,
-                    Name = specializationFromReq.Name,
-                    Description = specializationFromReq.Description
-                };
 
                 // Call the service to update the specialization in DB
                 bool isUpdated =
-                    await _specializationService.UpdateAsync(specialization);
+                    await _specializationService.UpdateAsync(specializationFromReq, id);
 
                 // Check if the update was successful
                 if (isUpdated)
@@ -148,20 +119,12 @@ namespace _03_APILayer.Controllers
             try
             {
                 // Call the service to get the specialization by ID
-                Specialization specialization = await _specializationService.GetByIdAsync(id);
+                SpecializationDTO specializationDTO = 
+                    await _specializationService.GetByIdAsync(id);
 
                 // Check if the specialization exists
-                if (specialization != null)
-                {
-                    // Map the properties to a DTO
-                    SpecializationDTO specializationDTO = new SpecializationDTO
-                    {
-                        Name = specialization.Name,
-                        Description = specialization.Description
-                    };
-
+                if (specializationDTO != null)
                     return Ok(specializationDTO);
-                }
 
                 return NotFound();
             }

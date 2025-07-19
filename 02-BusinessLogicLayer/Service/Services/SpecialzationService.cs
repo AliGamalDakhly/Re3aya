@@ -8,7 +8,9 @@ using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
+using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
+using AutoMapper;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -17,45 +19,56 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be injected by DI container
         private readonly IUnitOfWork _unitOfWork; 
         // this will be used to access the repository methods
-        private readonly IGenericRepository<Specialization, int> _context; 
+        private readonly IGenericRepository<Specialization, int> _context;
+        private readonly IMapper _mapper;
 
-        public SpecialzationService(IUnitOfWork unitOfWork)
+        public SpecialzationService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
             _context = _unitOfWork.Repository<Specialization, int>();
         }
 
-        public async Task<Specialization> AddAsync(Specialization specialization)
+        public async Task<SpecializationDTO> AddAsync(SpecializationDTO specializationDTO)
         {
+            // Use Auto Mapper to map DTO to Entity
+            var specialization =  _mapper.Map<Specialization>(specializationDTO);
             // add your required logic here
             //...
             var result =  await _context.AddAsync(specialization);
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
-            return result;
+
+            // Use Auto Mapper to map Entity to DTO
+            return _mapper.Map<SpecializationDTO>(result);
         }
 
         // Be Careful Here pls
-        public async Task<bool> UpdateAsync(Specialization specialization)
+        public async Task<bool> UpdateAsync(SpecializationDTO specializationDTO, int id)
         {
             // add your required logic here
             // ...
             // we first get the entity from DB.
-            var existingSpecialization = await _context.GetByIdAsync(specialization.SpecializationId);
+            var existingSpecialization = await _context.GetByIdAsync(id);
 
             if (existingSpecialization == null)
                 return false;
             //-------- dont forget to update all fields of your entity ---------
-            existingSpecialization.Name = specialization.Name;
-            existingSpecialization.Description = specialization.Description;
+            existingSpecialization.Name = specializationDTO.Name;
+            existingSpecialization.Description = specializationDTO.Description;
 
-            await _context.UpdateAsync(specialization);
+            await _context.UpdateAsync(existingSpecialization);
             await _unitOfWork.CompleteAsync();
             return true;
         }
 
-        public async Task<Specialization> GetByIdAsync(int id)
+        public async Task<SpecializationDTO> GetByIdAsync(int id)
         {
-            return await _context.GetByIdAsync(id);
+            Specialization specialization =  await _context.GetByIdAsync(id);
+ 
+            if (specialization == null)
+                return null;
+
+            return _mapper.Map<SpecializationDTO>(specialization);
         }
 
         public async Task<bool> DeleteByIdAsync(int id)
@@ -65,8 +78,11 @@ namespace _02_BusinessLogicLayer.Service.Services
             return res;
         }
 
-        public async Task<bool> DeleteAsync(Specialization specialization)
+        public async Task<bool> DeleteAsync(SpecializationDTO specializationDTO)
         {
+            // Use Auto Mapper to map DTO to Entity
+            var specialization = _mapper.Map<Specialization>(specializationDTO);
+
             bool res = await _context.DeleteAsync(specialization);
             await _unitOfWork.CompleteAsync();
             return res;
@@ -83,9 +99,11 @@ namespace _02_BusinessLogicLayer.Service.Services
            
         }
 
-        public async Task<List<Specialization>> GetAllAsync(QueryOptions<Specialization> options)
-        {
-            return await _context.GetAllAsync(options);
+        public async Task<List<SpecializationDTO>> GetAllAsync(QueryOptions<Specialization> options)
+        { 
+            List<Specialization> specializations = await _context.GetAllAsync(options);
+            List<SpecializationDTO> specializationDTOs = _mapper.Map<List<SpecializationDTO>>(specializations);
+            return specializationDTOs;
         }
     }
 }
