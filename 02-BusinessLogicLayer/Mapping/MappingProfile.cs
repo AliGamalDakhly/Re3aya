@@ -1,8 +1,11 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
+
+using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
+
 using AutoMapper;
 using Microsoft.Identity.Client;
 using System;
@@ -17,7 +20,8 @@ namespace _02_BusinessLogicLayer.Mapping
     {
         public MappingProfile()
         {
-            //Patient Dto mapping 
+            //********************** Patient Dto Mapping **********************//
+
 
             #region  First way for mapping   (we will not use this way)
             //// this way convert from DTO to Entity
@@ -45,6 +49,7 @@ namespace _02_BusinessLogicLayer.Mapping
             // this way convert from Entity to DTO
 
             CreateMap<Patient, PatientDTO>()
+                       //Patient Id wil Automatically map because it is the same name in both models
                        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.AppUser.FullName))
                        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email))
                        .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.AppUser.PasswordHash))
@@ -54,8 +59,15 @@ namespace _02_BusinessLogicLayer.Mapping
                        .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender))
                        ;
 
-            //CreateMap<PatientCreateDTO, Patient>();
 
+            CreateMap<Patient, PatientDetailsDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.AppUser.FullName))
+                .ForMember(dest => dest.Age, opt => opt.MapFrom(src => CalculateAge(src.AppUser.DateOfBirth.ToDateTime(new TimeOnly(0, 0)))))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.AppUser.PhoneNumber))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender));
+
+
+            //CreateMap<LoginDTO,>
             #endregion
 
 
@@ -70,6 +82,25 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
+
+            //********************** Time Slot Mapping **********************//
+
+            #region     TimeSlot DTOs Mapping 
+
+            //for view
+            CreateMap<TimeSlot, TimeSlotDTO>()
+              .ForMember(dest => dest.DayOfWeek, opt => opt.MapFrom(src => src.DayOfWeek.ToString()))
+              .ReverseMap()
+             .ForMember(dest => dest.DayOfWeek, opt => opt.MapFrom(src => Enum.Parse<WeekDays>(src.DayOfWeek)));
+
+            //for edit
+            CreateMap<TimeSlot, EditTimeSlotDTO>().ReverseMap();
+
+            //for create will not pass id
+            CreateMap<TimeSlot, CreateTimeSlotDTO>().ReverseMap();
+
+            #endregion    
+=======
             CreateMap<SpecializationDTO, Specialization>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
@@ -91,6 +122,15 @@ namespace _02_BusinessLogicLayer.Mapping
 
 
         }
+
+         #region helpfull methods
+        public int CalculateAge(DateTime birthDate)
+        {
+            var age = DateTime.Today.Year - birthDate.Year;
+            if (birthDate.Date > DateTime.Today.AddYears(-age)) age--;
+            return age;
+        }
+        #endregion
     }
-    
+
 }
