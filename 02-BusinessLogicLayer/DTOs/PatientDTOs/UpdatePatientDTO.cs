@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 {
-    public class PatientCreateDTO
+    public class UpdatePatientDTO
     {
-        // AppUser 
         public string FullName { get; set; }
 
         [DataType(DataType.Date)]
@@ -18,9 +17,6 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 
         public string PhoneNumber { get; set; }
 
-        public string Email { get; set; }
-        public string Password { get; set; }
-
-        public Gender Gender { get; set; }  // enum Gender
+        public Gender Gender { get; set; }
     }
 }
