@@ -33,6 +33,7 @@ namespace _03_APILayer
             builder.Services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<Re3ayaDbContext>()
                 .AddDefaultTokenProviders();
+
             //Register AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddAutoMapper(typeof(DoctorProfile));
@@ -49,6 +50,7 @@ namespace _03_APILayer
 
 
 
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
 
 

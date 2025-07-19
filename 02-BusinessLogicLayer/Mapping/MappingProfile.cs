@@ -1,5 +1,6 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
+using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 
 using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
@@ -7,12 +8,6 @@ using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 
 using AutoMapper;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.Mapping
 {
@@ -120,7 +115,37 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId));
             #endregion
 
+            #region government mapping
+            CreateMap<Government, GovernmentDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
+            CreateMap<GovernmentDTO, Government>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+            #endregion
+
+            #region city mapping
+            CreateMap<City, CityDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.GovernmentId, opt => opt.MapFrom(src => src.GovernmentId));
+
+            CreateMap<CityDTO, City>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.GovernmentId, opt => opt.MapFrom(src => src.GovernmentId));
+            #endregion
+            #region Address Mapping
+
+            CreateMap<Address, AddressDTO>()
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
+                .ForMember(dest => dest.DetailedAddress, opt => opt.MapFrom(src => src.DetailedAddress))
+                .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.CityId))
+                .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId));
+
+            CreateMap<AddressDTO, Address>()
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
+                .ForMember(dest => dest.DetailedAddress, opt => opt.MapFrom(src => src.DetailedAddress))
+                .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.CityId))
+                .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId));
+            #endregion
         }
 
          #region helpfull methods
