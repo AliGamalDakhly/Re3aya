@@ -1,6 +1,8 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
+using _02_BusinessLogicLayer.DTOs.RatingDTOs;
+using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using AutoMapper;
 using Microsoft.Identity.Client;
 using System;
@@ -63,9 +65,29 @@ namespace _02_BusinessLogicLayer.Mapping
             //......
             //......
 
+            #region Mapping of Specialization Entity (Ali)
+            CreateMap<Specialization, SpecializationDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
+            CreateMap<SpecializationDTO, Specialization>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
+            #endregion
 
+            #region Mapping of Rating Entity (Ali)
+            CreateMap<Rating, RatingDTO>()
+                .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
+                .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId))
+                .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId));
 
+            CreateMap<RatingDTO, Rating>()
+                .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
+                .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId))
+                .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId));
+            #endregion
 
 
         }
