@@ -184,7 +184,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Admin", b =>
@@ -212,7 +212,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("SystemInfoId");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.AppUser", b =>
@@ -336,7 +336,7 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("PaymentId")
                         .IsUnique();
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.City", b =>
@@ -359,7 +359,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("GovernmentId");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Doctor", b =>
@@ -412,7 +412,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("SpecializationId");
 
-                    b.ToTable("Doctors", t =>
+                    b.ToTable("Doctors", null, t =>
                         {
                             t.HasCheckConstraint("CK_NationalID_Length", "LEN(NationalID) = 14 AND NationalID NOT LIKE '%[^0-9]%'");
 
@@ -443,7 +443,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("TimeSlotId");
 
-                    b.ToTable("DoctorTimeSlots");
+                    b.ToTable("DoctorTimeSlots", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Document", b =>
@@ -474,7 +474,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("Documents");
+                    b.ToTable("Documents", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Government", b =>
@@ -492,7 +492,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasKey("GovernmentId");
 
-                    b.ToTable("Governments");
+                    b.ToTable("Governments", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Patient", b =>
@@ -512,7 +512,7 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("AppUserId")
                         .IsUnique();
 
-                    b.ToTable("Patients");
+                    b.ToTable("Patients", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Payment", b =>
@@ -537,7 +537,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasKey("PaymentId");
 
-                    b.ToTable("Payments", t =>
+                    b.ToTable("Payments", null, t =>
                         {
                             t.HasCheckConstraint("CK_Amount_Positive", "Amount > 100");
                         });
@@ -570,7 +570,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Ratings", t =>
+                    b.ToTable("Ratings", null, t =>
                         {
                             t.HasCheckConstraint("RatingValue_Range", "RatingValue >= 0 AND RatingValue <= 10");
                         });
@@ -595,7 +595,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasKey("SpecializationId");
 
-                    b.ToTable("Specializations");
+                    b.ToTable("Specializations", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.SystemInfo", b =>
@@ -623,7 +623,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasKey("SystemInfoId");
 
-                    b.ToTable("SystemInfos");
+                    b.ToTable("SystemInfos", (string)null);
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.TimeSlot", b =>
@@ -645,7 +645,7 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                     b.HasKey("TimeSlotId");
 
-                    b.ToTable("TimeSlots", t =>
+                    b.ToTable("TimeSlots", null, t =>
                         {
                             t.HasCheckConstraint("CK_TimeSlot_EndTime_After_StartTime", "EndTime > StartTime");
                         });
