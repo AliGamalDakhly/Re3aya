@@ -30,12 +30,15 @@ namespace _03_APILayer
 
             //Register AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddAutoMapper(typeof(DoctorProfile));
 
             //Register Services      //add your services here
             builder.Services.AddScoped<IPatientService, PatientService>();
             builder.Services.AddScoped<ISpecializationService, SpecialzationService>();
             builder.Services.AddScoped<IAddressService, AddressService>();
+            builder.Services.AddScoped<IDoctorService, DoctorService>();
             builder.Services.AddScoped<IRatingService, RatingService>();
+
 
 
 
