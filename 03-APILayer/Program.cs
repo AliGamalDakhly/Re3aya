@@ -50,6 +50,7 @@ namespace _03_APILayer
 
 
 
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
 
 

@@ -95,7 +95,7 @@ namespace _02_BusinessLogicLayer.Mapping
             CreateMap<TimeSlot, CreateTimeSlotDTO>().ReverseMap();
 
             #endregion    
-=======
+
             CreateMap<SpecializationDTO, Specialization>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
