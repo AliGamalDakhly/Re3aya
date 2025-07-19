@@ -79,7 +79,7 @@ namespace _01_DataAccessLayer.Data.Context
                     DateOfBirth = new DateOnly(1980, 3, 10),
                     CreatedAt = new DateTime(2025, 7, 1, 12, 0, 0, DateTimeKind.Utc),
                     Gender = Gender.Male,
-                    PhoneNumber = "+201102682493",
+                    PhoneNumber = "01102682493",
                     PasswordHash = hasher.HashPassword(null, "Admin123!")
                 }
             );

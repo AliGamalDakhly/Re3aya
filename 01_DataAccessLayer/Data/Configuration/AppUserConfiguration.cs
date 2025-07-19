@@ -18,7 +18,8 @@ namespace _01_DataAccessLayer.Data.Configuration
                 .HasMaxLength(50);
 
             builder.Property(u => u.PhoneNumber)
-                .IsRequired();
+                .IsRequired()
+                .HasMaxLength(11);
                 
 
             builder.Property(u => u.DateOfBirth)

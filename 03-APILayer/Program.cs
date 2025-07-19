@@ -1,10 +1,12 @@
 using _01_DataAccessLayer.Data.Context;
+using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository.GenericRepository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.Mapping;
 using _02_BusinessLogicLayer.Service.IServices;
 using _02_BusinessLogicLayer.Service.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace _03_APILayer
@@ -28,6 +30,9 @@ namespace _03_APILayer
             builder.Services.AddDbContext<Re3ayaDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Re3ayaDbConnectionString")));
 
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<Re3ayaDbContext>()
+                .AddDefaultTokenProviders();
             //Register AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddAutoMapper(typeof(DoctorProfile));
