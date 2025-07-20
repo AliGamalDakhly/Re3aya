@@ -1,5 +1,4 @@
-﻿using _01_DataAccessLayer.Models;
-using _02_BusinessLogicLayer.DTOs.AddressDTOs;
+﻿using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,13 +20,10 @@ namespace _03_APILayer.Controllers
             try
             {
 
-                List<Government> governments = await _addressService.GetAllGovernmentsAsync();
+                List<GovernmentDTO> governmentDTOs = await _addressService.GetAllGovernmentsAsync();
 
                 // Assuming you want to map the Government entities to GovernmentDTOs.
-                List<GovernmentDTO> governmentDTOs = governments.Select(g => new GovernmentDTO
-                {
-                    Name = g.Name
-                }).ToList();
+
 
                 return Ok(governmentDTOs);
             }
@@ -42,16 +38,11 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                // Map the DTO to the entity
-                Government government = new Government
-                {
-                    Name = governmentFromReq.Name
 
-                };
                 // Call the service to add the government
-                Government addedGovernment = await _addressService.AddGovernmentAsync(government);
+                GovernmentDTO addedGovernment = await _addressService.AddGovernmentAsync(governmentFromReq);
                 // Return the added government as a DTO
-                return CreatedAtAction(nameof(GetAll), new GovernmentDTO { Name = addedGovernment.Name });
+                return Ok(addedGovernment);
             }
             catch (Exception ex)
             {
@@ -65,13 +56,9 @@ namespace _03_APILayer.Controllers
             try
             {
                 // Map the DTO to the entity
-                Government government = new Government
-                {
-                    GovernmentId = id,
-                    Name = governmentFromReq.Name
-                };
+
                 // Call the service to update the government
-                bool isUpdated = await _addressService.UpdateGovernmentAsync(government);
+                bool isUpdated = await _addressService.UpdateGovernmentAsync(governmentFromReq, id);
                 if (isUpdated)
                     return NoContent(); // 204 No Content
                 return NotFound(); // 404 Not Found
@@ -87,13 +74,9 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                List<City> cities = await _addressService.GetAllCitiesAsync();
+                List<CityDTO> cityDTOs = await _addressService.GetAllCitiesAsync();
                 // Assuming you want to map the City entities to CityDTOs.
-                List<CityDTO> cityDTOs = cities.Select(c => new CityDTO
-                {
-                    Name = c.Name,
-                    GovernmentId = c.GovernmentId
-                }).ToList();
+
                 return Ok(cityDTOs);
             }
             catch (Exception ex)
@@ -108,15 +91,11 @@ namespace _03_APILayer.Controllers
             try
             {
                 // Map the DTO to the entity
-                City city = new City
-                {
-                    Name = cityFromReq.Name,
-                    GovernmentId = cityFromReq.GovernmentId
-                };
+
                 // Call the service to add the city
-                City addedCity = await _addressService.AddCityAsync(city);
+                CityDTO addedCity = await _addressService.AddCityAsync(cityFromReq);
                 // Return the added city as a DTO
-                return CreatedAtAction(nameof(GetAllCities), new CityDTO { Name = addedCity.Name, GovernmentId = addedCity.GovernmentId });
+                return Ok(addedCity);
             }
             catch (Exception ex)
             {
@@ -129,16 +108,73 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                // Map the DTO to the entity
-                City city = new City
-                {
-                    CityId = id,
-                    Name = cityFromReq.Name,
-                    GovernmentId = cityFromReq.GovernmentId
-                };
+
                 // Call the service to update the city
-                bool isUpdated = await _addressService.UpdateCityAsync(city);
+                bool isUpdated = await _addressService.UpdateCityAsync(cityFromReq, id);
                 if (isUpdated)
+                    return NoContent(); // 204 No Content
+                return NotFound(); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unexpected error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("addresses")]
+        public async Task<IActionResult> GetAllAddresses()
+        {
+            try
+            {
+                List<AddressDTO> addressDTOs = await _addressService.GetAllAddressesAsync();
+                // Assuming you want to map the Address entities to AddressDTOs.
+                return Ok(addressDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unexpected error: " + ex.Message);
+            }
+        }
+
+        [HttpPost("CreateAddress")]
+        public async Task<IActionResult> CreateAddress(AddressDTO addressFromReq)
+        {
+            try
+            {
+                // Call the service to add the address
+                AddressDTO addedAddress = await _addressService.AddAddressAsync(addressFromReq);
+                // Return the added address as a DTO
+                return Ok(addedAddress);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unexpected error: " + ex.Message);
+            }
+        }
+        [HttpPut("address/{id}")]
+        public async Task<IActionResult> UpdateAddress(AddressDTO addressFromReq, int id)
+        {
+            try
+            {
+                // Call the service to update the address
+                bool isUpdated = await _addressService.UpdateAddressAsync(addressFromReq, id);
+                if (isUpdated)
+                    return NoContent(); // 204 No Content
+                return NotFound(); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unexpected error: " + ex.Message);
+            }
+        }
+        [HttpDelete("address/{id}")]
+        public async Task<IActionResult> DeleteAddress(int id)
+        {
+            try
+            {
+                // Call the service to delete the address by ID
+                bool isDeleted = await _addressService.DeleteAddressByIdAsync(id);
+                if (isDeleted)
                     return NoContent(); // 204 No Content
                 return NotFound(); // 404 Not Found
             }

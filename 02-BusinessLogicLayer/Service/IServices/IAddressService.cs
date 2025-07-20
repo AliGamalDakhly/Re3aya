@@ -1,5 +1,6 @@
 ﻿using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
+using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using System.Linq.Expressions;
 
 namespace _02_BusinessLogicLayer.Service.IServices
@@ -8,13 +9,13 @@ namespace _02_BusinessLogicLayer.Service.IServices
     {
         #region Governments
 
-        Task<Government> AddGovernmentAsync(Government government);
+        Task<GovernmentDTO> AddGovernmentAsync(GovernmentDTO government);
 
-        Task<bool> UpdateGovernmentAsync(Government government);
+        Task<bool> UpdateGovernmentAsync(GovernmentDTO government, int id);
 
-        Task<List<Government>> GetAllGovernmentsAsync(QueryOptions<Government>? options = null);
+        Task<List<GovernmentDTO>> GetAllGovernmentsAsync(QueryOptions<Government>? options = null);
 
-        Task<Government> GetGovernmentByIdAsync(int id);
+        Task<GovernmentDTO> GetGovernmentByIdAsync(int id);
 
         Task<int> CountGovernmentsAsync(Expression<Func<Government, bool>>? filter = null);
 
@@ -22,17 +23,29 @@ namespace _02_BusinessLogicLayer.Service.IServices
         #endregion
 
         #region Cities
-        Task<City> AddCityAsync(City city);
+        Task<CityDTO> AddCityAsync(CityDTO city);
 
-        Task<bool> UpdateCityAsync(City city);
+        Task<bool> UpdateCityAsync(CityDTO city, int id);
 
-        Task<List<City>> GetAllCitiesAsync(QueryOptions<City>? options = null);
+        Task<List<CityDTO>> GetAllCitiesAsync(QueryOptions<City>? options = null);
 
-        Task<City> GetCityByIdAsync(int id);
+        Task<CityDTO> GetCityByIdAsync(int id);
 
         Task<int> CountCitiesAsync(Expression<Func<City, bool>>? filter = null);
 
         Task<bool> ExistsCityAsync(Expression<Func<City, bool>> predicate);
+        #endregion
+
+        #region Addresses
+        Task<AddressDTO> AddAddressAsync(AddressDTO address);
+        Task<bool> UpdateAddressAsync(AddressDTO address, int id);
+        Task<bool> DeleteAddressAsync(AddressDTO address);
+        Task<bool> DeleteAddressByIdAsync(int id);
+        Task<List<AddressDTO>> GetAllAddressesAsync(QueryOptions<Address>? options = null);
+        Task<AddressDTO> GetAddressByIdAsync(int id);
+        Task<int> CountAddressesAsync(Expression<Func<Address, bool>>? filter = null);
+        Task<bool> ExistsAddressAsync(Expression<Func<Address, bool>> predicate);
+
         #endregion
     }
 }

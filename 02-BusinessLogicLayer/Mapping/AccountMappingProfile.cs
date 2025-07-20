@@ -10,13 +10,16 @@ using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.Mapping
 {
-    public class DoctorProfile : Profile
+    public class AccountMappingProfile : Profile
     {
-        public DoctorProfile()
+        public AccountMappingProfile()
         {
-            CreateMap<DoctorRegisterDTO, Doctor>();
-            CreateMap<Doctor, DoctorGetDTO>();
-            CreateMap<DoctorUpdateDTO, Doctor>();
+          
+            // PatientRegisterDTO → Patient
+            CreateMap<PatientRegisterDTO, Patient>();
+
+            // AdminRegisterDTO → Admin
+            CreateMap<AdminRegisterDTO, Admin>();
         }
     }
 }

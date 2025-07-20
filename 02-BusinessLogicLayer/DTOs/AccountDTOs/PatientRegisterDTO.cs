@@ -6,21 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
+namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
 {
-    public class PatientCreateDTO
+    public class PatientRegisterDTO
     {
         // AppUser 
         public string FullName { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
 
         public string PhoneNumber { get; set; }
 
         public string Email { get; set; }
         public string Password { get; set; }
-
-        public Gender Gender { get; set; }  // enum Gender
+        public DateOnly DateOfBirth { get; set; }
+        public Gender Gender { get; set; }
+        public string UserName { get; set; }
     }
 }
