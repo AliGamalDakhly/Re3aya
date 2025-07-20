@@ -7,26 +7,16 @@ namespace _03_APILayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DoctorsController : ControllerBase
+    public class DoctorController : ControllerBase
     {
         private readonly IDoctorService _doctorService;
 
-        public DoctorsController(IDoctorService doctorService)
+        public DoctorController(IDoctorService doctorService)
         {
             _doctorService = doctorService;
         }
 
-        /// <summary>
-        /// Register a new doctor
-        /// </summary>
-        [HttpPost("register")]
-        public async Task<IActionResult> RegisterDoctor([FromBody] DoctorRegisterDTO dto)
-        {
-            if (dto == null) return BadRequest("Invalid data.");
 
-            var result = await _doctorService.AddDoctorAsync(dto);
-            return Ok(result);
-        }
 
         /// <summary>
         /// Get all doctors

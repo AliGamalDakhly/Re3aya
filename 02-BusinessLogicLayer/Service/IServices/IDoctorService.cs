@@ -11,7 +11,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 {
     public interface IDoctorService
     {
-        Task<DoctorGetDTO> AddDoctorAsync(DoctorRegisterDTO doctorDto);
+        //Task<DoctorGetDTO> AddDoctorAsync(DoctorRegisterDTO doctorDto);
         Task<bool> DeleteDoctorByIdAsync(int id);
         //Task<bool> DeleteDoctorAsync(Doctor doctor);
         Task<bool> ActivateDoctorAccountAsync(int doctorId);
