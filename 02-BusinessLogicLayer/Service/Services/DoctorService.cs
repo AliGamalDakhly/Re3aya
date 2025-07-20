@@ -27,6 +27,9 @@ namespace _02_BusinessLogicLayer.Service.Services
             _mapper = mapper;
         }
 
+
+
+
         public async Task<bool> ActivateDoctorAccountAsync(int doctorId)
         {
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
@@ -39,36 +42,6 @@ namespace _02_BusinessLogicLayer.Service.Services
             return true;
         }
 
-        public async Task<DoctorGetDTO> AddDoctorAsync(DoctorRegisterDTO doctorDto)
-        {
-            var user = new AppUser
-            {
-                UserName = doctorDto.UserName,
-                FullName = doctorDto.FullName,
-                Email = doctorDto.Email,
-                PhoneNumber = doctorDto.PhoneNumber,
-                Gender = doctorDto.Gender,
-                DateOfBirth = doctorDto.DateOfBirth
-            };
-
-            var result = await _userManager.CreateAsync(user, doctorDto.Password);
-            if (!result.Succeeded)
-                throw new Exception("Failed to create AppUser: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-
-            var doctor = _mapper.Map<Doctor>(doctorDto);
-            doctor.AppUserId = user.Id;
-
-            await _unitOfWork.Repository<Doctor, int>().AddAsync(doctor);
-            await _unitOfWork.CompleteAsync();
-
-            // Map output DTO
-            var output = _mapper.Map<DoctorGetDTO>(doctor);
-            output.FullName = user.FullName;
-            output.Email = user.Email;
-            output.PhoneNumber = user.PhoneNumber;
-
-            return output;
-        }
 
         public async Task<int> CountDoctorsAsync()
         {
