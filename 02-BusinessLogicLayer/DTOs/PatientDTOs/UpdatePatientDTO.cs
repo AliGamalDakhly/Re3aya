@@ -6,11 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
+namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 {
-    public class PatientRegisterDTO
+    public class UpdatePatientDTO
     {
-        // AppUser 
         public string FullName { get; set; }
 
         [DataType(DataType.Date)]
@@ -18,10 +17,6 @@ namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
 
         public string PhoneNumber { get; set; }
 
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public DateOnly DateOfBirth { get; set; }
         public Gender Gender { get; set; }
-        public string UserName { get; set; }
     }
 }

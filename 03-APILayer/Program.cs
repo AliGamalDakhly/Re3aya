@@ -44,10 +44,14 @@ namespace _03_APILayer
             builder.Services.AddScoped<IPatientService, PatientService>();
             builder.Services.AddScoped<ISpecializationService, SpecialzationService>();
             builder.Services.AddScoped<IAddressService, AddressService>();
+
+            builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
+
             builder.Services.AddScoped<IDoctorService, DoctorService>();
             builder.Services.AddScoped<IRatingService, RatingService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IDocumentService, DocumentService>();
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
 
 
@@ -69,6 +73,7 @@ namespace _03_APILayer
                     ValidateAudience = true,
                     ValidateLifetime = true, // check expiration
                     ValidateIssuerSigningKey = true,
+
 
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
                     ValidAudience = builder.Configuration["JWT:Audience"],
