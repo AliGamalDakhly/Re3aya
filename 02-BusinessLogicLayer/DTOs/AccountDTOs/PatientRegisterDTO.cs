@@ -14,7 +14,6 @@ namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
         public string FullName { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
 
         public string PhoneNumber { get; set; }
 
