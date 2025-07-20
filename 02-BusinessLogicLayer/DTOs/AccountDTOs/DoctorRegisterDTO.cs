@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
+namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
 {
     public class DoctorRegisterDTO
     {

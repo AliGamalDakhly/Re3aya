@@ -185,6 +185,16 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("DoctorId");
 
                     b.ToTable("Addresses");
+
+                    b.HasData(
+                        new
+                        {
+                            AddressId = 1,
+                            CityId = 1,
+                            DetailedAddress = "5th Settlement",
+                            DoctorId = 1,
+                            Location = "Cairo"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Admin", b =>
@@ -213,6 +223,14 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("SystemInfoId");
 
                     b.ToTable("Admins");
+
+                    b.HasData(
+                        new
+                        {
+                            AdminId = 1,
+                            AppUserId = "3",
+                            SystemId = 1
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.AppUser", b =>
@@ -297,6 +315,71 @@ namespace _01_DataAccessLayer.Data.Migrations
                         {
                             t.HasCheckConstraint("CK_Date_LessThan20YearsAgo", "DateOfBirth <= DATEADD(YEAR, -16, GETDATE())");
                         });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "956139ad-3ffd-41e8-8102-93f4c3b87637",
+                            CreatedAt = new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                            DateOfBirth = new DateOnly(1990, 5, 15),
+                            Email = "ahmed@example.com",
+                            EmailConfirmed = false,
+                            FullName = "Ahmed Khaled",
+                            Gender = 0,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "AHMED@EXAMPLE.COM",
+                            NormalizedUserName = "AHMED@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA4C32bi7qEtGxWSMCHilpP21lLYJGid1cBrC0sFVxTLB1JLjDLtwAJwBASCf0oGBA==",
+                            PhoneNumber = "01234567890",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "bb277107-d779-4da2-bfb9-7c1b6ff8a16e",
+                            TwoFactorEnabled = false,
+                            UserName = "ahmed@example.com"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "06ec269e-fa30-47bd-bf0e-7322c541c3f1",
+                            CreatedAt = new DateTime(2025, 7, 1, 11, 0, 0, 0, DateTimeKind.Utc),
+                            DateOfBirth = new DateOnly(1985, 9, 22),
+                            Email = "sara.ali@doc.com",
+                            EmailConfirmed = false,
+                            FullName = "Dr. Sara Ali",
+                            Gender = 1,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "SARA.ALI@DOC.COM",
+                            NormalizedUserName = "SARA.ALI@DOC.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOPUTYBM7gWG1IfHLo+ib765KszXshspEQi3T5hh6DiKKy0w1/SaHDVPl2iQY94lZA==",
+                            PhoneNumber = "01987654321",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "fe91ac9b-e442-4c2c-a342-e61831901b18",
+                            TwoFactorEnabled = false,
+                            UserName = "sara.ali@doc.com"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20ce748f-99da-4bf8-b652-1a82ebe46443",
+                            CreatedAt = new DateTime(2025, 7, 1, 12, 0, 0, 0, DateTimeKind.Utc),
+                            DateOfBirth = new DateOnly(1980, 3, 10),
+                            Email = "omar@admin.com",
+                            EmailConfirmed = false,
+                            FullName = "Admin Omar",
+                            Gender = 0,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "OMAR@ADMIN.COM",
+                            NormalizedUserName = "OMAR@ADMIN.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJohljpp/1tq41a2VWfbti5WXeBqHfLD203XIVekIC4maR73RbCXyOiDohdvUDoHIw==",
+                            PhoneNumber = "01102682493",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ad6d3318-3cb8-4388-963d-a43b4d45ab7d",
+                            TwoFactorEnabled = false,
+                            UserName = "omar@admin.com"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Appointment", b =>
@@ -337,6 +420,18 @@ namespace _01_DataAccessLayer.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Appointments");
+
+                    b.HasData(
+                        new
+                        {
+                            AppointmentId = 1,
+                            CreatedAt = new DateTime(2025, 7, 19, 11, 0, 0, 0, DateTimeKind.Utc),
+                            DoctorTimeSlotId = 1,
+                            Notes = "Initial visit",
+                            PatientId = 1,
+                            PaymentId = 1,
+                            Status = 1
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.City", b =>
@@ -360,6 +455,20 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("GovernmentId");
 
                     b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            CityId = 1,
+                            GovernmentId = 1,
+                            Name = "Cairo"
+                        },
+                        new
+                        {
+                            CityId = 2,
+                            GovernmentId = 2,
+                            Name = "Alexandria"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Doctor", b =>
@@ -418,6 +527,22 @@ namespace _01_DataAccessLayer.Data.Migrations
 
                             t.HasCheckConstraint("CK_RatingValue_Range", "RatingValue >= 0 AND RatingValue <= 10");
                         });
+
+                    b.HasData(
+                        new
+                        {
+                            DoctorId = 1,
+                            AboutMe = "Experienced cardiologist with 10 years in heart care.",
+                            AppUserId = "2",
+                            Balance = 1500.0,
+                            ExpYears = 10,
+                            Fees = 500.0,
+                            NationalId = "12345678901234",
+                            RatingValue = 4.8f,
+                            Service = 1,
+                            SpecializationId = 1,
+                            Status = 1
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.DoctorTimeSlot", b =>
@@ -444,6 +569,22 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("TimeSlotId");
 
                     b.ToTable("DoctorTimeSlots");
+
+                    b.HasData(
+                        new
+                        {
+                            DoctorTimeSlotId = 1,
+                            DoctorId = 1,
+                            IsAvailable = true,
+                            TimeSlotId = 1
+                        },
+                        new
+                        {
+                            DoctorTimeSlotId = 2,
+                            DoctorId = 1,
+                            IsAvailable = true,
+                            TimeSlotId = 2
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Document", b =>
@@ -475,6 +616,26 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasIndex("DoctorId");
 
                     b.ToTable("Documents");
+
+                    b.HasData(
+                        new
+                        {
+                            DocumentId = 1,
+                            DoctorId = 1,
+                            DocumentType = 2,
+                            FilePath = "cert_sara.pdf",
+                            IsVerified = true,
+                            UploadedAt = new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            DocumentId = 2,
+                            DoctorId = 1,
+                            DocumentType = 4,
+                            FilePath = "id_sara.pdf",
+                            IsVerified = true,
+                            UploadedAt = new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Government", b =>
@@ -493,6 +654,18 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasKey("GovernmentId");
 
                     b.ToTable("Governments");
+
+                    b.HasData(
+                        new
+                        {
+                            GovernmentId = 1,
+                            Name = "Cairo"
+                        },
+                        new
+                        {
+                            GovernmentId = 2,
+                            Name = "Alexandria"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Patient", b =>
@@ -513,6 +686,13 @@ namespace _01_DataAccessLayer.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Patients");
+
+                    b.HasData(
+                        new
+                        {
+                            PatientId = 1,
+                            AppUserId = "1"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Payment", b =>
@@ -540,6 +720,16 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.ToTable("Payments", t =>
                         {
                             t.HasCheckConstraint("CK_Amount_Positive", "Amount > 100");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            PaymentId = 1,
+                            Amount = 500.0,
+                            CreatedAt = new DateTime(2025, 7, 19, 11, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1,
+                            TransactionId = 123456
                         });
                 });
 
@@ -574,6 +764,16 @@ namespace _01_DataAccessLayer.Data.Migrations
                         {
                             t.HasCheckConstraint("RatingValue_Range", "RatingValue >= 0 AND RatingValue <= 10");
                         });
+
+                    b.HasData(
+                        new
+                        {
+                            RatingId = 1,
+                            Comment = "Great service!",
+                            DoctorId = 1,
+                            PatientId = 1,
+                            RatingValue = 4.8f
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Specialization", b =>
@@ -596,6 +796,20 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasKey("SpecializationId");
 
                     b.ToTable("Specializations");
+
+                    b.HasData(
+                        new
+                        {
+                            SpecializationId = 1,
+                            Description = "Heart care",
+                            Name = "Cardiology"
+                        },
+                        new
+                        {
+                            SpecializationId = 2,
+                            Description = "Child care",
+                            Name = "Pediatrics"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.SystemInfo", b =>
@@ -624,6 +838,16 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasKey("SystemInfoId");
 
                     b.ToTable("SystemInfos");
+
+                    b.HasData(
+                        new
+                        {
+                            SystemInfoId = 1,
+                            Balance = 10000.0,
+                            Email = "support@rea3ya.com",
+                            Name = "Rea3ya",
+                            PhoneNumber = "+20212345678"
+                        });
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.TimeSlot", b =>
@@ -648,6 +872,22 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.ToTable("TimeSlots", t =>
                         {
                             t.HasCheckConstraint("CK_TimeSlot_EndTime_After_StartTime", "EndTime > StartTime");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            TimeSlotId = 1,
+                            DayOfWeek = 2,
+                            EndTime = new DateTime(2025, 7, 21, 12, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2025, 7, 21, 9, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            TimeSlotId = 2,
+                            DayOfWeek = 3,
+                            EndTime = new DateTime(2025, 7, 22, 17, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2025, 7, 22, 14, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
