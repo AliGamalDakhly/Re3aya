@@ -321,7 +321,7 @@ namespace _01_DataAccessLayer.Data.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4ee7844d-3149-4f56-83d7-244b5ee88158",
+                            ConcurrencyStamp = "956139ad-3ffd-41e8-8102-93f4c3b87637",
                             CreatedAt = new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc),
                             DateOfBirth = new DateOnly(1990, 5, 15),
                             Email = "ahmed@example.com",
@@ -331,10 +331,10 @@ namespace _01_DataAccessLayer.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "AHMED@EXAMPLE.COM",
                             NormalizedUserName = "AHMED@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIts5thpT2n7kPhpnRUqHmxgTA/0//rnFWtEj4+5hbyJ81DyqnWvcw08Hm+rHkxNzg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA4C32bi7qEtGxWSMCHilpP21lLYJGid1cBrC0sFVxTLB1JLjDLtwAJwBASCf0oGBA==",
                             PhoneNumber = "01234567890",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "bf5afc01-9ea5-474e-b47e-79fdcf195b48",
+                            SecurityStamp = "bb277107-d779-4da2-bfb9-7c1b6ff8a16e",
                             TwoFactorEnabled = false,
                             UserName = "ahmed@example.com"
                         },
@@ -342,7 +342,7 @@ namespace _01_DataAccessLayer.Data.Migrations
                         {
                             Id = "2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b3f99c9f-d25b-4ab9-9df4-ad10f3497ed5",
+                            ConcurrencyStamp = "06ec269e-fa30-47bd-bf0e-7322c541c3f1",
                             CreatedAt = new DateTime(2025, 7, 1, 11, 0, 0, 0, DateTimeKind.Utc),
                             DateOfBirth = new DateOnly(1985, 9, 22),
                             Email = "sara.ali@doc.com",
@@ -352,10 +352,10 @@ namespace _01_DataAccessLayer.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "SARA.ALI@DOC.COM",
                             NormalizedUserName = "SARA.ALI@DOC.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDQjfzwLsck14pKgV4m7rGwjb9lhThmoEUU50bBNjpCmQ+jvVxeMDVwh8a+yqy6g/A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOPUTYBM7gWG1IfHLo+ib765KszXshspEQi3T5hh6DiKKy0w1/SaHDVPl2iQY94lZA==",
                             PhoneNumber = "01987654321",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "279d9822-3ca9-4e6c-b984-69a92e4a97e1",
+                            SecurityStamp = "fe91ac9b-e442-4c2c-a342-e61831901b18",
                             TwoFactorEnabled = false,
                             UserName = "sara.ali@doc.com"
                         },
@@ -363,7 +363,7 @@ namespace _01_DataAccessLayer.Data.Migrations
                         {
                             Id = "3",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3eb9a1f8-74ac-4b44-8ef6-643d8d8ec970",
+                            ConcurrencyStamp = "20ce748f-99da-4bf8-b652-1a82ebe46443",
                             CreatedAt = new DateTime(2025, 7, 1, 12, 0, 0, 0, DateTimeKind.Utc),
                             DateOfBirth = new DateOnly(1980, 3, 10),
                             Email = "omar@admin.com",
@@ -373,10 +373,10 @@ namespace _01_DataAccessLayer.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "OMAR@ADMIN.COM",
                             NormalizedUserName = "OMAR@ADMIN.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAENdp++w0WactLcx+xrDWmHum1H3DaQNU4hgiRMcMzexLRZ8bvlPriMEUg1PE2CaZBQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJohljpp/1tq41a2VWfbti5WXeBqHfLD203XIVekIC4maR73RbCXyOiDohdvUDoHIw==",
                             PhoneNumber = "01102682493",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7cb1bd41-85fb-423c-9bbc-adb8dc6ddd8e",
+                            SecurityStamp = "ad6d3318-3cb8-4388-963d-a43b4d45ab7d",
                             TwoFactorEnabled = false,
                             UserName = "omar@admin.com"
                         });

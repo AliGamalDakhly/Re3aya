@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace _01_DataAccessLayer.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Init_Create : Migration
+    public partial class Init_Migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -482,9 +482,9 @@ namespace _01_DataAccessLayer.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "DateOfBirth", "Email", "EmailConfirmed", "FullName", "Gender", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "1", 0, "4ee7844d-3149-4f56-83d7-244b5ee88158", new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1990, 5, 15), "ahmed@example.com", false, "Ahmed Khaled", 0, false, null, "AHMED@EXAMPLE.COM", "AHMED@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIts5thpT2n7kPhpnRUqHmxgTA/0//rnFWtEj4+5hbyJ81DyqnWvcw08Hm+rHkxNzg==", "01234567890", false, "bf5afc01-9ea5-474e-b47e-79fdcf195b48", false, "ahmed@example.com" },
-                    { "2", 0, "b3f99c9f-d25b-4ab9-9df4-ad10f3497ed5", new DateTime(2025, 7, 1, 11, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1985, 9, 22), "sara.ali@doc.com", false, "Dr. Sara Ali", 1, false, null, "SARA.ALI@DOC.COM", "SARA.ALI@DOC.COM", "AQAAAAIAAYagAAAAEDQjfzwLsck14pKgV4m7rGwjb9lhThmoEUU50bBNjpCmQ+jvVxeMDVwh8a+yqy6g/A==", "01987654321", false, "279d9822-3ca9-4e6c-b984-69a92e4a97e1", false, "sara.ali@doc.com" },
-                    { "3", 0, "3eb9a1f8-74ac-4b44-8ef6-643d8d8ec970", new DateTime(2025, 7, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1980, 3, 10), "omar@admin.com", false, "Admin Omar", 0, false, null, "OMAR@ADMIN.COM", "OMAR@ADMIN.COM", "AQAAAAIAAYagAAAAENdp++w0WactLcx+xrDWmHum1H3DaQNU4hgiRMcMzexLRZ8bvlPriMEUg1PE2CaZBQ==", "01102682493", false, "7cb1bd41-85fb-423c-9bbc-adb8dc6ddd8e", false, "omar@admin.com" }
+                    { "1", 0, "956139ad-3ffd-41e8-8102-93f4c3b87637", new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1990, 5, 15), "ahmed@example.com", false, "Ahmed Khaled", 0, false, null, "AHMED@EXAMPLE.COM", "AHMED@EXAMPLE.COM", "AQAAAAIAAYagAAAAEA4C32bi7qEtGxWSMCHilpP21lLYJGid1cBrC0sFVxTLB1JLjDLtwAJwBASCf0oGBA==", "01234567890", false, "bb277107-d779-4da2-bfb9-7c1b6ff8a16e", false, "ahmed@example.com" },
+                    { "2", 0, "06ec269e-fa30-47bd-bf0e-7322c541c3f1", new DateTime(2025, 7, 1, 11, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1985, 9, 22), "sara.ali@doc.com", false, "Dr. Sara Ali", 1, false, null, "SARA.ALI@DOC.COM", "SARA.ALI@DOC.COM", "AQAAAAIAAYagAAAAEOPUTYBM7gWG1IfHLo+ib765KszXshspEQi3T5hh6DiKKy0w1/SaHDVPl2iQY94lZA==", "01987654321", false, "fe91ac9b-e442-4c2c-a342-e61831901b18", false, "sara.ali@doc.com" },
+                    { "3", 0, "20ce748f-99da-4bf8-b652-1a82ebe46443", new DateTime(2025, 7, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1980, 3, 10), "omar@admin.com", false, "Admin Omar", 0, false, null, "OMAR@ADMIN.COM", "OMAR@ADMIN.COM", "AQAAAAIAAYagAAAAEJohljpp/1tq41a2VWfbti5WXeBqHfLD203XIVekIC4maR73RbCXyOiDohdvUDoHIw==", "01102682493", false, "ad6d3318-3cb8-4388-963d-a43b4d45ab7d", false, "omar@admin.com" }
                 });
 
             migrationBuilder.InsertData(
