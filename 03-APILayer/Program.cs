@@ -1,3 +1,4 @@
+using System.Text;
 using _01_DataAccessLayer.Data.Context;
 using _01_DataAccessLayer.Data.Seed;
 using _01_DataAccessLayer.Models;
@@ -7,11 +8,10 @@ using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.Mapping;
 using _02_BusinessLogicLayer.Service.IServices;
 using _02_BusinessLogicLayer.Service.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
 
 namespace _03_APILayer
@@ -52,6 +52,7 @@ namespace _03_APILayer
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IDocumentService, DocumentService>();
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 
 
@@ -116,7 +117,7 @@ namespace _03_APILayer
 
                          }
                      });
-                            });
+            });
             #endregion
 
             // Add Authorization

@@ -1,12 +1,11 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.AddressDTOs;
+using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
-
-using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
-
+using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using AutoMapper;
 
 namespace _02_BusinessLogicLayer.Mapping
@@ -157,9 +156,27 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.CityId))
                 .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId));
             #endregion
+            #region  Appointment
+
+            CreateMap<Appointment, AppointmentDTO>()
+                .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId))
+                .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.PaymentId))
+                .ForMember(dest => dest.DoctorTimeSlotId, opt => opt.MapFrom(src => src.DoctorTimeSlot))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+
+            CreateMap<AppointmentDTO, Appointment>()
+                 .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId))
+                .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.PaymentId))
+                .ForMember(dest => dest.DoctorTimeSlotId, opt => opt.MapFrom(src => src.DoctorTimeSlotId))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            #endregion
         }
 
-         #region helpfull methods
+        #region helpfull methods
         public int CalculateAge(DateTime birthDate)
         {
             var age = DateTime.Today.Year - birthDate.Year;
