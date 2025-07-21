@@ -17,9 +17,10 @@ namespace _03_APILayer.Controllers
         [HttpGet("get-all-appointments")]
         public async Task<IActionResult> GetAllAppointments()
         {
+
             try
             {
-                var appointments = await _appointmentService.GetAllAppointmentsAsync();
+                List<AppointmentDTO> appointments = await _appointmentService.GetAllAppointmentsAsync();
                 return Ok(appointments);
             }
             catch (Exception ex)
@@ -47,7 +48,7 @@ namespace _03_APILayer.Controllers
         }
 
         [HttpPost("add-appointment")]
-        public async Task<IActionResult> AddAppointment([FromBody] AppointmentDTO appointmentDto)
+        public async Task<IActionResult> AddAppointment(AppointmentDTO appointmentDto)
         {
             try
             {

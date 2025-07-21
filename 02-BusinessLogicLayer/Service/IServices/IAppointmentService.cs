@@ -1,4 +1,5 @@
 ﻿using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using System.Linq.Expressions;
 
@@ -10,7 +11,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<AppointmentDTO> GetAppointmentByIdAsync(int appointmentId);
 
         Task<bool> ConfirmAppointmentAsync(int appointmentId);
-        Task<IEnumerable<AppointmentDTO>> GetAllAppointmentsAsync();
+        Task<List<AppointmentDTO>> GetAllAppointmentsAsync(QueryOptions<Appointment>? options = null);
 
         Task<bool> UpdateAppointmentAsync(AppointmentDTO appointment, int appointmentId);
 

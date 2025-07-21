@@ -1,5 +1,6 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
@@ -9,9 +10,9 @@ using System.Linq.Expressions;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
-    internal class AppointmentService : IAppointmentService
+    public class AppointmentService : IAppointmentService
     {
-        private readonly IAppointmentService _appointmentService;
+
         private readonly IUnitOfWork _unitOfWork;
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
@@ -89,11 +90,11 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         }
 
-        public async Task<IEnumerable<AppointmentDTO>> GetAllAppointmentsAsync()
+        public async Task<List<AppointmentDTO>> GetAllAppointmentsAsync(QueryOptions<Appointment>? options)
         {
-
-            var appointments = await _context.GetAllAsync();
-            return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
+            List<Appointment> appointments = await _context.GetAllAsync(options);
+            List<AppointmentDTO> appointmentDTOs = _mapper.Map<List<AppointmentDTO>>(appointments);
+            return appointmentDTOs;
         }
 
         public async Task<AppointmentDTO> GetAppointmentByIdAsync(int appointmentId)
