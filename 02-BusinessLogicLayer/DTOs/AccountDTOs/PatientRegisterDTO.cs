@@ -12,9 +12,6 @@ namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
     {
         // AppUser 
         public string FullName { get; set; }
-
-        [DataType(DataType.Date)]
-
         public string PhoneNumber { get; set; }
 
         public string Email { get; set; }
