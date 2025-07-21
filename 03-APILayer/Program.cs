@@ -1,3 +1,4 @@
+using System.Text;
 using _01_DataAccessLayer.Data.Context;
 using _01_DataAccessLayer.Data.Seed;
 using _01_DataAccessLayer.Models;
@@ -7,8 +8,10 @@ using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.Mapping;
 using _02_BusinessLogicLayer.Service.IServices;
 using _02_BusinessLogicLayer.Service.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace _03_APILayer
@@ -55,31 +58,31 @@ namespace _03_APILayer
 
 
             // Add JWT authentication
-            //builder.Services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            //}).AddJwtBearer(options =>
-            //{
-            //    options.SaveToken = true; //Not Expired?
-            //    options.RequireHttpsMetadata = false; //specfic Protocol Https
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true; //Not Expired?
+                options.RequireHttpsMetadata = false; //specfic Protocol Https
 
-            //    options.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        ValidateIssuer = true,
-            //        ValidateAudience = true,
-            //        ValidateLifetime = true, // check expiration
-            //        ValidateIssuerSigningKey = true,
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true, // check expiration
+                    ValidateIssuerSigningKey = true,
 
 
-            //        ValidIssuer = builder.Configuration["JWT:Issuer"],
-            //        ValidAudience = builder.Configuration["JWT:Audience"],
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
 
-            //    };
+                };
 
-            //});
+            });
 
             #region Customize swagger to test Authorization
 
