@@ -16,128 +16,89 @@ namespace _02_BusinessLogicLayer.Service.Services
 {
     public class PatientService : IPatientService
     {
-
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<Patient, int> _patientRepo;
         private readonly IMapper _mapper;
-
-        // Constructor injection for UnitOfWork and Mapper
+        private readonly IGenericRepository<Patient, int> _patientRepository;
         public PatientService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _patientRepo = _unitOfWork.Repository<Patient, int>();
+            _patientRepository = _unitOfWork.Repository<Patient, int>();
         }
 
-
-        //add a new patient
-        public async Task<PatientDTO> AddPatientAsync(PatientDTO patientDto)
+        public async Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null)
         {
-            var patient = _mapper.Map<Patient>(patientDto);
-            await _patientRepo.AddAsync(patient);
-            await _unitOfWork.CompleteAsync();
-            return _mapper.Map<PatientDTO>(patient);
+            return await _patientRepository.CountAsync(filter);
         }
-        //public async Task<PatientDTO> AddPatientAsync(PatientCreateDTO dto)
-        //{
-        //    var patient = _mapper.Map<Patient>(dto);
-        //    await _unitOfWork.Repository<Patient, int>().AddAsync(patient);
-        //    await _unitOfWork.CompleteAsync();
 
+        public async Task<bool> DeleteAsync(int patientId)
+        {
+            var patient = await _patientRepository.GetByIdAsync(patientId);
+            if (patient == null)
+            {
+                return false; // Patient not found
+            }
+            _patientRepository.Delete(patient);
+            await _unitOfWork.CompleteAsync();
+            return true; // Patient deleted successfully
+
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate)
+        {
+            return await _patientRepository.ExistsAsync(predicate);
+        }
+
+        public async Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options)
+        {
+            var patients = _patientRepository.GetAll(options);
+            var patientDtos = _mapper.Map<List<PatientDTO>>(patients);
+            return patientDtos;
+
+
+
+        }
+
+        public async Task<PatientDTO> GetByIdAsync(int patientId)
+        {
+            var patient = await _patientRepository.GetByIdAsync(patientId);
+            return _mapper.Map<PatientDTO>(patient);
+          
+        }
+
+        //not need this 
+        //public async Task<PatientDTO> GetPatientProfileAsync(int userId)
+        //{
+        //    var patient = await _patientRepository.GetByIdAsync(userId);
         //    return _mapper.Map<PatientDTO>(patient);
+
         //}
 
-
-        // Update an existing patient by ID
-        public async Task<PatientDTO> UpdatePatientAsync(int id, PatientDTO patientDto)
+   
+        //add
+        public async Task<PatientDTO> RegisterAsync(PatientDTO dto)
         {
-            var patient = await _patientRepo.GetByIdAsync(id);
-            if (patient == null)
-                throw new Exception("Patient not found");
-
-            _mapper.Map(patientDto, patient); 
-            _patientRepo.Update(patient);
+           var patient = _mapper.Map<Patient>(dto);
+            _patientRepository.Add(patient);
             await _unitOfWork.CompleteAsync();
-
             return _mapper.Map<PatientDTO>(patient);
         }
 
-
-        // Get a patient by ID
-        public async Task<PatientDTO> GetPatientByIdAsync(int id)
+        public async Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, int Id)
         {
-            var patient = await _patientRepo.GetByIdAsync(id);
+
+            var patient = await _patientRepository.GetByIdAsync(Id);
             if (patient == null)
-                throw new Exception("Patient not found");
-
-            return _mapper.Map<PatientDTO>(patient);
-        }
-
-
-        // Get all patients
-        public async Task<List<PatientDTO>> GetAllPatientsAsync()
-        {
-            var patients = await _patientRepo.GetAllAsync();
-            return _mapper.Map<List<PatientDTO>>(patients);
-        }
-
-
-        // Get a patient by name
-        public async Task<PatientDTO> GetPatientByNameAsync(string name)
-        {
-            var result = await _patientRepo.GetAllAsync(new()
             {
-                Filter = p => p.AppUser.FullName.Contains(name)
-            });
-
-            var patient = result.FirstOrDefault();
-            if (patient == null)
-                throw new Exception("Patient not found");
-
-            return _mapper.Map<PatientDTO>(patient);
-        }
-
-
-        // Get a patient by user ID this from APP User Not from Patient
-        public async Task<PatientDTO> GetPatientByUserIdAsync(string userId)
-        {
-            var result = await _patientRepo.GetAllAsync(new()
-            {
-                Filter = p => p.AppUserId == userId
-            });
-
-            var patient = result.FirstOrDefault();
-            if (patient == null)
-                throw new Exception("Patient not found");
-
-            return _mapper.Map<PatientDTO>(patient);
-        }
-
-        // Delete a patient by ID
-        public async Task<bool> DeletePatientAsync(int id)
-        {
-            var patient = await _patientRepo.GetByIdAsync(id);
-            if (patient == null)
-                return false;
-
-            _patientRepo.Delete(patient);
+                return false; // Patient not found
+            }
+            
+            _mapper.Map(dto, patient);
+            _patientRepository.Update(patient);
             await _unitOfWork.CompleteAsync();
-            return true;
-        }
+            return true; 
 
 
-        // Check if a patient exists by user id
-        public async Task<bool> IsPatientExist(string userId)
-        {
-            return await _patientRepo.ExistsAsync(p => p.AppUserId == userId);
         }
     }
-
-
-
-    //*************************************************************************//
-
-    //we may add more methods in the future
-
 }
-
