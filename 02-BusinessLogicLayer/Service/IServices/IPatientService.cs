@@ -1,5 +1,6 @@
 ﻿using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
+using _02_BusinessLogicLayer.DTOs.AccountDTOs;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using System;
 using System.Collections.Generic;
@@ -13,19 +14,20 @@ namespace _02_BusinessLogicLayer.Service.IServices
     public interface IPatientService
     {
 
-        Task<PatientDTO> AddPatientAsync(PatientDTO patientDto);
-        Task<PatientDTO> UpdatePatientAsync(int id, PatientDTO patientDto);
-        Task<PatientDTO> GetPatientByIdAsync(int id);
-        Task<List<PatientDTO>> GetAllPatientsAsync();
-        Task<PatientDTO> GetPatientByNameAsync(string name);
-        Task<PatientDTO> GetPatientByUserIdAsync(string userId);
-        Task<bool> DeletePatientAsync(int id);
-        Task<bool> IsPatientExist(string userId);
+        Task<PatientDTO> RegisterAsync(PatientDTO dto);                  // registr from patient side
+        //Task<PatientDetailsDTO> GetProfileAsync(string appUserId);       // Detailed View by identity
+        Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, int Id); 
+        Task<bool> DeleteAsync(int patientId);
+
+        Task<PatientDTO> GetByIdAsync(int patientId);                 
+        Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options);
+        Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate);
+        Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null);
 
 
 
         #region
-      
+
 
         //we will handle this after add AppointmentDTO
         //Task<List<AppointmentDTO>> GetAppointmentForPatientAsync(int patientId); //get all appointments for a specific patient

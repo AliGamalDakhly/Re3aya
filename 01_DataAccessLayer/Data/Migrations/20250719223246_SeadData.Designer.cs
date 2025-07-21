@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _01_DataAccessLayer.Data.Context;
 
@@ -11,9 +12,11 @@ using _01_DataAccessLayer.Data.Context;
 namespace _01_DataAccessLayer.Data.Migrations
 {
     [DbContext(typeof(Re3ayaDbContext))]
-    partial class Re3ayaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250719223246_SeadData")]
+    partial class SeadData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,11 +322,9 @@ namespace _01_DataAccessLayer.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1",
+                            Id = "7",
                             AccessFailedCount = 0,
-
-                            ConcurrencyStamp = "956139ad-3ffd-41e8-8102-93f4c3b87637",
-
+                            ConcurrencyStamp = "ec4fdfdf-67e4-4b38-b2d8-8b21fe1f2b4b",
                             CreatedAt = new DateTime(2025, 7, 1, 10, 0, 0, 0, DateTimeKind.Utc),
                             DateOfBirth = new DateOnly(1990, 5, 15),
                             Email = "ahmed@example.com",
@@ -333,22 +334,18 @@ namespace _01_DataAccessLayer.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "AHMED@EXAMPLE.COM",
                             NormalizedUserName = "AHMED@EXAMPLE.COM",
-
-                            PasswordHash = "AQAAAAIAAYagAAAAEA4C32bi7qEtGxWSMCHilpP21lLYJGid1cBrC0sFVxTLB1JLjDLtwAJwBASCf0oGBA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMZc/NMZ2hYNpT5thIRLa9W6LqgPYlp/gkYdRJil8cD1q+D2bbHKzF3rH2YwwYWc1w==",
                             PhoneNumber = "01234567890",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "bb277107-d779-4da2-bfb9-7c1b6ff8a16e",
-
+                            SecurityStamp = "7aad23ff-a8d5-492d-838c-69f00cc820ed",
                             TwoFactorEnabled = false,
                             UserName = "ahmed@example.com"
                         },
                         new
                         {
-                            Id = "2",
+                            Id = "6",
                             AccessFailedCount = 0,
-
-                            ConcurrencyStamp = "06ec269e-fa30-47bd-bf0e-7322c541c3f1",
-
+                            ConcurrencyStamp = "a28a1f6a-da01-425d-a696-b4e0ce74902c",
                             CreatedAt = new DateTime(2025, 7, 1, 11, 0, 0, 0, DateTimeKind.Utc),
                             DateOfBirth = new DateOnly(1985, 9, 22),
                             Email = "sara.ali@doc.com",
@@ -358,22 +355,18 @@ namespace _01_DataAccessLayer.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "SARA.ALI@DOC.COM",
                             NormalizedUserName = "SARA.ALI@DOC.COM",
-
-                            PasswordHash = "AQAAAAIAAYagAAAAEOPUTYBM7gWG1IfHLo+ib765KszXshspEQi3T5hh6DiKKy0w1/SaHDVPl2iQY94lZA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGbenWRv90bduGW7Jge8KwAeaLX+lK72m3s4iaBPwE0mR7KUu1WSwLvGzcYT3JVvoQ==",
                             PhoneNumber = "01987654321",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fe91ac9b-e442-4c2c-a342-e61831901b18",
-
+                            SecurityStamp = "e8eaf264-b4f3-4db3-b8e3-9bfd0d0b3105",
                             TwoFactorEnabled = false,
                             UserName = "sara.ali@doc.com"
                         },
                         new
                         {
-                            Id = "3",
+                            Id = "5",
                             AccessFailedCount = 0,
-
-                            ConcurrencyStamp = "20ce748f-99da-4bf8-b652-1a82ebe46443",
-
+                            ConcurrencyStamp = "07c501c3-f37a-4bb4-adf8-9b6cbdff9e4f",
                             CreatedAt = new DateTime(2025, 7, 1, 12, 0, 0, 0, DateTimeKind.Utc),
                             DateOfBirth = new DateOnly(1980, 3, 10),
                             Email = "omar@admin.com",
@@ -383,12 +376,10 @@ namespace _01_DataAccessLayer.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "OMAR@ADMIN.COM",
                             NormalizedUserName = "OMAR@ADMIN.COM",
-
-                            PasswordHash = "AQAAAAIAAYagAAAAEJohljpp/1tq41a2VWfbti5WXeBqHfLD203XIVekIC4maR73RbCXyOiDohdvUDoHIw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDJFGyozDdHxCTAX4dwBmRtqLVydroCJ/ZNXGcdKZmDmQNCqnlebtSr+aOrj9NlUbw==",
                             PhoneNumber = "01102682493",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ad6d3318-3cb8-4388-963d-a43b4d45ab7d",
-
+                            SecurityStamp = "e9f91751-9e80-4177-8dd1-c5542ba4a6ea",
                             TwoFactorEnabled = false,
                             UserName = "omar@admin.com"
                         });

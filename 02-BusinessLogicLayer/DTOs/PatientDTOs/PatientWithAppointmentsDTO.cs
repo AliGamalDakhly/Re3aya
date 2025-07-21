@@ -8,5 +8,9 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 {
     public class PatientWithAppointmentsDTO
     {
+        //public int PatientId { get; set; }
+        //public string FullName { get; set; }
+
+        //public List<AppointmentDTO> Appointments { get; set; }
     }
 }
