@@ -7,6 +7,7 @@ using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using AutoMapper;
+using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 
 namespace _02_BusinessLogicLayer.Mapping
 {
@@ -81,7 +82,19 @@ namespace _02_BusinessLogicLayer.Mapping
             //add your mapping here
             //......
             //......
+            //********************** Patient Rating Dto Mapping **********************//
+            #region Mapping  of Rating and Appointment DTOs
+            // Rating
+            CreateMap<AddRatingDTO, Rating>();
+            CreateMap<UpdateRatingDTO, Rating>();
 
+            // Appointment
+            CreateMap<BookAppointmentDTO, Appointment>();
+            CreateMap<CancelAppointmentDTO, Appointment>();
+
+            #endregion
+
+            //********************** Specialization Dto Mapping **********************//
             #region Mapping of Specialization Entity (Ali)
             CreateMap<Specialization, SpecializationDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
