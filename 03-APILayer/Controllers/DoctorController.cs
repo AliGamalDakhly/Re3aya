@@ -1,4 +1,6 @@
 ﻿using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
+using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
+using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +12,16 @@ namespace _03_APILayer.Controllers
     public class DoctorController : ControllerBase
     {
         private readonly IDoctorService _doctorService;
+        private readonly IDocumentService _documentService;
 
-        public DoctorController(IDoctorService doctorService)
+
+        public DoctorController(IDoctorService doctorService, IDocumentService documentService)
         {
             _doctorService = doctorService;
+            _documentService = documentService;
         }
 
-
+        #region Doctor Endpoints
 
         /// <summary>
         /// Get all doctors
@@ -103,5 +108,131 @@ namespace _03_APILayer.Controllers
             var exists = await _doctorService.ExistsDoctorAsync(id);
             return Ok(exists);
         }
+
+        #endregion
+
+
+        #region Doctor Time Slot Endpoints
+
+        /// <summary>
+        /// Adds a new time slot for a doctor.
+        /// </summary>
+        [HttpPost("DoctorTimeSlot")]
+        public async Task<IActionResult> AddTimeSlot([FromBody] DoctorTimeSlotDTO dto)
+        {
+            try
+            {
+                var result = await _doctorService.AddDoctorTimeSlotAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+        /// <summary>
+        /// Deletes a specific doctor time slot by its unique identifier.
+        /// </summary>
+        [HttpDelete("DoctorTimeSlot/{doctorTimeSlotId}")]
+        public async Task<IActionResult> DeleteTimeSlot(int doctorTimeSlotId)
+        {
+            try
+            {
+                var result = await _doctorService.DeleteDoctorTimeSlotAsync(doctorTimeSlotId);
+                if (!result) return NotFound();
+                return NoContent();
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+        /// <summary>
+        /// Deactivates a specific doctor's time slot.
+        /// </summary>
+        [HttpPut("DoctorTimeSlot/{doctorTimeSlotId}/deactivate")]
+        public async Task<IActionResult> DeactivateTimeSlot(int doctorTimeSlotId)
+        {
+            try
+            {
+                var result = await _doctorService.DeactivateDoctorTimeSlotAsync(doctorTimeSlotId);
+                if (!result) return NotFound();
+                return Ok("Deactivated");
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+        #endregion
+
+
+        #region Document Endpoints
+
+        /// <summary>
+        /// Add ONE document for Doctor
+        /// </summary>
+        [HttpPost("{doctorId}/document")]
+        public async Task<IActionResult> AddDocumentForDoctor(int doctorId, [FromBody] DocumentDTO dto)
+        {
+            try
+            {
+                dto.DoctorId = doctorId;
+                var result = await _documentService.AddDocumentAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+        /// <summary>
+        /// Add MULTIPLE documents for Doctor
+        /// </summary>
+        [HttpPost("{doctorId}/documents")]
+        public async Task<IActionResult> AddDocumentsForDoctor(int doctorId, [FromBody] List<DocumentDTO> dtos)
+        {
+            try
+            {
+                foreach (var dto in dtos) dto.DoctorId = doctorId;
+
+                foreach (var dto in dtos)
+                    await _documentService.AddDocumentAsync(dto);
+
+                return Ok("Documents Added");
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+
+        /// <summary>
+        /// Update Document
+        /// </summary>
+        [HttpPut("document/{documentId}")]
+        public async Task<IActionResult> UpdateDocument(int documentId, [FromBody] DocumentDTO dto)
+        {
+            try
+            {
+                dto.DocumentId = documentId;
+                var result = await _documentService.UpdateDocumentAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+
+        // <summary>
+        /// Delete Document
+        /// </summary>
+        [HttpDelete("document/{documentId}")]
+        public async Task<IActionResult> DeleteDocument(int documentId)
+        {
+            try
+            {
+                var result = await _documentService.DeleteDocumentByIdAsync(documentId);
+                if (!result) return NotFound();
+                return NoContent();
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+        #endregion
+
+
+
+
+
     }
 }

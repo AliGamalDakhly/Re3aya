@@ -93,5 +93,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             return await _unitOfWork.Repository<Document, int>().CountAsync();
         }
 
+        public async Task AddDocumentsAsync(List<DocumentDTO> dtos)
+        {
+            foreach (var dto in dtos)
+            {
+                var document = _mapper.Map<Document>(dto);
+                await _unitOfWork.Repository<Document, int>().AddAsync(document);
+            }
+            await _unitOfWork.CompleteAsync();
+        }
     }
 }

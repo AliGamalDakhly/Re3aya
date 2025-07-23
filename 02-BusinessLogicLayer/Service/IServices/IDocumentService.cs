@@ -10,6 +10,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
     public interface IDocumentService
     {
         Task<DocumentDTO> AddDocumentAsync(DocumentDTO dto);
+        Task AddDocumentsAsync(List<DocumentDTO> dtos);
         Task<bool> DeleteDocumentByIdAsync(int id);
         Task<bool> DeleteDocumentAsync(DocumentDTO dto);
         Task<DocumentDTO> UpdateDocumentAsync(DocumentDTO dto);
