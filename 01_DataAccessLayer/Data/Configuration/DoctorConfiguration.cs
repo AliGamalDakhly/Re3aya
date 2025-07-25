@@ -25,8 +25,8 @@ namespace _01_DataAccessLayer.Data.Configuration
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            //builder.Property(d => d.NationalId)
-            //    .IsRequired();
+            builder.Property(d => d.NationalId)
+                .IsRequired();
        
 
             builder
