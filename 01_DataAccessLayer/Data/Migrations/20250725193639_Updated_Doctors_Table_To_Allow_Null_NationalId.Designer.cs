@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _01_DataAccessLayer.Data.Context;
 
@@ -11,9 +12,11 @@ using _01_DataAccessLayer.Data.Context;
 namespace _01_DataAccessLayer.Data.Migrations
 {
     [DbContext(typeof(Re3ayaDbContext))]
-    partial class Re3ayaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250725193639_Updated_Doctors_Table_To_Allow_Null_NationalId")]
+    partial class Updated_Doctors_Table_To_Allow_Null_NationalId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
