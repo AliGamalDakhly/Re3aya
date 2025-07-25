@@ -11,18 +11,18 @@ namespace _01_DataAccessLayer.Models
     public class Doctor
     {
         public int DoctorId { get; set; }
-        
-        public double Balance { get; set; }
-        public int? ExpYears { get; set; }
-        public string AboutMe { get; set; }
-        public float RatingValue { get; set; }
-        public double Fees { get; set; }
+
+        public double Balance { get; set; } = 0;
+        public int? ExpYears { get; set; } = 0;
+        public string? AboutMe { get; set; } = null;
+        public float RatingValue { get; set; } = 0;
+        public double Fees { get; set; } = 100;
         public DoctorAccountStatus Status { get; set; } = DoctorAccountStatus.Pending;
-        public DoctorService Service { get; set; }
-        public string NationalId { get; set; }
+        public DoctorService Service { get; set; } = DoctorService.OnlineConsultion;
+        public string? NationalId { get; set; } = null;
 
 
-        public int SpecializationId { get; set; }
+        public int? SpecializationId { get; set; } = null;
         public string AppUserId { get; set; }
 
 
