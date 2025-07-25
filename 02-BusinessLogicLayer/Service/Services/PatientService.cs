@@ -1,143 +1,162 @@
-﻿using _01_DataAccessLayer.Models;
-using _01_DataAccessLayer.Repository;
+﻿using _01_DataAccessLayer.Enums;
+using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
+using AppointmentDTO = _02_BusinessLogicLayer.DTOs.AppointmentDTOs.AppointmentDTO;
+using _01_DataAccessLayer.Repository;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
     public class PatientService : IPatientService
     {
-
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<Patient, int> _patientRepo;
         private readonly IMapper _mapper;
+        private readonly IGenericRepository<Patient, int> _patientRepository;
 
-        // Constructor injection for UnitOfWork and Mapper
         public PatientService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _patientRepo = _unitOfWork.Repository<Patient, int>();
+            _patientRepository = _unitOfWork.Repository<Patient, int>();
         }
 
-
-        //add a new patient
-        public async Task<PatientDTO> AddPatientAsync(PatientDTO patientDto)
+        public async Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null)
         {
-            var patient = _mapper.Map<Patient>(patientDto);
-            await _patientRepo.AddAsync(patient);
-            await _unitOfWork.CompleteAsync();
-            return _mapper.Map<PatientDTO>(patient);
-        }
-        //public async Task<PatientDTO> AddPatientAsync(PatientCreateDTO dto)
-        //{
-        //    var patient = _mapper.Map<Patient>(dto);
-        //    await _unitOfWork.Repository<Patient, int>().AddAsync(patient);
-        //    await _unitOfWork.CompleteAsync();
-
-        //    return _mapper.Map<PatientDTO>(patient);
-        //}
-
-
-        // Update an existing patient by ID
-        public async Task<PatientDTO> UpdatePatientAsync(int id, PatientDTO patientDto)
-        {
-            var patient = await _patientRepo.GetByIdAsync(id);
-            if (patient == null)
-                throw new Exception("Patient not found");
-
-            _mapper.Map(patientDto, patient); 
-            _patientRepo.Update(patient);
-            await _unitOfWork.CompleteAsync();
-
-            return _mapper.Map<PatientDTO>(patient);
+            return await _patientRepository.CountAsync(filter);
         }
 
-
-        // Get a patient by ID
-        public async Task<PatientDTO> GetPatientByIdAsync(int id)
+        public async Task<bool> DeleteAsync(int patientId)
         {
-            var patient = await _patientRepo.GetByIdAsync(id);
-            if (patient == null)
-                throw new Exception("Patient not found");
+            var patient = await _patientRepository.GetByIdAsync(patientId);
+            if (patient == null) return false;
 
-            return _mapper.Map<PatientDTO>(patient);
+            _patientRepository.Delete(patient);
+            return await _unitOfWork.CompleteAsync() > 0;
         }
 
-
-        // Get all patients
-        public async Task<List<PatientDTO>> GetAllPatientsAsync()
+        public async Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate)
         {
-            var patients = await _patientRepo.GetAllAsync();
+            return await _patientRepository.ExistsAsync(predicate);
+        }
+
+        public async Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options)
+        {
+            var patients = _patientRepository.GetAll(options);
             return _mapper.Map<List<PatientDTO>>(patients);
         }
 
-
-        // Get a patient by name
-        public async Task<PatientDTO> GetPatientByNameAsync(string name)
+        public async Task<PatientDTO> GetByIdAsync(int patientId)
         {
-            var result = await _patientRepo.GetAllAsync(new()
-            {
-                Filter = p => p.AppUser.FullName.Contains(name)
-            });
-
-            var patient = result.FirstOrDefault();
-            if (patient == null)
-                throw new Exception("Patient not found");
-
+            var patient = await _patientRepository.GetByIdAsync(patientId);
             return _mapper.Map<PatientDTO>(patient);
         }
 
-
-        // Get a patient by user ID this from APP User Not from Patient
-        public async Task<PatientDTO> GetPatientByUserIdAsync(string userId)
+        public async Task<PatientDTO> RegisterAsync(PatientDTO dto)
         {
-            var result = await _patientRepo.GetAllAsync(new()
-            {
-                Filter = p => p.AppUserId == userId
-            });
-
-            var patient = result.FirstOrDefault();
-            if (patient == null)
-                throw new Exception("Patient not found");
-
+            var patient = _mapper.Map<Patient>(dto);
+            _patientRepository.Add(patient);
+            await _unitOfWork.CompleteAsync();
             return _mapper.Map<PatientDTO>(patient);
         }
 
-        // Delete a patient by ID
-        public async Task<bool> DeletePatientAsync(int id)
+        public async Task<PatientDetailsDTO?> GetProfileByIdAsync(string appUserId)
         {
-            var patient = await _patientRepo.GetByIdAsync(id);
-            if (patient == null)
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            return patient == null ? null : _mapper.Map<PatientDetailsDTO>(patient);
+        }
+
+        public async Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, string userId)
+        {
+
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+            if (patient == null) return false;
+            _mapper.Map(dto, patient);
+            _patientRepository.Update(patient);
+            return await _unitOfWork.CompleteAsync() > 0;
+        }
+
+        public async Task<bool> AddRatingAsync(AddRatingDTO dto, string userId)
+        {
+            var ratingRepo = _unitOfWork.Repository<Rating, int>();
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+            if (patient == null) return false;
+
+            var rating = _mapper.Map<Rating>(dto);
+            rating.PatientId = patient.PatientId;
+            ratingRepo.Add(rating);
+            return await _unitOfWork.CompleteAsync() > 0;
+        }
+
+        public async Task<bool> UpdateRatingAsync(UpdateRatingDTO dto, string userId)
+        {
+            var ratingRepo = _unitOfWork.Repository<Rating, int>();
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+            if (patient == null) return false;
+
+            var rating = await ratingRepo.GetByIdAsync(dto.RatingId);
+            if (rating == null || rating.PatientId != patient.PatientId) return false;
+
+            _mapper.Map(dto, rating);
+            ratingRepo.Update(rating);
+            return await _unitOfWork.CompleteAsync() > 0;
+        }
+
+        public async Task<bool> BookAppointmentAsync(BookAppointmentDTO dto, string appUserId)
+        {
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return false;
+
+            var appointment = _mapper.Map<Appointment>(dto);
+            appointment.PatientId = patient.PatientId;
+            appointmentRepo.Add(appointment);
+            return await _unitOfWork.CompleteAsync() > 0;
+        }
+
+        public async Task<bool> CancelAppointmentAsync(CancelAppointmentDTO dto, string appUserId)
+        {
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return false;
+
+            var appointment = await appointmentRepo.GetFirstOrDefaultAsync(
+                a => a.AppointmentId == dto.AppointmentId && a.PatientId == patient.PatientId,
+                a => a.DoctorTimeSlot,
+                a => a.DoctorTimeSlot.TimeSlot
+            );
+
+            if (appointment == null) return false;
+
+            var now = DateTime.UtcNow;
+            var startTime = appointment.DoctorTimeSlot.TimeSlot.StartTime;
+
+            if (startTime <= now || (startTime - now).TotalHours < 24)
                 return false;
 
-            _patientRepo.Delete(patient);
-            await _unitOfWork.CompleteAsync();
-            return true;
+            appointment.Status = AppointmentStatus.Cancelled;
+            appointmentRepo.Update(appointment);
+            return await _unitOfWork.CompleteAsync() > 0;
         }
 
-
-        // Check if a patient exists by user id
-        public async Task<bool> IsPatientExist(string userId)
+        public async Task<List<AppointmentDTO>> GetAppointmentsAsync(string appUserId)
         {
-            return await _patientRepo.ExistsAsync(p => p.AppUserId == userId);
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return new List<AppointmentDTO>();
+
+            var appointments = await appointmentRepo.GetFirstOrDefaultAsync (
+                a => a.PatientId == patient.PatientId,
+                a => a.DoctorTimeSlot,
+                a => a.DoctorTimeSlot.TimeSlot,
+                a => a.DoctorTimeSlot.Doctor
+            );
+
+            return _mapper.Map<List<AppointmentDTO>>(appointments);
         }
     }
-
-
-
-    //*************************************************************************//
-
-    //we may add more methods in the future
-
 }
-

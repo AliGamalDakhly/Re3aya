@@ -127,6 +127,29 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
             return await query.ToListAsync();
         }
 
+        //public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        //{
+        //    if (predicate == null)
+        //        throw new ArgumentNullException(nameof(predicate), "Predicate cannot be null");
+        //    return await _dbSet.FirstOrDefaultAsync(predicate);
+        //}
+
+        public async Task<TEntity?> GetFirstOrDefaultAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate), "Predicate cannot be null");
+            IQueryable<TEntity> query = _dbSet.Where(predicate);
+            if (includes != null && includes.Length > 0)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+            return await query.FirstOrDefaultAsync();
+        }
         #endregion
 
         #region Synchronous Methods

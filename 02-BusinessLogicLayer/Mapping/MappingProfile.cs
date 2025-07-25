@@ -7,6 +7,7 @@ using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using AutoMapper;
+using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 
 namespace _02_BusinessLogicLayer.Mapping
 {
@@ -27,13 +28,13 @@ namespace _02_BusinessLogicLayer.Mapping
                {
                    FullName = src.FullName,
                    Email = src.Email,
-                   PasswordHash = src.Password, // Assuming you want to map Password to PasswordHash
-                   UserName = src.UserName,
+                   //PasswordHash = src.Password, // Assuming you want to map Password to PasswordHash
+                   //UserName = src.UserName,
                    PhoneNumber = src.PhoneNumber,
                    DateOfBirth = src.DateOfBirth,
-                   //Gender = src.Gender,    //this is error because it is enum in the model and string in DTO
+                   Gender = src.Gender,    //this is error because it is enum in the model and string in DTO
                    //convert to enum to solve this error
-                   Gender = Enum.Parse<Gender>(src.Gender)
+                  // Gender = Enum.Parse<Gender>(src.Gender)
 
                }));
 
@@ -42,24 +43,35 @@ namespace _02_BusinessLogicLayer.Mapping
             #region secand way for mapping this is the best for our case
             // this way convert from Entity to DTO
 
+
+            //for Get 
             CreateMap<Patient, PatientDTO>()
                        //Patient Id wil Automatically map because it is the same name in both models
                        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.AppUser.FullName))
                        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email))
-                       .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.AppUser.PasswordHash))
-                       .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AppUser.UserName))
                        .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.AppUser.PhoneNumber))
                        .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.AppUser.DateOfBirth))
-                       .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender))
-                       ;
+                       .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender.ToString()));
+                       
 
-
+            //for patient details
             CreateMap<Patient, PatientDetailsDTO>()
+                //patient id atumaticlay map
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.AppUser.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.AppUser.DateOfBirth))
                 .ForMember(dest => dest.Age, opt => opt.MapFrom(src => CalculateAge(src.AppUser.DateOfBirth.ToDateTime(new TimeOnly(0, 0)))))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.AppUser.PhoneNumber))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender));
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender.ToString()));
 
+            //for update
+            CreateMap<UpdatePatientDTO, AppUser>();
+
+
+            //CreateMap<Patient, UpdatePatientDTO>()
+            //    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.AppUser.FullName))
+            //    .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.AppUser.PhoneNumber));
+            // .ForMember(dest => dest.Appointments, opt => opt.MapFrom(src => src.Appointments));
 
             //CreateMap<LoginDTO,>
             #endregion
@@ -70,7 +82,19 @@ namespace _02_BusinessLogicLayer.Mapping
             //add your mapping here
             //......
             //......
+            //********************** Patient Rating Dto Mapping **********************//
+            #region Mapping  of Rating and Appointment DTOs
+            // Rating
+            CreateMap<AddRatingDTO, Rating>();
+            CreateMap<UpdateRatingDTO, Rating>();
 
+            // Appointment
+            CreateMap<BookAppointmentDTO, Appointment>();
+            CreateMap<CancelAppointmentDTO, Appointment>();
+
+            #endregion
+
+            //********************** Specialization Dto Mapping **********************//
             #region Mapping of Specialization Entity (Ali)
             CreateMap<Specialization, SpecializationDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
