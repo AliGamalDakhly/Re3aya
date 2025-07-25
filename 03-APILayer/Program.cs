@@ -1,4 +1,3 @@
-using System.Text;
 using _01_DataAccessLayer.Data.Context;
 using _01_DataAccessLayer.Data.Seed;
 using _01_DataAccessLayer.Models;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace _03_APILayer
 {
@@ -55,6 +55,16 @@ namespace _03_APILayer
             builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 
+            // Add CORS services before building the app
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
 
             // Add JWT authentication
@@ -147,6 +157,7 @@ namespace _03_APILayer
                 app.UseSwaggerUI();
             }
 
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
 
