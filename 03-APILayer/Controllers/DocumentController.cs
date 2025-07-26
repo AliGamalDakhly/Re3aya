@@ -1,9 +1,7 @@
 ﻿using _02_BusinessLogicLayer.DTOs.Common;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace _03_APILayer.Controllers
 {
@@ -12,13 +10,13 @@ namespace _03_APILayer.Controllers
     public class DocumentController : ControllerBase
     {
         private readonly IDocumentService _documentService;
-        private readonly ICloudinaryService _cloudinaryService; 
-        private readonly IDoctorService _doctorService;  
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IDoctorService _doctorService;
 
 
         public DocumentController(
             IDocumentService documentService,
-            ICloudinaryService cloudinaryService,  
+            ICloudinaryService cloudinaryService,
             IDoctorService doctorService
         )
         {
@@ -192,7 +190,7 @@ namespace _03_APILayer.Controllers
         }
 
 
- 
+
         [HttpPut("upload/edit")]
         public async Task<IActionResult> EditDocumentWithNewFile([FromForm] DocumentEditDTO dto, IFormFile file)
         {
@@ -225,12 +223,6 @@ namespace _03_APILayer.Controllers
                 ApiUsage = "this api endpoint is under development for Re3aya|care by Abdallah Mokarb"
             });
         }
-
-
-
-
-
-
 
 
     }
