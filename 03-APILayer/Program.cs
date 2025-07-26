@@ -54,6 +54,8 @@ namespace _03_APILayer
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
 
 
 

@@ -16,5 +16,7 @@ namespace _02_BusinessLogicLayer.DTOs.DocumentDTO
         public bool IsVerified { get; set; }
 
         public int DoctorId { get; set; }
+        public string? DoctorName { get; set; }
+
     }
 }
