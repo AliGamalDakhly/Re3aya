@@ -25,6 +25,5 @@ namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
         public string NationalId { get; set; }
         public int? SpecializationId { get; set; } = null;
         public string AppUserId { get; set; }
-
     }
 }
