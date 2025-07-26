@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 {
-    public class BookAppointmentDTO
+    public class AppointmentDTO2
     {
-        //public int PatientId { get; set; }     //I will take it from his login to security
+        public string Status { get; set; }= "Booked"; 
+        public int PaymentId { get; set; }
         public int DoctorTimeSlotId { get; set; }
-        public string? Notes { get; set; }
-
-        public PaymentDTO Payment { get; set; }
+        public string Notes { get; set; }
     }
 }
