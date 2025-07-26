@@ -178,6 +178,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             return addressDTOs;
         }
 
+        public async Task<List<DetailedAddressDTO>> GetDetialedAddressesAsync(QueryOptions<Address>? options = null)
         public async Task<AddressDTO> GetAddressByIdAsync(int id)
         {
 
