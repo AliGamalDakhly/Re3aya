@@ -6,6 +6,7 @@ using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,7 +178,22 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync();
             return true;
         }
-        
+
+
+        public async Task<string?> GetDoctorFullNameByIdAsync(int doctorId)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null)
+                return null;
+
+            var appUser = await _userManager.FindByIdAsync(doctor.AppUserId);
+            if (appUser == null)
+                return null;
+
+            return appUser.FullName;
+        }
+
+
 
     }
 }

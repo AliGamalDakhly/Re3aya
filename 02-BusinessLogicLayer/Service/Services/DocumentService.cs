@@ -1,8 +1,10 @@
-﻿using _01_DataAccessLayer.Models;
+﻿using _01_DataAccessLayer.Enums;
+using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,5 +104,31 @@ namespace _02_BusinessLogicLayer.Service.Services
             }
             await _unitOfWork.CompleteAsync();
         }
+
+
+        ///****************************** CloudinaryService ************************************////////////
+
+        public async Task<DocumentDTO> UpdateLinkOnlyAsync(int documentId, string newFilePath, DocumentType newDocumentType )
+        {
+            var repo = _unitOfWork.Repository<Document, int>();
+
+            var document = await repo.GetByIdAsync(documentId);
+
+            if (document == null)
+                throw new Exception("document not found");
+
+            document.FilePath = newFilePath;
+            document.DocumentType = newDocumentType;
+ 
+            await repo.UpdateAsync(document);
+            await _unitOfWork.CompleteAsync();
+
+            return _mapper.Map<DocumentDTO>(document);
+        }
+
+
+
+   
+
     }
 }
