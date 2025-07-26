@@ -42,6 +42,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> DeleteAddressAsync(AddressDTO address);
         Task<bool> DeleteAddressByIdAsync(int id);
         Task<List<AddressDTO>> GetAllAddressesAsync(QueryOptions<Address>? options = null);
+        //Task<List<DetailedAddressDTO>> GetDetailedAddressesAsync(QueryOptions<Address>? options = null);
         Task<AddressDTO> GetAddressByIdAsync(int id);
         Task<int> CountAddressesAsync(Expression<Func<Address, bool>>? filter = null);
         Task<bool> ExistsAddressAsync(Expression<Func<Address, bool>> predicate);
