@@ -44,6 +44,14 @@ namespace _03_APILayer.Controllers
             return Ok(doctor);
         }
 
+        [HttpGet("details/{id}")]
+        public async Task<IActionResult> GetDoctorDetailsById(int id)
+        {
+            var doctor = await _doctorService.GetDoctorDetailsByIdAsync(id);
+            if (doctor == null) return NotFound($"Doctor with ID {id} not found.");
+            return Ok(doctor);
+        }
+
         /// <summary>
         /// Update a doctor's info
         /// </summary>
