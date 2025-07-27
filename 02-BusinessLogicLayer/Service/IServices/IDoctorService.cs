@@ -14,6 +14,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<DoctorGetDTO> UpdateDoctorAsync(int id, DoctorUpdateDTO doctorDto);
         Task<List<DoctorCardDTO>> GetAllAsync();
         Task<DoctorGetDTO> GetDoctorByIdAsync(int id);
+        Task<DoctorDetialsDTO> GetDoctorDetailsByIdAsync(int id);
         Task<int> CountDoctorsAsync();
         Task<bool> ExistsDoctorAsync(int id);
 

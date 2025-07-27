@@ -103,34 +103,28 @@ namespace _02_BusinessLogicLayer.Service.Services
         //}
 
 
-        //public async Task<DoctorDetialsDTO> GetDoctorByIdAsync(int id)
-        //{
-        //    List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().
-        //        GetAllAsync(new QueryOptions<Doctor>
-        //        {
-        //            Filter = d => d.DoctorId == id,
-        //            Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser]
-        //        });
 
-        //    Doctor doctor = doctors.FirstOrDefault();
+         public async Task<DoctorDetialsDTO> GetDoctorDetailsByIdAsync(int id)
+        {
+            List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().
+                GetAllAsync(new QueryOptions<Doctor>
+                {
+                    Filter = d => d.DoctorId == id,
+                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser]
+                });
 
-        //    if (doctor == null) return null;
+            Doctor doctor = doctors.FirstOrDefault();
 
-        //    return _mapper.Map<DoctorDetialsDTO>(doctor);
-        //}
+            if (doctor == null) return null;
+
+            return _mapper.Map<DoctorDetialsDTO>(doctor);
+        }
+
 
         public async Task<DoctorGetDTO> GetDoctorByIdAsync(int id)
         {
-            var doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
-                new QueryOptions<Doctor>
-                {
-                    Filter = d => d.DoctorId == id,
-                    Includes = [d => d.Specialization, d => d.AppUser]
-                });
-            var doctor = doctors.FirstOrDefault();
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(id);
             if (doctor == null) return null;
-
-
             var user = await _userManager.FindByIdAsync(doctor.AppUserId);
 
             var dto = _mapper.Map<DoctorGetDTO>(doctor);
