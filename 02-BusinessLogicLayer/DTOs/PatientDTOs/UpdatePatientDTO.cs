@@ -10,6 +10,7 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 {
     public class UpdatePatientDTO
     {
+        public string AppUserId { get; set; }
         public string FullName { get; set; }
 
         [DataType(DataType.Date)]
