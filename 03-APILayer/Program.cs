@@ -53,6 +53,7 @@ namespace _03_APILayer
             builder.Services.AddScoped<IDocumentService, DocumentService>();
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+            builder.Services.AddScoped<IDoctorTimeSlotService, DoctorTimeSlotService>();
 
 
             // Add CORS services before building the app
