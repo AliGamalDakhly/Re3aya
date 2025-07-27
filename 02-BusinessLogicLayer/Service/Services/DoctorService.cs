@@ -111,7 +111,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         //}
 
 
-        public async Task<DoctorDetialsDTO> GetDoctorByIdAsync(int id)
+        public async Task<DoctorDetialsDTO> GetDoctorDetailsByIdAsync(int id)
         {
             List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().
                 GetAllAsync(new QueryOptions<Doctor>
@@ -127,20 +127,20 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<DoctorDetialsDTO>(doctor);
         }
 
-        //public async Task<DoctorGetDTO> GetDoctorByIdAsync(int id)
-        //{
-        //    var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(id);
-        //    if (doctor == null) return null;
+        public async Task<DoctorGetDTO> GetDoctorByIdAsync(int id)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(id);
+            if (doctor == null) return null;
 
-        //    var user = await _userManager.FindByIdAsync(doctor.AppUserId);
+            var user = await _userManager.FindByIdAsync(doctor.AppUserId);
 
-        //    var dto = _mapper.Map<DoctorGetDTO>(doctor);
-        //    dto.FullName = user.FullName;
-        //    dto.Email = user.Email;
-        //    dto.PhoneNumber = user.PhoneNumber;
+            var dto = _mapper.Map<DoctorGetDTO>(doctor);
+            dto.FullName = user.FullName;
+            dto.Email = user.Email;
+            dto.PhoneNumber = user.PhoneNumber;
 
-        //    return dto;
-        //}
+            return dto;
+        }
 
         public async Task<DoctorGetDTO> UpdateDoctorAsync(int id, DoctorUpdateDTO doctorDto)
         {
