@@ -1,4 +1,5 @@
-﻿using _01_DataAccessLayer.Models;
+﻿using _01_DataAccessLayer.Enums;
+using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AccountDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
@@ -140,20 +141,58 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
+        //public async Task<LoginResponseDTO> LoginAsync(LoginDTO dto)
+        //{
+        //    var user = await _userManager.FindByNameAsync(dto.UserName);
+        //    if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+        //        throw new Exception("Username or Passowrd is invalid.");
+
+        //    var roles = await _userManager.GetRolesAsync(user);
+
+        //    var authClaims = new List<Claim>
+        //    {
+        //        new Claim(ClaimTypes.Name, user.UserName),
+        //        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        //    };
+
+        //    foreach (var role in roles)
+        //        authClaims.Add(new Claim(ClaimTypes.Role, role));
+
+        //    var authSigningKey = new SymmetricSecurityKey(
+        //        Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+
+        //    var token = new JwtSecurityToken(
+        //        issuer: _configuration["Jwt:Issuer"],
+        //        audience: _configuration["Jwt:Audience"],
+        //        expires: DateTime.UtcNow.AddHours(3),
+        //        claims: authClaims,
+        //        signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        //    );
+
+        //    return new LoginResponseDTO
+        //    {
+        //        Token = new JwtSecurityTokenHandler().WriteToken(token),
+        //        Expiration = token.ValidTo
+        //    };
+        //}
+
+
+
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO dto)
         {
             var user = await _userManager.FindByNameAsync(dto.UserName);
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                throw new Exception("Username or Passowrd is invalid.");
+                throw new Exception("username or Password is invalid");
 
             var roles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+    {
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
             foreach (var role in roles)
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
@@ -172,9 +211,18 @@ namespace _02_BusinessLogicLayer.Service.Services
             return new LoginResponseDTO
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = token.ValidTo
+                Expiration = token.ValidTo,
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Roles = roles.ToList()
             };
         }
+
+
+
+         
 
 
     }
