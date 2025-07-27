@@ -1,12 +1,6 @@
-﻿using _01_DataAccessLayer.Enums;
-using _01_DataAccessLayer.Models;
+﻿using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.Service.IServices
 {
@@ -19,7 +13,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> DeActivateDoctorAccountAsync(int doctorId);
         Task<DoctorGetDTO> UpdateDoctorAsync(int id, DoctorUpdateDTO doctorDto);
         Task<List<DoctorCardDTO>> GetAllAsync();
-        Task<DoctorDetialsDTO> GetDoctorByIdAsync(int id);
+        Task<DoctorGetDTO> GetDoctorByIdAsync(int id);
         Task<int> CountDoctorsAsync();
         Task<bool> ExistsDoctorAsync(int id);
 
