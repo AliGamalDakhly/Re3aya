@@ -178,6 +178,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             return addressDTOs;
         }
 
+        public async Task<List<DetailedAddressDTO>> GetDetialedAddressesAsync(QueryOptions<Address>? options = null)
+        {
+
+            List<Address> addresses = await _addressContext.GetAllAsync(options);
+            List<DetailedAddressDTO> addressDTOs = _mapper.Map<List<DetailedAddressDTO>>(addresses);
+            return addressDTOs;
+        }
+
         public async Task<AddressDTO> GetAddressByIdAsync(int id)
         {
 

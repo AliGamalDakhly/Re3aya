@@ -1,8 +1,11 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
+using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
+using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -20,12 +23,17 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly IAddressService _addressService;
+        private readonly ISpecializationService _specialzationService;
 
-        public DoctorService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IMapper mapper)
+        public DoctorService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager,
+            IMapper mapper, IAddressService addressService, ISpecializationService specializationService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _mapper = mapper;
+            _addressService = addressService;
+            _specialzationService = specializationService;
         }
 
 
@@ -73,38 +81,66 @@ namespace _02_BusinessLogicLayer.Service.Services
             return await _unitOfWork.Repository<Doctor, int>().ExistsAsync(d => d.DoctorId == id);
         }
 
-        public async Task<List<DoctorGetDTO>> GetAllAsync()
+        public async Task<List<DoctorCardDTO>> GetAllAsync()
         {
-            var doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync();
-            var result = new List<DoctorGetDTO>();
+            List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
+                new QueryOptions<Doctor> { Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser] });
 
-            foreach (var doctor in doctors)
-            {
-                var user = await _userManager.FindByIdAsync(doctor.AppUserId);
-                var dto = _mapper.Map<DoctorGetDTO>(doctor);
-                dto.FullName = user.FullName;
-                dto.Email = user.Email;
-                dto.PhoneNumber = user.PhoneNumber;
-                result.Add(dto);
-            }
 
-            return result;
+            List<DoctorCardDTO> doctorsDtos = _mapper.Map<List<DoctorCardDTO>>(doctors);
+
+            return doctorsDtos;
         }
 
-        public async Task<DoctorGetDTO> GetDoctorByIdAsync(int id)
+        //public async Task<List<DoctorGetDTO>> GetAllAsync()
+        //{
+        //    var doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync();
+        //    var result = new List<DoctorGetDTO>();
+
+        //    foreach (var doctor in doctors)
+        //    {
+        //        var user = await _userManager.FindByIdAsync(doctor.AppUserId);
+        //        var dto = _mapper.Map<DoctorGetDTO>(doctor);
+        //        dto.FullName = user.FullName;
+        //        dto.Email = user.Email;
+        //        dto.PhoneNumber = user.PhoneNumber;
+        //        result.Add(dto);
+        //    }
+
+        //    return result;
+        //}
+
+
+        public async Task<DoctorDetialsDTO> GetDoctorByIdAsync(int id)
         {
-            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(id);
+            List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().
+                GetAllAsync(new QueryOptions<Doctor>
+                {
+                    Filter = d => d.DoctorId == id,
+                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser]
+                });
+
+            Doctor doctor = doctors.FirstOrDefault();
+
             if (doctor == null) return null;
-
-            var user = await _userManager.FindByIdAsync(doctor.AppUserId);
-
-            var dto = _mapper.Map<DoctorGetDTO>(doctor);
-            dto.FullName = user.FullName;
-            dto.Email = user.Email;
-            dto.PhoneNumber = user.PhoneNumber;
-
-            return dto;
+ 
+            return _mapper.Map<DoctorDetialsDTO>(doctor);
         }
+
+        //public async Task<DoctorGetDTO> GetDoctorByIdAsync(int id)
+        //{
+        //    var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(id);
+        //    if (doctor == null) return null;
+
+        //    var user = await _userManager.FindByIdAsync(doctor.AppUserId);
+
+        //    var dto = _mapper.Map<DoctorGetDTO>(doctor);
+        //    dto.FullName = user.FullName;
+        //    dto.Email = user.Email;
+        //    dto.PhoneNumber = user.PhoneNumber;
+
+        //    return dto;
+        //}
 
         public async Task<DoctorGetDTO> UpdateDoctorAsync(int id, DoctorUpdateDTO doctorDto)
         {
