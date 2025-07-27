@@ -26,5 +26,9 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<DoctorTimeSlot> AddDoctorTimeSlotAsync(DoctorTimeSlotDTO dto);
         Task<bool> DeleteDoctorTimeSlotAsync(int doctorTimeSlotId);
         Task<bool> DeactivateDoctorTimeSlotAsync(int doctorTimeSlotId);
+
+        Task<string?> GetDoctorFullNameByIdAsync(int doctorId);
+
+
     }
 }

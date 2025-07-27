@@ -1,4 +1,5 @@
-﻿using _02_BusinessLogicLayer.DTOs.DocumentDTO;
+﻿using _01_DataAccessLayer.Enums;
+using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,8 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<int> CountDocumentAsync();
         Task<bool> ExistsDocumentAsync(int id);
         Task<bool> VerifyDocumentAsync(int id);
+
+        Task<DocumentDTO> UpdateLinkOnlyAsync(int documentId, string newFilePath, DocumentType newDocumentType);
+
     }
 }
