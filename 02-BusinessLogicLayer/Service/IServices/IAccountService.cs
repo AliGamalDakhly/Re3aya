@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,5 +14,6 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<string> RegisterPatientAsync(PatientRegisterDTO dto);
         Task<string> RegisterAdminAsync(AdminRegisterDTO dto);
         Task<LoginResponseDTO> LoginAsync(LoginDTO dto);
+ 
     }
 }
