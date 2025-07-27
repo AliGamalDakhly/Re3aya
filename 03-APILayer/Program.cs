@@ -35,10 +35,7 @@ namespace _03_APILayer
 
 
             //Register AutoMapper
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddAutoMapper(typeof(DoctorProfile));
-            builder.Services.AddAutoMapper(typeof(AccountMappingProfile));
-
+            builder.Services.AddAutoMapper(typeof(DoctorProfile).Assembly);
 
             //Register Services      //add your services here
             builder.Services.AddScoped<IPatientService, PatientService>();
@@ -89,9 +86,9 @@ namespace _03_APILayer
                     ValidateLifetime = true, // check expiration
                     ValidateIssuerSigningKey = true,
 
-
+            
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
-                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<List<string>>(),
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
 
                 };
@@ -110,16 +107,16 @@ namespace _03_APILayer
                     Description = " ITI Projrcy"
                 });
 
-                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "\"Enter 'Bearer' [space] and then your valid token in the text input below.\\r\\n\\r\\nExample: \\\"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6\r\n IkpXVCJ9\"",
-
+                    Description = "Enter 'Bearer' followed by your JWT token.\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                 });
+
                 swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
