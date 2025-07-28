@@ -13,10 +13,13 @@ namespace _02_BusinessLogicLayer.Mapping
     {
         public AddressMapping() {
             CreateMap<Government, GovernmentDTO>()
-        .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+        .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+        .ForMember(dest => dest.GovernmentId, opt => opt.MapFrom(src => src.GovernmentId));
+
 
             CreateMap<GovernmentDTO, Government>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.GovernmentId, opt => opt.MapFrom(src => src.GovernmentId));
 
             CreateMap<City, CityDTO>()
                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))

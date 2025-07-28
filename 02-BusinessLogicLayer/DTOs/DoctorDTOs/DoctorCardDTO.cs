@@ -23,7 +23,7 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         // Related Entites
         public string Specialization { get; set; }
         public List<String> Addresses { get; set; }
-        
-        
+        public string profilePicture { get; set; } // URL to the doctor's profile picture
+
     }
 }
