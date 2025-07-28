@@ -143,6 +143,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             dto.FullName = user.FullName;
             dto.Email = user.Email;
             dto.PhoneNumber = user.PhoneNumber;
+            dto.Gender = user.Gender.ToString();
             dto.location = doctor.Addresses?.FirstOrDefault()?.Location; // Assuming Addresses is a collection and Location is a property
             dto.DetailedAddress = doctor.Addresses?.FirstOrDefault()?.DetailedAddress; // Assuming Addresses is a collection and DetailedAddress is a property
             dto.MedicalLicenseUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.MedicalLicense).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
@@ -186,7 +187,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             appUser.FullName = doctorDto.FullName ?? appUser.FullName; // Update full name if provided  
             appUser.Email = doctorDto.Email ?? appUser.Email; // Update email if provided
             appUser.PhoneNumber = doctorDto.PhoneNumber ?? appUser.PhoneNumber; // Update phone number if provided
-
+            appUser.Gender = (Gender)Enum.Parse(typeof(Gender), doctorDto.Gender);
             await _userManager.UpdateAsync(appUser); // Save changes to AppUser
 
 
@@ -213,6 +214,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             output.FullName = appUser.FullName;
             output.Email = appUser.Email;
             output.PhoneNumber = appUser.PhoneNumber;
+            output.Gender = appUser.Gender.ToString();
             output.Specialization = _specialzationService.GetByIdAsync(doctorDto.SpecializationId).Result?.Name; // Assuming GetByIdAsync returns a Task<SpecializationDTO>
             output.location = doctorDto.location;
             output.DetailedAddress = doctorDto.DetailedAddress;

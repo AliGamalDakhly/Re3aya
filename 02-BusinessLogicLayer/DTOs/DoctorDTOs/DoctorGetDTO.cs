@@ -27,6 +27,7 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public string GraduationCertificateUrl { get; set; } // URL to the graduation certificate document
         public string ExperienceCertificateUrl { get; set; }
         public string ProfilePictureUrl { get; set; } // URL to the doctor's profile picture
+        public string Gender { get; set; } // Assuming this is a string representation
 
     }
 }
