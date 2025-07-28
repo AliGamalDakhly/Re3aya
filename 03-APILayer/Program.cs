@@ -1,4 +1,3 @@
-using System.Text;
 using _01_DataAccessLayer.Data.Context;
 using _01_DataAccessLayer.Data.Seed;
 using _01_DataAccessLayer.Models;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace _03_APILayer
 {
@@ -35,10 +35,7 @@ namespace _03_APILayer
 
 
             //Register AutoMapper
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddAutoMapper(typeof(DoctorProfile));
-            builder.Services.AddAutoMapper(typeof(AccountMappingProfile));
-
+            builder.Services.AddAutoMapper(typeof(DoctorProfile).Assembly);
 
             //Register Services      //add your services here
             builder.Services.AddScoped<IPatientService, PatientService>();
@@ -53,8 +50,22 @@ namespace _03_APILayer
             builder.Services.AddScoped<IDocumentService, DocumentService>();
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+            builder.Services.AddScoped<IDoctorTimeSlotService, DoctorTimeSlotService>();
+
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 
+
+            // Add CORS services before building the app
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
 
             // Add JWT authentication
@@ -75,9 +86,9 @@ namespace _03_APILayer
                     ValidateLifetime = true, // check expiration
                     ValidateIssuerSigningKey = true,
 
-
+            
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
-                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<List<string>>(),
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
 
                 };
@@ -95,7 +106,7 @@ namespace _03_APILayer
                     Description = "ITI Project API"
                 });
 
-                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey,
@@ -153,6 +164,7 @@ namespace _03_APILayer
             app.UseSwagger();
             app.UseSwaggerUI();
 
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
 

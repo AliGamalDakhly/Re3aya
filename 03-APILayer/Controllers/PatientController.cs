@@ -10,7 +10,7 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 
 namespace _03_APILayer.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -29,6 +29,7 @@ namespace _03_APILayer.Controllers
                 throw new UnauthorizedAccessException("User ID not found in token.");
             return userId;
         }
+
 
         // Register a new patient
         [AllowAnonymous]
@@ -59,7 +60,7 @@ namespace _03_APILayer.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500,$"Error while retrieving patient: {ex.Message}");
+                return StatusCode(500, $"Error while retrieving patient: {ex.Message}");
             }
         }
 
@@ -70,6 +71,10 @@ namespace _03_APILayer.Controllers
             try
             {
                 var userId = GetAppUserId();
+
+                if(userId != updatePatientDto.AppUserId)
+                    return Unauthorized("You can only update your own profile.");
+
                 var result = await _patientService.UpdateProfileAsync(updatePatientDto, userId);
                 if (!result)
                     return NotFound("Patient not found or unauthorized");
@@ -77,7 +82,7 @@ namespace _03_APILayer.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500,$"Error while updating profile: {ex.Message}");
+                return StatusCode(500, $"Error while updating profile: {ex.Message}");
             }
         }
 
@@ -116,24 +121,26 @@ namespace _03_APILayer.Controllers
             }
         }
 
-        //I will Solve it Soon 
+
         // Get all patients
-        //[HttpGet("GetAll")]
-        //public async Task<IActionResult> GetAllPatients([FromQuery] QueryOptions<Patient> options)
-        //{
-        //    try
-        //    {
-        //        var patients = await _patientService.GetAllAsync(options);
-        //        return Ok(patients);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500,$"Error while retrieving patients: {ex.Message}");
-        //    }
-        //}
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAllPatients()
+        {
+            try
+            {
+                var patients = await _patientService.GetAllAsync();
+                return Ok(patients);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while retrieving patients: {ex.Message}");
+            }
+        }
 
 
         // Check if a patient exists by a search term
+
+
         [HttpGet("Exists")]
         public async Task<IActionResult> PatientExists([FromQuery] string condition)
         {
@@ -232,8 +239,8 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                
-                var userId = GetAppUserId(); 
+
+                var userId = GetAppUserId();
                 var success = await _patientService.BookAppointmentAsync(dto, userId);
 
                 if (success)

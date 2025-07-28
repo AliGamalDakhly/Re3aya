@@ -1,9 +1,4 @@
 ﻿using _01_DataAccessLayer.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
 {
@@ -18,8 +13,11 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public string AboutMe { get; set; }
         public float RatingValue { get; set; }
         public double Fees { get; set; }
+        public string Service { get; set; }
+        public DoctorService ServiceId { get; set; } // Enum for service type
         public DoctorAccountStatus Status { get; set; }
         public string Specialization { get; set; }
+        public int? SpecializationId { get; set; }
 
     }
 }

@@ -46,20 +46,35 @@ namespace _02_BusinessLogicLayer.Service.Services
             _patientRepository.Delete(patient);
             return await _unitOfWork.CompleteAsync() > 0;
         }
+
         public async Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate)
         {
             return await _patientRepository.ExistsAsync(predicate);
         }
 
-        public async Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options)
+        public async Task<List<PatientDTO>> GetAllAsync()
         {
-            var patients = _patientRepository.GetAll(options);
+            List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
+            {
+                Includes = [p => p.AppUser]
+            });
+
             return _mapper.Map<List<PatientDTO>>(patients);
         }
 
         public async Task<PatientDTO> GetByIdAsync(int patientId)
         {
-            var patient = await _patientRepository.GetByIdAsync(patientId);
+            List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
+            {
+                Filter = p => p.PatientId == patientId,
+                Includes = [p => p.AppUser]
+            });
+
+            Patient? patient = patients?.FirstOrDefault();
+
+            if (patient == null)
+                throw new KeyNotFoundException($"No patient found with ID {patientId}");
+
             return _mapper.Map<PatientDTO>(patient);
         }
 
@@ -135,8 +150,6 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
             appointmentRepo.Add(appointment);
-
-            // 
             return await _unitOfWork.CompleteAsync() > 0;
         }
 

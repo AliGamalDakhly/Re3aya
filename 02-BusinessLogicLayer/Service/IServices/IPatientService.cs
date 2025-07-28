@@ -22,7 +22,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> DeleteAsync(int patientId);
 
         Task<PatientDTO> GetByIdAsync(int patientId);                 
-        Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options);
+        Task<List<PatientDTO>> GetAllAsync();
         Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate);
         Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null);
 

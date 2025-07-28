@@ -117,5 +117,32 @@ namespace _02_BusinessLogicLayer.Service.Services
             // Use Auto Mapper to map Entity to DTO
             return _mapper.Map<List<RatingDTO>>(ratings);
         }
+
+        public async Task<List<DoctorRatingDTO>> GetAllDoctorRatings(int doctorId)
+        {
+            // add your required logic here
+            // ...
+            List<Rating> ratings = await _context.GetAllAsync(new QueryOptions<Rating>
+            {
+                Filter = r => r.DoctorId == doctorId,
+                Includes = [r => r.Patient] // if you want to include related entities
+            });
+
+            List<DoctorRatingDTO> ratingDTOs = _mapper.Map<List<DoctorRatingDTO>>(ratings);
+
+            foreach (var rating in ratings)
+            {
+                List<Patient> patients = await _unitOfWork.Repository<Patient, int>().GetAllAsync(new QueryOptions<Patient>
+                {
+                    Filter = p => p.PatientId == rating.PatientId,
+                    Includes = [p => p.AppUser]
+                });
+
+                ratingDTOs.FirstOrDefault( r => r.RatingId == rating.RatingId).PatientName = patients.FirstOrDefault().AppUser.FullName;
+            }
+
+            // Use Auto Mapper to map Entity to DTO
+            return ratingDTOs;
+        }
     }
 }
