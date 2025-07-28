@@ -78,7 +78,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         public async Task<List<DoctorCardDTO>> GetAllAsync()
         {
             List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
-                new QueryOptions<Doctor> { Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser] });
+                new QueryOptions<Doctor> { Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser, d => d.Documents] });
 
 
             List<DoctorCardDTO> doctorsDtos = _mapper.Map<List<DoctorCardDTO>>(doctors);
@@ -112,7 +112,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 GetAllAsync(new QueryOptions<Doctor>
                 {
                     Filter = d => d.DoctorId == id,
-                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser]
+                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser, d => d.Documents]
                 });
 
             Doctor doctor = doctors.FirstOrDefault();

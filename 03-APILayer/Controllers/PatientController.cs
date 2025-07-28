@@ -10,7 +10,7 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 
 namespace _03_APILayer.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -104,24 +104,24 @@ namespace _03_APILayer.Controllers
         }
 
         //Delete profile of logged-in patient
-        //[HttpDelete("DeleteProfile")]
-        //public async Task<IActionResult> DeleteProfile()
-        //{
-        //    try
-        //    {
-        //        var userId = GetAppUserId();
-        //        var result = await _patientService.DeleteProfileAsync(userId);
-        //        if (!result)
-        //            return NotFound("Patient profile not found or unauthorized");
-        //        return Ok("Profile deleted successfully.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Error while deleting profile: {ex.Message}");
-        //    }
-        //}
+        [HttpDelete("DeleteProfile")]
+        public async Task<IActionResult> DeleteProfile()
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var result = await _patientService.DeleteProfileAsync(userId);
+                if (!result)
+                    return NotFound("Patient profile not found or unauthorized");
+                return Ok("Profile deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while deleting profile: {ex.Message}");
+            }
+        }
 
-        //I will Solve it Soon 
+
         // Get all patients
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllPatients()
