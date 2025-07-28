@@ -39,6 +39,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             return await _unitOfWork.CompleteAsync() > 0;
         }
 
+        public async Task<bool> DeleteProfileAsync(string appUserId)
+        {
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return false;
+            _patientRepository.Delete(patient);
+            return await _unitOfWork.CompleteAsync() > 0;
+        }
+
         public async Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate)
         {
             return await _patientRepository.ExistsAsync(predicate);
