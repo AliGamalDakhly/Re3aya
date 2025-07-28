@@ -149,7 +149,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             dto.NationalIdUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.NationalId).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             dto.GraduationCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.GraduationCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             dto.ExperienceCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ExperienceCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
-
+            dto.ProfilePictureUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ProfileImage).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             return dto;
         }
 
@@ -160,7 +160,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 new QueryOptions<Doctor>
                 {
                     Filter = d => d.DoctorId == id,
-                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser]
+                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser, d => d.Documents]
                 });
 
             var doctor = doctors.FirstOrDefault();
@@ -217,6 +217,11 @@ namespace _02_BusinessLogicLayer.Service.Services
             output.location = doctorDto.location;
             output.DetailedAddress = doctorDto.DetailedAddress;
             output.ServiceId = doctorDto.Service; // Assuming ServiceId is a property in Doctor
+            output.MedicalLicenseUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.MedicalLicense).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
+            output.NationalIdUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.NationalId).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
+            output.GraduationCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.GraduationCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
+            output.ExperienceCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ExperienceCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
+            output.ProfilePictureUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ProfileImage).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             return output;
         }
 
