@@ -90,16 +90,7 @@ namespace _02_BusinessLogicLayer.Mapping
             CreateMap<UpdateRatingDTO, Rating>();
 
             // Appointment
-            //CreateMap<BookAppointmentDTO, Appointment>();
-            //CreateMap<BookAppointmentDTO, Appointment>()
-            //   .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
-            //   .ForMember(dest => dest.DoctorTimeSlotId, opt => opt.MapFrom(src => src.DoctorTimeSlotId))
-            //   .ForMember(dest => dest.PatientId, opt => opt.Ignore()) // يتم تعيينه يدويًا
-            //   .ForMember(dest => dest.PaymentId, opt => opt.Ignore()) // مهم جدًا
-            //   .ForMember(dest => dest.Status, opt => opt.Ignore())
-            //   .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-            //   .ForAllMembers(opt => opt.Ignore());
-
+         
             //CreateMap<PaymentDTO, Payment>();
             //CreateMap<BookAppointmentDTO, Appointment>();
             CreateMap<PaymentDTO, Payment>();

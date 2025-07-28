@@ -126,10 +126,9 @@ namespace _02_BusinessLogicLayer.Service.Services
             var paymentRepo = _unitOfWork.Repository<Payment, int>();
             paymentRepo.Add(payment);
 
-            // 
             await _unitOfWork.CompleteAsync();
 
-            // 
+             
             var appointment = _mapper.Map<Appointment>(dto);
             appointment.PatientId = patient.PatientId;
             appointment.PaymentId = payment.PaymentId;
