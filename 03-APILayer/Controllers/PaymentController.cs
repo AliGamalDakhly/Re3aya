@@ -1,9 +1,14 @@
-﻿
+﻿using _01_DataAccessLayer.Data.Context;
+using _01_DataAccessLayer.Enums;
+using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.UnitOfWork;
+using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.DTOs.PaymentDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Mvc;
-  
+using Microsoft.EntityFrameworkCore;
+
+
 namespace _03_APILayer.Controllers
 {
     [Route("api/[controller]")]
@@ -13,15 +18,19 @@ namespace _03_APILayer.Controllers
         private readonly IPaymobService _paymobService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<PaymentController> _logger;
+        private readonly Re3ayaDbContext _context;
 
-        public PaymentController(IPaymobService paymobService, IUnitOfWork unitOfWork, ILogger<PaymentController> logger)
+
+        public PaymentController(IPaymobService paymobService, IUnitOfWork unitOfWork, ILogger<PaymentController> logger, Re3ayaDbContext context)
         {
             _paymobService = paymobService;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _context = context;
+
         }
 
-        [HttpPost("book-appointment")]
+        [HttpPost("Create")]
         public async Task<IActionResult> BookAppointment([FromBody] AppointmentPaymentRequest request)
         {
             var authToken = await _paymobService.GetAuthTokenAsync();
@@ -54,7 +63,89 @@ namespace _03_APILayer.Controllers
             }
         }
 
- 
+
+
+
+
+
+
+        [HttpGet("paymob-callback")]
+        public async Task<IActionResult> PaymobCallback([FromQuery] PaymobCallbackDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            double amount = Convert.ToDouble(dto.AmountCents) / 100.0;
+
+            var payment = new _01_DataAccessLayer.Models.Payment
+            {
+                TransactionId = dto.Id,
+                Amount = amount,
+                Status = dto.Success ? PaymentStatus.Completed : PaymentStatus.Failed,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().Add(payment);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(new { message = "payment saved successfully" });
+        }
+
+
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var payments = await _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().GetAllAsync();
+            return Ok(payments);
+        }
+
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPaymentById(int id)
+        {
+            var payment = await _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>()
+                .GetFirstOrDefaultAsync(p => p.PaymentId == id);
+
+            if (payment == null)
+                return NotFound(new { message = "payment not found" });
+
+            return Ok(payment);
+        }
+
+
+
+
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<PaymentDtoForUser>>> GetPaymentsByUserId(int userId)
+        {
+            var payments = await _context.Payments
+                .Where(p => p.Appointment.PatientId == userId)
+                .Select(p => new PaymentDtoForUser
+                {
+                    PaymentId = p.PaymentId,
+                    Amount = p.Amount,
+                    Status = p.Status,
+                    TransactionId = p.TransactionId,
+                    CreatedAt = p.CreatedAt
+                })
+                .ToListAsync();
+
+            if (payments == null || !payments.Any())
+                return NotFound("no payments found for this user");
+
+            return Ok(payments);
+        }
+
+
+
+
+
+
 
 
 
