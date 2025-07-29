@@ -2,6 +2,7 @@
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
+using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
 using _02_BusinessLogicLayer.Service.IServices;
@@ -76,10 +77,21 @@ namespace _02_BusinessLogicLayer.Service.Services
         public async Task<List<DoctorCardDTO>> GetAllAsync()
         {
             List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
-                new QueryOptions<Doctor> { Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser, d => d.Documents] });
+                new QueryOptions<Doctor> { 
+                    Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser, d => d.Documents],
+                    OrderBy = d => d.RatingValue ,
+                    SortDirection = SortDirection.Descending,
+                    Filter = d => d.Status == DoctorAccountStatus.Approved
+                });
 
 
             List<DoctorCardDTO> doctorsDtos = _mapper.Map<List<DoctorCardDTO>>(doctors);
+
+            foreach(var doctor in doctors)
+            {
+                CityDTO city = await _addressService.GetCityByIdAsync(doctor.Addresses.FirstOrDefault()?.CityId ?? 0);
+                doctorsDtos.FirstOrDefault(d => d.DoctorId == doctor.DoctorId).GovernemntId = city?.GovernmentId ?? 0;
+            }
 
             return doctorsDtos;
         }
