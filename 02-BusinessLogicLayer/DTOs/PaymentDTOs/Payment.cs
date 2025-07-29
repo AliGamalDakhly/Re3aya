@@ -10,7 +10,7 @@ public class Payment
 {
     public int PaymentId { get; set; }
     public double Amount { get; set; }
-    public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+    public PaymentStatus Status { get; set; }
     public int TransactionId { get; set; }
     public string Currency { get; set; }
     public string CardType { get; set; }   
