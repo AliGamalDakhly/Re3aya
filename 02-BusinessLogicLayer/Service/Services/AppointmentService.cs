@@ -61,6 +61,12 @@ namespace _02_BusinessLogicLayer.Service.Services
             appointment.DoctorTimeSlotId = doctorTimeSlotDTO.DoctorTimeSlotId;
 
             var addedAppointment = await _context.AddAsync(appointment);
+
+            // after confirm and creat of appointment
+            // disable the timeslot.
+            doctorTimeSlotDTO.IsAvailable = false;
+            await _doctorTimeSlotService.UpadateDoctorTimeSlot(doctorTimeSlotDTO, doctorTimeSlotDTO.DoctorTimeSlotId);
+
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
 
             return _mapper.Map<BookAppointment>(addedAppointment);
