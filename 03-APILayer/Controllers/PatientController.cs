@@ -9,7 +9,7 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 
 namespace _03_APILayer.Controllers
 {
-    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -64,6 +64,7 @@ namespace _03_APILayer.Controllers
         }
 
         // Update profile of logged-in patient
+        [Authorize]
         [HttpPut("UpdateProfile")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdatePatientDTO updatePatientDto)
         {
