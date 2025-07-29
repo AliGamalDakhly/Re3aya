@@ -1,10 +1,6 @@
 ﻿using _01_DataAccessLayer.Enums;
+using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.Service.IServices
 {
@@ -22,6 +18,6 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> VerifyDocumentAsync(int id);
 
         Task<DocumentDTO> UpdateLinkOnlyAsync(int documentId, string newFilePath, DocumentType newDocumentType);
-
+        Task<List<DoctorDocumentsDTO>> GetDocumentsByDoctorIdAsync(int doctorId);
     }
 }
