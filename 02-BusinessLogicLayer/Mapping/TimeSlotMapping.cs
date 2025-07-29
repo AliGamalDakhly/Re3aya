@@ -34,6 +34,7 @@ namespace _02_BusinessLogicLayer.Mapping
 
             //for create will not pass id
             CreateMap<TimeSlot, CreateTimeSlotDTO>().ReverseMap();
+
         }
     }
 }

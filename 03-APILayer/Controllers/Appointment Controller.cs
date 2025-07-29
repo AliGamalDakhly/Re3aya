@@ -65,6 +65,26 @@ namespace _03_APILayer.Controllers
             }
         }
 
+
+        [HttpPost("book-appointment")]
+        public async Task<IActionResult> BookAppointment(BookAppointment appointmentDto)
+        {
+            try
+            {
+                if (appointmentDto == null)
+                {
+                    return BadRequest("Appointment data is null.");
+                }
+                var addedAppointment = await _appointmentService.BookAppointmentAsync(appointmentDto);
+                return Ok(addedAppointment);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
         [HttpPut("update-appointment/{id}")]
         public async Task<IActionResult> UpdateAppointment(int id, [FromBody] AppointmentDTO appointmentDto)
         {

@@ -26,6 +26,24 @@ namespace _02_BusinessLogicLayer.Service.Services
             _mapper = mapper;
             _context = _unitOfWork.Repository<DoctorTimeSlot, int>();
         }
+
+        public async Task<AddDoctorTimeSlotDTO> AddDoctorTimeSlot(AddDoctorTimeSlotDTO doctorTimeSlotDTO)
+        {
+            DoctorTimeSlot doctorTimeSlot = _mapper.Map<DoctorTimeSlot>(doctorTimeSlotDTO);
+            var  addedDoctorTimeSlot = await _context.AddAsync(doctorTimeSlot);
+            await _unitOfWork.CompleteAsync();
+
+            return _mapper.Map<AddDoctorTimeSlotDTO>(addedDoctorTimeSlot);
+        }
+
+
+        public async Task<List<AddDoctorTimeSlotDTO>> GetAllAsync(QueryOptions<DoctorTimeSlot>? options = null)
+        {
+            List<DoctorTimeSlot> doctorTimeSlots = await _context.GetAllAsync(options);
+
+            return _mapper.Map<List<AddDoctorTimeSlotDTO>>(doctorTimeSlots);
+        }
+
         public async Task<List<AvailableDoctorTImeSlotDTO>> AvailableDoctorTimeSlots(int doctorId, DateOnly date)
         {
             DateTime dayStart = date.ToDateTime(TimeOnly.MinValue); // 00:00
