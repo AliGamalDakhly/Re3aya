@@ -30,5 +30,9 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public int SpecializationId { get; set; } // ID of the doctor's specialization
         
 
+        public bool HasAvailableTimeSlots { get; set; }
+        public bool HasAvailableTimeSlotsToday { get; set; }
+        public bool HasAvailableTimeSlotsTomorrow { get; set; }
+
     }
 }
