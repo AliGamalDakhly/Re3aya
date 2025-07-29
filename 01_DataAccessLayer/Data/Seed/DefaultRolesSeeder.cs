@@ -9,15 +9,23 @@ namespace _01_DataAccessLayer.Data.Seed
 {
     public static class DefaultRolesSeeder
     {
-        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+        public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
         {
             string[] roles = { "Admin", "Doctor", "Patient" };
 
             foreach (var role in roles)
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                if (!string.IsNullOrWhiteSpace(role) && !await roleManager.RoleExistsAsync(role))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    var result = await roleManager.CreateAsync(new IdentityRole(role));
+                    if (!result.Succeeded)
+                    {
+                        Console.WriteLine($"❌ Failed to create role {role}:");
+                        foreach (var error in result.Errors)
+                        {
+                            Console.WriteLine($"- {error.Description}");
+                        }
+                    }
                 }
             }
         }

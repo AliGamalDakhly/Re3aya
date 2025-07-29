@@ -92,6 +92,8 @@ namespace _02_BusinessLogicLayer.Service.Services
             return patient == null ? null : _mapper.Map<PatientDetailsDTO>(patient);
         }
 
+
+
         public async Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, string userId)
         {
 
@@ -130,15 +132,27 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<bool> BookAppointmentAsync(BookAppointmentDTO dto, string appUserId)
         {
-            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+            // AppUserId
             var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
             if (patient == null) return false;
 
+            // PaymentDTO
+            var payment = _mapper.Map<Payment>(dto.Payment);
+            var paymentRepo = _unitOfWork.Repository<Payment, int>();
+            paymentRepo.Add(payment);
+
+            await _unitOfWork.CompleteAsync();
+
+             
             var appointment = _mapper.Map<Appointment>(dto);
             appointment.PatientId = patient.PatientId;
+            appointment.PaymentId = payment.PaymentId;
+
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
             appointmentRepo.Add(appointment);
             return await _unitOfWork.CompleteAsync() > 0;
         }
+
 
         public async Task<bool> CancelAppointmentAsync(CancelAppointmentDTO dto, string appUserId)
         {

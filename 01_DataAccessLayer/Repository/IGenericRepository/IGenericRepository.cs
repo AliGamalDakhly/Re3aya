@@ -15,7 +15,7 @@ namespace _01_DataAccessLayer.Repository.IGenericRepository
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
         Task<List<TEntity>> GetAllAsync(QueryOptions<TEntity>? options = null);
 
-        //I will add this method to Enhance loading
+        //I will add this method to Enhance loading and include related entities
         Task<TEntity?> GetFirstOrDefaultAsync(
            Expression<Func<TEntity, bool>> predicate,
            params Expression<Func<TEntity, object>>[] includes

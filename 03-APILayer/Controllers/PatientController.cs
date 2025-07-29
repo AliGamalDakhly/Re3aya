@@ -250,7 +250,7 @@ namespace _03_APILayer.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred while booking appointment: {ex.Message}");
+                 return StatusCode(500, $"An error occurred while booking appointment: {ex.Message}");
             }
         }
 

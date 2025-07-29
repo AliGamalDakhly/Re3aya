@@ -26,7 +26,8 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate);
         Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null);
 
-        Task<bool> DeleteProfileAsync(string appUserId);
+        //delete my provile only patient can delete his profile 
+        Task<bool> DeleteProfileAsync(string appUserId); //delete his profile by his identity
 
         //Add Rating only after treatment
         Task<bool> AddRatingAsync(AddRatingDTO rating, string appUserId); //this allow patient add Rating to his doctor
