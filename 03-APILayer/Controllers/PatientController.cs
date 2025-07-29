@@ -1,5 +1,4 @@
 ﻿using _01_DataAccessLayer.Models;
-using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -72,8 +71,8 @@ namespace _03_APILayer.Controllers
             {
                 var userId = GetAppUserId();
 
-                if(userId != updatePatientDto.AppUserId)
-                    return Unauthorized("You can only update your own profile.");
+                //if (userId != updatePatientDto.UserId)
+                //  return Unauthorized("You can only update your own profile.");
 
                 var result = await _patientService.UpdateProfileAsync(updatePatientDto, userId);
                 if (!result)
