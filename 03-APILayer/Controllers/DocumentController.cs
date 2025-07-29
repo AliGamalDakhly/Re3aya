@@ -1,9 +1,7 @@
 ﻿using _02_BusinessLogicLayer.DTOs.Common;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace _03_APILayer.Controllers
 {
@@ -48,6 +46,24 @@ namespace _03_APILayer.Controllers
         {
             var result = await _documentService.GetAllAsync();
             return Ok(result);
+        }
+
+        [HttpGet("doctor/{doctorId}")]
+        public async Task<IActionResult> GetDocumentsByDoctorId(int doctorId)
+        {
+            var result = await _documentService.GetDocumentsByDoctorIdAsync(doctorId);
+            if (result == null || !result.Any()) return NotFound($"No documents found for doctor with ID {doctorId}.");
+            var response = result.Select(doc => new
+            {
+
+                doc.DocumentType,
+                data = new
+                {
+                    DocumentId = doc.DocumentId,
+                    FilePath = doc.FilePath
+                }
+            }).ToList();
+            return Ok(response);
         }
 
         /// <summary>
