@@ -4,6 +4,7 @@ using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
+using _02_BusinessLogicLayer.DTOs.DoctorTimeSlotDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
@@ -16,15 +17,16 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
+        private readonly IDoctorTimeSlotService _doctorTimeSlotService;
         private readonly IMapper _mapper;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IDoctorTimeSlotService doctorTimeSlotService)
         {
 
             _unitOfWork = unitOfWork;
             _context = _unitOfWork.Repository<Appointment, int>();
             _mapper = mapper;
-
+            _doctorTimeSlotService = doctorTimeSlotService;
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -35,6 +37,33 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
 
             return _mapper.Map<AppointmentDTO>(addedAppointment);
+        }
+
+        public async Task<BookAppointment> BookAppointmentAsync(BookAppointment bookAppointmentDto)
+        {
+
+            Appointment appointment = _mapper.Map<Appointment>(bookAppointmentDto);
+            
+            // i want to get the id of doctor timeslot where timeslotid and doctorid equals coming from appointment dto
+            List<AddDoctorTimeSlotDTO> doctorTimeSlots = await _doctorTimeSlotService
+                .GetAllAsync(new QueryOptions<DoctorTimeSlot>
+                {
+                    Filter = dts => (dts.TimeSlotId == bookAppointmentDto.TimeSlotId
+                            && dts.DoctorId == bookAppointmentDto.DoctorId
+                            && dts.IsAvailable == true )
+                });
+
+            AddDoctorTimeSlotDTO doctorTimeSlotDTO = doctorTimeSlots.FirstOrDefault();
+            if (doctorTimeSlotDTO == null)
+                throw new Exception("This Appointment is not Available now"); 
+
+
+            appointment.DoctorTimeSlotId = doctorTimeSlotDTO.DoctorTimeSlotId;
+
+            var addedAppointment = await _context.AddAsync(appointment);
+            await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
+
+            return _mapper.Map<BookAppointment>(addedAppointment);
         }
 
         public async Task<bool> ConfirmAppointmentAsync(int appointmentId)

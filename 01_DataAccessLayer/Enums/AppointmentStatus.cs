@@ -8,7 +8,6 @@ namespace _01_DataAccessLayer.Enums
 {
     public enum AppointmentStatus
     {
-        Booked,
         Confirmed,
         Cancelled,
         Finished
