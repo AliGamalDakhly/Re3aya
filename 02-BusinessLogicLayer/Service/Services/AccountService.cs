@@ -198,11 +198,11 @@ namespace _02_BusinessLogicLayer.Service.Services
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
 
             var authSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+                Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _configuration["JWT:IssuerIP"],
+                audience: _configuration["JWT:Audience"],
                 expires: DateTime.UtcNow.AddHours(3),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
