@@ -1,14 +1,14 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
-using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 using AppointmentDTO = _02_BusinessLogicLayer.DTOs.AppointmentDTOs.AppointmentDTO;
-using _01_DataAccessLayer.Repository;
+using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -75,7 +75,9 @@ namespace _02_BusinessLogicLayer.Service.Services
             if (patient == null)
                 throw new KeyNotFoundException($"No patient found with ID {patientId}");
 
-            return _mapper.Map<PatientDTO>(patient);
+            var patientDTO = _mapper.Map<PatientDTO>(patient);
+            patientDTO.UserId = patient.AppUser?.Id; // Ensure UserId is set from AppUser if available
+            return patientDTO;
         }
 
         public async Task<PatientDTO> RegisterAsync(PatientDTO dto)
@@ -95,9 +97,11 @@ namespace _02_BusinessLogicLayer.Service.Services
         public async Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, string userId)
         {
 
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId, p => p.AppUser);
             if (patient == null) return false;
+
             _mapper.Map(dto, patient);
+
             _patientRepository.Update(patient);
             return await _unitOfWork.CompleteAsync() > 0;
         }
@@ -171,7 +175,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
             if (patient == null) return new List<AppointmentDTO>();
 
-            var appointments = await appointmentRepo.GetFirstOrDefaultAsync (
+            var appointments = await appointmentRepo.GetFirstOrDefaultAsync(
                 a => a.PatientId == patient.PatientId,
                 a => a.DoctorTimeSlot,
                 a => a.DoctorTimeSlot.TimeSlot,

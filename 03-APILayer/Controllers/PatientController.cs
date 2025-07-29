@@ -1,5 +1,4 @@
 ﻿using _01_DataAccessLayer.Models;
-using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +9,7 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 
 namespace _03_APILayer.Controllers
 {
-    [Authorize]
+    //   [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -70,12 +69,12 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                var userId = GetAppUserId();
+                // var userId = GetAppUserId();
 
-                if(userId != updatePatientDto.AppUserId)
-                    return Unauthorized("You can only update your own profile.");
+                //if (userId != updatePatientDto.UserId)
+                //  return Unauthorized("You can only update your own profile.");
 
-                var result = await _patientService.UpdateProfileAsync(updatePatientDto, userId);
+                var result = await _patientService.UpdateProfileAsync(updatePatientDto, updatePatientDto.UserId);
                 if (!result)
                     return NotFound("Patient not found or unauthorized");
                 return Ok("Profile updated successfully.");
