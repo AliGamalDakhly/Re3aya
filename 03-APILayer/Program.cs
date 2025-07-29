@@ -88,7 +88,7 @@ namespace _03_APILayer
 
             
                     ValidIssuer = builder.Configuration["JWT:IssuerIP"],
-                    ValidAudiences = builder.Configuration.GetSection("JWT:Audiences").Get<List<string>>(),
+                    ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
 
                 };

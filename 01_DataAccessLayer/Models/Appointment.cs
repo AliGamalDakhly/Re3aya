@@ -11,7 +11,7 @@ namespace _01_DataAccessLayer.Models
     public class Appointment
     {
         public int AppointmentId { get; set; }
-        public AppointmentStatus Status { get; set; } = AppointmentStatus.Booked;
+        public AppointmentStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string Notes { get; set; }
 
