@@ -8,6 +8,7 @@ using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.DoctorTimeSlotDTOs;
+using _02_BusinessLogicLayer.DTOs.SpecailzationDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -36,7 +37,20 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<AddDoctorTimeSlotDTO>(addedDoctorTimeSlot);
         }
 
+        public async Task<bool> UpadateDoctorTimeSlot(AddDoctorTimeSlotDTO doctorTimeSlotDTO, int id)
+        {
+            // we first get the entity from DB.
+            var existingDoctorTimeSlot = await _context.GetByIdAsync(id);
 
+            if (existingDoctorTimeSlot == null)
+                return false;
+            //-------- dont forget to update all fields of your entity ---------
+            existingDoctorTimeSlot.IsAvailable = doctorTimeSlotDTO.IsAvailable;
+
+            await _context.UpdateAsync(existingDoctorTimeSlot);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
         public async Task<List<AddDoctorTimeSlotDTO>> GetAllAsync(QueryOptions<DoctorTimeSlot>? options = null)
         {
             List<DoctorTimeSlot> doctorTimeSlots = await _context.GetAllAsync(options);
@@ -60,6 +74,49 @@ namespace _02_BusinessLogicLayer.Service.Services
             });
 
             return _mapper.Map<List<AvailableDoctorTImeSlotDTO>>(availableTimeSlots);
+        }
+
+        public async Task<bool> HasAvailableTimeSlots(int doctorId, DateTime fromDateTime)
+        {
+
+            var date = fromDateTime.Date; // Get only the date part
+            var dayEnd = date.AddDays(1).AddTicks(-1); // End of the same day (23:59:59.9999999)
+
+            var doctorTimeSlots = await _context.GetAllAsync(new QueryOptions<DoctorTimeSlot>
+            {
+                Includes = [dts => dts.TimeSlot],
+                Filter = dts =>
+                    dts.DoctorId == doctorId &&
+                    dts.IsAvailable &&
+                    dts.TimeSlot.StartTime >= fromDateTime &&
+                    dts.TimeSlot.StartTime <= dayEnd
+            });
+
+            if (doctorTimeSlots?.Count == 0  || doctorTimeSlots == null)
+                return false;
+
+            return true;
+
+        }
+
+        public async Task<bool> HasAvailableTimeSlots(int doctorId)
+        {
+
+            DateTime dayStart = DateTime.Now; // 00:00
+
+            List<DoctorTimeSlot> doctorTimeSlots = await _context.GetAllAsync(new QueryOptions<DoctorTimeSlot>
+            {
+                Includes = [dts => dts.TimeSlot],
+                Filter = ts => (ts.DoctorId == doctorId &&
+                    ts.TimeSlot.StartTime >= dayStart &&
+                    ts.IsAvailable)
+            });
+
+            if (doctorTimeSlots?.Count == 0 || doctorTimeSlots == null)
+                return false;
+
+            return true;
+
         }
     }
 }
