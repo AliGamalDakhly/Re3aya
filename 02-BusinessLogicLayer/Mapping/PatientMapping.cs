@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using _01_DataAccessLayer.Models;
+﻿using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using AutoMapper;
 
@@ -42,7 +37,12 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender.ToString()));
 
             //for update
-            CreateMap<UpdatePatientDTO, AppUser>();
+            CreateMap<UpdatePatientDTO, Patient>()
+            .ForPath(dest => dest.AppUser.FullName, opt => opt.MapFrom(src => src.FullName))
+             .ForPath(dest => dest.AppUser.Email, opt => opt.MapFrom(src => src.Email))
+             .ForPath(dest => dest.AppUser.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForPath(dest => dest.AppUser.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth))
+                .ForPath(dest => dest.AppUser.Gender, opt => opt.MapFrom(src => src.Gender));
         }
 
         #region helpfull methods
