@@ -12,7 +12,10 @@ namespace _02_BusinessLogicLayer.Service.IServices
     public interface IDoctorTimeSlotService
     {
         Task<AddDoctorTimeSlotDTO> AddDoctorTimeSlot(AddDoctorTimeSlotDTO doctorTimeSlotDTO);
+        Task<bool> UpadateDoctorTimeSlot(AddDoctorTimeSlotDTO doctorTimeSlotDTO, int id);
         Task<List<AvailableDoctorTImeSlotDTO>> AvailableDoctorTimeSlots(int doctorId, DateOnly date);
         Task<List<AddDoctorTimeSlotDTO>> GetAllAsync(QueryOptions<DoctorTimeSlot>? options = null);
+        Task<bool> HasAvailableTimeSlots(int doctorId, DateTime date);
+        Task<bool> HasAvailableTimeSlots(int doctorId);
     }
 }

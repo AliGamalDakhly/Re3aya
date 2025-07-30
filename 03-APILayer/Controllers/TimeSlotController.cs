@@ -156,5 +156,21 @@ namespace _03_APILayer.Controllers
         }
 
 
+
+        [HttpGet("isAvailable/{id}")]
+        public async Task<IActionResult> HasAvailableTImeSlots(int id, DateTime date)
+        {
+            try
+            {
+                var result = await _doctorTimeSlotService.HasAvailableTimeSlots(id, date);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error on Retriving All TimeSlots {ex.Message}");
+            }
+        }
+
+
     }
 }

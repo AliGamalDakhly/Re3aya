@@ -1,4 +1,5 @@
-﻿using _01_DataAccessLayer.Enums;
+﻿using System.Numerics;
+using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
@@ -8,6 +9,7 @@ using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -18,16 +20,19 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IMapper _mapper;
         private readonly IAddressService _addressService;
         private readonly ISpecializationService _specialzationService;
+        private readonly IDoctorTimeSlotService _doctorTimeSlotService;
         private AddressDTO addressDto;
 
         public DoctorService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager,
-            IMapper mapper, IAddressService addressService, ISpecializationService specializationService)
+            IDoctorTimeSlotService doctorTimeSlotService,IMapper mapper, 
+            IAddressService addressService, ISpecializationService specializationService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _mapper = mapper;
             _addressService = addressService;
             _specialzationService = specializationService;
+            _doctorTimeSlotService = doctorTimeSlotService;
         }
 
 
@@ -88,10 +93,26 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             List<DoctorCardDTO> doctorsDtos = _mapper.Map<List<DoctorCardDTO>>(doctors);
 
-            foreach(var doctor in doctors)
+            //foreach(var doctor in doctors)
+            //{
+            //    CityDTO city = await _addressService.GetCityByIdAsync(doctor.Addresses.FirstOrDefault()?.CityId ?? 0);
+            //    doctorsDtos.FirstOrDefault(d => d.DoctorId == doctor.DoctorId).GovernemntId = city?.GovernmentId ?? 0;
+
+
+            //}
+
+            for(int i = 0; i < doctors.Count; i++)
             {
-                CityDTO city = await _addressService.GetCityByIdAsync(doctor.Addresses.FirstOrDefault()?.CityId ?? 0);
-                doctorsDtos.FirstOrDefault(d => d.DoctorId == doctor.DoctorId).GovernemntId = city?.GovernmentId ?? 0;
+                CityDTO city = await _addressService.GetCityByIdAsync(doctors[i].Addresses.FirstOrDefault()?.CityId ?? 0);
+                doctorsDtos[i].GovernemntId = city?.GovernmentId ?? 0;
+
+                bool hasAvailableTimeSlots = await _doctorTimeSlotService.HasAvailableTimeSlots(doctors[i].DoctorId);
+                bool hasAvailableTimeSlotsToday = await _doctorTimeSlotService.HasAvailableTimeSlots(doctors[i].DoctorId, DateTime.Now);
+                bool hasAvailableTimeSlotsTomorrow = await _doctorTimeSlotService.HasAvailableTimeSlots(doctors[i].DoctorId, DateTime.Now.Date.AddDays(1));
+
+                doctorsDtos[i].HasAvailableTimeSlots = hasAvailableTimeSlots;
+                doctorsDtos[i].HasAvailableTimeSlotsToday = hasAvailableTimeSlotsToday;
+                doctorsDtos[i].HasAvailableTimeSlotsTomorrow = hasAvailableTimeSlotsTomorrow;
             }
 
             return doctorsDtos;

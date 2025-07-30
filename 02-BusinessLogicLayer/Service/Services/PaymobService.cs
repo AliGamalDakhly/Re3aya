@@ -1,5 +1,5 @@
-﻿ using _02_BusinessLogicLayer.DTOs.PaymentDTOs;
- using _02_BusinessLogicLayer.Service.IServices;
+﻿using _02_BusinessLogicLayer.DTOs.PaymentDTOs;
+using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -21,8 +21,8 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<string> GetAuthTokenAsync()
         {
-            var apiKey = _config["Paymob:APIKey"];
-            var payload = new { api_key = apiKey };
+            var Apk = _config["Payment:Apk"];
+            var payload = new { api_key = Apk };
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
             var response = await _http.PostAsync("https://accept.paymob.com/api/auth/tokens", content);
@@ -86,7 +86,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 order_id = orderId,
                 billing_data = billingData,
                 currency = "EGP",
-                integration_id = int.Parse(_config["Paymob:IntegrationId"]),
+                integration_id = int.Parse(_config["Payment:IntegrationId"]),
                 lock_order_when_paid = true
             };
 
@@ -100,10 +100,10 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public string GetIframeUrl(string paymentToken)
         {
-            var iframeId = _config["Paymob:IframeId"];
+            var iframeId = _config["Payment:IframeId"];
             return $"https://accept.paymob.com/api/acceptance/iframes/{iframeId}?payment_token={paymentToken}";
         }
- 
+
 
         public async Task<JsonDocument> RefundAsync(int transactionId, int amountCents)
         {
@@ -126,7 +126,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             return JsonDocument.Parse(result);
         }
 
-    
+
 
     }
 }
