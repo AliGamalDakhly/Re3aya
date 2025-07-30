@@ -8,6 +8,7 @@ namespace _02_BusinessLogicLayer.DTOs.RatingDTOs
 {
     public class RatingDTO
     {
+        public int RatingId { get; set; }
         public float RatingValue { get; set; }
         public string? Comment { get; set; }
         public int DoctorId { get; set; }

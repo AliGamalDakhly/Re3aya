@@ -13,6 +13,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 {
     public interface IRatingService
     {
+        Task<float> GetDoctorRatingByIdAsync(int doctorId);
         Task<RatingDTO> AddRatingAsync(RatingDTO ratingDTO);
         Task<bool> UpdateRatingAsync(RatingDTO ratingDTO, int id);
         Task<RatingDTO> GetRatingByIdAsync(int id);

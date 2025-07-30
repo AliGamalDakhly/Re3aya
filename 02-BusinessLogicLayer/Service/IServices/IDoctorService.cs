@@ -24,6 +24,6 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
         Task<string?> GetDoctorFullNameByIdAsync(int doctorId);
 
-
+        Task UpdateDoctorRating(int doctorId);
     }
 }
