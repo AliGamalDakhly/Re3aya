@@ -4,6 +4,7 @@ using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
+using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
@@ -17,12 +18,17 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IGenericRepository<Patient, int> _patientRepository;
+        private readonly IRatingService _ratingService;
+        private readonly IDoctorService _doctorService;
 
-        public PatientService(IUnitOfWork unitOfWork, IMapper mapper)
+        public PatientService(IUnitOfWork unitOfWork, IMapper mapper,
+                IRatingService ratingService, IDoctorService doctorService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _patientRepository = _unitOfWork.Repository<Patient, int>();
+            _ratingService = ratingService;
+            _doctorService = doctorService;
         }
 
         public async Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null)
@@ -114,7 +120,29 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             var rating = _mapper.Map<Rating>(dto);
             rating.PatientId = patient.PatientId;
-            ratingRepo.Add(rating);
+
+            bool exist =  await _ratingService.ExistsAsync(r => r.PatientId == rating.PatientId
+                            && r.DoctorId == rating.DoctorId);
+
+
+            if (exist) 
+            {
+                List<Rating> ratings = await ratingRepo.GetAllAsync(
+                    new QueryOptions<Rating> {
+                        Filter = r => r.PatientId == rating.PatientId 
+                            &&  r.DoctorId == rating.DoctorId
+                    });
+
+                ratings.FirstOrDefault().RatingValue = rating.RatingValue;
+                ratings.FirstOrDefault().Comment = rating.Comment;
+                ratingRepo.Update(ratings.FirstOrDefault());
+            }
+            else
+            {
+                ratingRepo.Add(rating);
+            }
+
+            await _doctorService.UpdateDoctorRating(rating.DoctorId);
             return await _unitOfWork.CompleteAsync() > 0;
         }
 
