@@ -120,53 +120,6 @@ namespace _03_APILayer.Controllers
         #endregion
 
 
-        #region Doctor Time Slot Endpoints
-
-        /// <summary>
-        /// Adds a new time slot for a doctor.
-        /// </summary>
-        [HttpPost("DoctorTimeSlot")]
-        public async Task<IActionResult> AddTimeSlot([FromBody] DoctorTimeSlotDTO dto)
-        {
-            try
-            {
-                var result = await _doctorService.AddDoctorTimeSlotAsync(dto);
-                return Ok(result);
-            }
-            catch (Exception ex) { return BadRequest(ex.Message); }
-        }
-
-        /// <summary>
-        /// Deletes a specific doctor time slot by its unique identifier.
-        /// </summary>
-        [HttpDelete("DoctorTimeSlot/{doctorTimeSlotId}")]
-        public async Task<IActionResult> DeleteTimeSlot(int doctorTimeSlotId)
-        {
-            try
-            {
-                var result = await _doctorService.DeleteDoctorTimeSlotAsync(doctorTimeSlotId);
-                if (!result) return NotFound();
-                return NoContent();
-            }
-            catch (Exception ex) { return BadRequest(ex.Message); }
-        }
-
-        /// <summary>
-        /// Deactivates a specific doctor's time slot.
-        /// </summary>
-        [HttpPut("DoctorTimeSlot/{doctorTimeSlotId}/deactivate")]
-        public async Task<IActionResult> DeactivateTimeSlot(int doctorTimeSlotId)
-        {
-            try
-            {
-                var result = await _doctorService.DeactivateDoctorTimeSlotAsync(doctorTimeSlotId);
-                if (!result) return NotFound();
-                return Ok("Deactivated");
-            }
-            catch (Exception ex) { return BadRequest(ex.Message); }
-        }
-
-        #endregion
 
 
         #region Document Endpoints

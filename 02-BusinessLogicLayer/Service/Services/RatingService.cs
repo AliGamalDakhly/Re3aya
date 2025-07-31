@@ -70,7 +70,21 @@ namespace _02_BusinessLogicLayer.Service.Services
             // Use Auto Mapper to map Entity to DTO
             return _mapper.Map<RatingDTO>(rating);
         }
+        public async Task<float> GetDoctorRatingByIdAsync(int doctorId)
+        {
+            List<Rating> ratings = await _context.GetAllAsync(new QueryOptions<Rating>
+            {
+                Filter = d => d.DoctorId == doctorId
+            });
 
+            float totalRating = 0;
+            foreach (var rating in ratings) // Fixed the foreach loop by specifying the type and identifier
+            {
+                totalRating += rating.RatingValue;
+            }
+
+            return ratings.Count > 0 ? totalRating / ratings.Count : 0; // Calculate average rating
+        }
         public async Task<bool> DeleteRatingByIdAsync(int id)
         {
             // add your required logic here
