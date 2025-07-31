@@ -259,51 +259,6 @@ namespace _02_BusinessLogicLayer.Service.Services
             return output;
         }
 
-        public async Task<DoctorTimeSlot> AddDoctorTimeSlotAsync(DoctorTimeSlotDTO dto)
-        {
-            var timeSlot = new TimeSlot
-            {
-                StartTime = dto.StartTime,
-                EndTime = dto.EndTime,
-                DayOfWeek = dto.DayOfWeek
-            };
-
-            await _unitOfWork.Repository<TimeSlot, int>().AddAsync(timeSlot);
-            await _unitOfWork.CompleteAsync();
-
-            var doctorTimeSlot = new DoctorTimeSlot
-            {
-                DoctorId = dto.DoctorId,
-                TimeSlotId = timeSlot.TimeSlotId,
-                IsAvailable = true
-            };
-
-            await _unitOfWork.Repository<DoctorTimeSlot, int>().AddAsync(doctorTimeSlot);
-            await _unitOfWork.CompleteAsync();
-
-            return doctorTimeSlot;
-        }
-        public async Task<bool> DeleteDoctorTimeSlotAsync(int doctorTimeSlotId)
-        {
-            var slot = await _unitOfWork.Repository<DoctorTimeSlot, int>().GetByIdAsync(doctorTimeSlotId);
-            if (slot == null) return false;
-
-            await _unitOfWork.Repository<DoctorTimeSlot, int>().DeleteAsync(slot);
-            await _unitOfWork.CompleteAsync();
-            return true;
-        }
-        public async Task<bool> DeactivateDoctorTimeSlotAsync(int doctorTimeSlotId)
-        {
-            var slot = await _unitOfWork.Repository<DoctorTimeSlot, int>().GetByIdAsync(doctorTimeSlotId);
-            if (slot == null) return false;
-
-            slot.IsAvailable = false;
-            await _unitOfWork.Repository<DoctorTimeSlot, int>().UpdateAsync(slot);
-            await _unitOfWork.CompleteAsync();
-            return true;
-        }
-
-
 
         public async Task<string?> GetDoctorFullNameByIdAsync(int doctorId)
         {
