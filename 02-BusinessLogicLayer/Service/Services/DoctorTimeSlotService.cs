@@ -30,6 +30,20 @@ namespace _02_BusinessLogicLayer.Service.Services
             _context = _unitOfWork.Repository<DoctorTimeSlot, int>();
         }
 
+           public async Task<bool> UpadateDoctorTimeSlot(DoctorTimeSlotDTO doctorTimeSlotDTO, int id)
+        {
+            // we first get the entity from DB.
+            var existingDoctorTimeSlot = await _context.GetByIdAsync(id);
+
+            if (existingDoctorTimeSlot == null)
+                return false;
+            //-------- dont forget to update all fields of your entity ---------
+            existingDoctorTimeSlot.IsAvailable = doctorTimeSlotDTO.IsAvailable;
+
+            await _context.UpdateAsync(existingDoctorTimeSlot);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
         
         public async Task<DoctorTimeSlotDTO> AddDoctorTimeSlotAsync(DoctorTimeSlotCreateDTO dto)
         {
