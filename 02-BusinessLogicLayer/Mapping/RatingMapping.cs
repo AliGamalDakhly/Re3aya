@@ -16,12 +16,14 @@ namespace _02_BusinessLogicLayer.Mapping
 
 
             CreateMap<Rating, RatingDTO>()
+                .ForMember(dest => dest.RatingId, opt => opt.MapFrom(src => src.RatingId))
                 .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
                 .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                 .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId))
                 .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId));
 
             CreateMap<RatingDTO, Rating>()
+                .ForMember(dest => dest.RatingId, opt => opt.MapFrom(src => src.RatingId))
                 .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
                 .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                 .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId))

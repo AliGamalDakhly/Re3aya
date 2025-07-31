@@ -21,10 +21,12 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IAddressService _addressService;
         private readonly ISpecializationService _specialzationService;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
+        private readonly IRatingService _ratingService;
         private AddressDTO addressDto;
 
         public DoctorService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager,
             IDoctorTimeSlotService doctorTimeSlotService,IMapper mapper, 
+            IRatingService ratingService,
             IAddressService addressService, ISpecializationService specializationService)
         {
             _unitOfWork = unitOfWork;
@@ -33,6 +35,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             _addressService = addressService;
             _specialzationService = specializationService;
             _doctorTimeSlotService = doctorTimeSlotService;
+            _ratingService = ratingService;
         }
 
 
@@ -271,6 +274,16 @@ namespace _02_BusinessLogicLayer.Service.Services
                 return null;
 
             return appUser.FullName;
+        }
+
+
+        public async Task UpdateDoctorRating(int doctorId)
+        {
+            float newRatingVal = await _ratingService.GetDoctorRatingByIdAsync(doctorId);
+            Doctor existingDoctor =  await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            existingDoctor.RatingValue = newRatingVal;
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(existingDoctor);
+            await _unitOfWork.CompleteAsync();
         }
 
 
