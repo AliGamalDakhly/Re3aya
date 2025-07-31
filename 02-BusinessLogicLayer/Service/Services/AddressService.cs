@@ -127,6 +127,15 @@ namespace _02_BusinessLogicLayer.Service.Services
             return true;
         }
 
+        public async Task<GovernmentDTO> GetGovernmentByCityIdAsync(int id)
+        {
+
+            City city = await _cityContext.GetByIdAsync(id);
+            if (city == null)
+                return null;
+            Government government = await _governmentContext.GetByIdAsync(city.GovernmentId);
+            return _mapper.Map<GovernmentDTO>(government);
+        }
         public async Task<AddressDTO> AddAddressAsync(AddressDTO address)
         {
             var addressEntity = _mapper.Map<Address>(address);
