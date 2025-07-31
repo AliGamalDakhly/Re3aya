@@ -22,6 +22,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<List<AvailableDoctorTImeSlotDTO>> AvailableDoctorTimeSlots(int doctorId, DateOnly date);
         Task<bool> HasAvailableTimeSlots(int doctorId, DateTime date);
         Task<bool> HasAvailableTimeSlots(int doctorId);
+        Task<bool> UpadateDoctorTimeSlot(DoctorTimeSlotDTO doctorTimeSlotDTO, int id);
 
 
     }

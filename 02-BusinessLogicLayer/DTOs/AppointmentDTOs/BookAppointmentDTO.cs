@@ -17,6 +17,8 @@ namespace _02_BusinessLogicLayer.DTOs.AppointmentDTOs
         public int DoctorId { get; set; }
         public int TimeSlotId { get; set; }
         public string Notes { get; set; }
+        public int AppointmentId { get; set; }
+        public int DoctorTimeSlotId { get; set; }
 
     }
 }

@@ -43,7 +43,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         //{
 
         //    Appointment appointment = _mapper.Map<Appointment>(bookAppointmentDto);
-            
+
         //    // i want to get the id of doctor timeslot where timeslotid and doctorid equals coming from appointment dto
         //    List<AddDoctorTimeSlotDTO> doctorTimeSlots = await _doctorTimeSlotService
         //        .GetAllAsync(new QueryOptions<DoctorTimeSlot>
@@ -72,40 +72,77 @@ namespace _02_BusinessLogicLayer.Service.Services
         //    return _mapper.Map<BookAppointment>(addedAppointment);
         //}
 
+        //public async Task<BookAppointment> BookAppointmentAsync(BookAppointment bookAppointmentDto)
+        //{
+        //    // 1. Map to entity
+        //    var appointment = _mapper.Map<Appointment>(bookAppointmentDto);
+
+        //    // 2. Get the exact DoctorTimeSlot entity using domain model service
+        //    var doctorTimeSlot = (await _unitOfWork.Repository<DoctorTimeSlot, int>()
+        //        .GetAllAsync(new QueryOptions<DoctorTimeSlot>
+        //        {
+        //            Filter = dts => dts.TimeSlotId == bookAppointmentDto.TimeSlotId
+        //                         && dts.DoctorId == bookAppointmentDto.DoctorId
+        //                         && dts.IsAvailable,
+        //        }))
+        //        .FirstOrDefault();
+
+        //    if (doctorTimeSlot == null)
+        //        throw new Exception("This appointment is not available right now.");
+
+        //    // 3. Assign the DoctorTimeSlotId
+        //    appointment.DoctorTimeSlotId = doctorTimeSlot.DoctorTimeSlotId;
+
+        //    // 4. Add the appointment
+        //    var addedAppointment = await _context.AddAsync(appointment);
+
+        //    // 5. Mark the DoctorTimeSlot as unavailable
+        //    doctorTimeSlot.IsAvailable = false;
+        //    await _unitOfWork.Repository<DoctorTimeSlot, int>().UpdateAsync(doctorTimeSlot);
+
+        //    // 6. Save all changes
+        //    await _unitOfWork.CompleteAsync();
+
+        //    // 7. Return result mapped to DTO
+        //    return _mapper.Map<BookAppointment>(addedAppointment);
+        //}
+
+
         public async Task<BookAppointment> BookAppointmentAsync(BookAppointment bookAppointmentDto)
         {
-            // 1. Map to entity
-            var appointment = _mapper.Map<Appointment>(bookAppointmentDto);
+            Appointment appointment = _mapper.Map<Appointment>(bookAppointmentDto);
 
-            // 2. Get the exact DoctorTimeSlot entity using domain model service
-            var doctorTimeSlot = (await _unitOfWork.Repository<DoctorTimeSlot, int>()
-                .GetAllAsync(new QueryOptions<DoctorTimeSlot>
-                {
-                    Filter = dts => dts.TimeSlotId == bookAppointmentDto.TimeSlotId
-                                 && dts.DoctorId == bookAppointmentDto.DoctorId
-                                 && dts.IsAvailable,
-                }))
-                .FirstOrDefault();
+            var doctorTimeSlots = await _doctorTimeSlotService.GetAllAsync(new QueryOptions<DoctorTimeSlot>
+            {
+                Filter = dts => dts.TimeSlotId == bookAppointmentDto.TimeSlotId
+                             && dts.DoctorId == bookAppointmentDto.DoctorId
+                             && dts.IsAvailable == true
+            });
 
-            if (doctorTimeSlot == null)
-                throw new Exception("This appointment is not available right now.");
+            var doctorTimeSlotDTO = doctorTimeSlots.FirstOrDefault();
+            if (doctorTimeSlotDTO == null)
+                throw new Exception($"No available slot found for DoctorId {bookAppointmentDto.DoctorId} and TimeSlotId {bookAppointmentDto.TimeSlotId}");
 
-            // 3. Assign the DoctorTimeSlotId
-            appointment.DoctorTimeSlotId = doctorTimeSlot.DoctorTimeSlotId;
+            appointment.DoctorTimeSlotId = doctorTimeSlotDTO.DoctorTimeSlotId;
 
-            // 4. Add the appointment
-            var addedAppointment = await _context.AddAsync(appointment);
+            var result = await _context.AddAsync(appointment);
 
-            // 5. Mark the DoctorTimeSlot as unavailable
-            doctorTimeSlot.IsAvailable = false;
-            await _unitOfWork.Repository<DoctorTimeSlot, int>().UpdateAsync(doctorTimeSlot);
+            doctorTimeSlotDTO.IsAvailable = false;
 
-            // 6. Save all changes
+            await _doctorTimeSlotService.UpadateDoctorTimeSlot(doctorTimeSlotDTO, doctorTimeSlotDTO.DoctorTimeSlotId);
             await _unitOfWork.CompleteAsync();
 
-            // 7. Return result mapped to DTO
-            return _mapper.Map<BookAppointment>(addedAppointment);
+            return new BookAppointment
+            {
+                AppointmentId = result.AppointmentId,
+                DoctorId = bookAppointmentDto.DoctorId,
+                TimeSlotId = bookAppointmentDto.TimeSlotId,
+                DoctorTimeSlotId = doctorTimeSlotDTO.DoctorTimeSlotId,
+                PaymentId = appointment.PaymentId,
+                Notes = appointment.Notes,
+            };
         }
+
 
         public async Task<bool> ConfirmAppointmentAsync(int appointmentId)
         {

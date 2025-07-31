@@ -69,6 +69,29 @@ namespace _03_APILayer.Controllers
 
 
 
+        //[HttpGet("paymob-callback")]
+        //public async Task<IActionResult> PaymobCallback([FromQuery] PaymobCallbackDTO dto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    double amount = Convert.ToDouble(dto.AmountCents) / 100.0;
+
+        //    var payment = new _01_DataAccessLayer.Models.Payment
+        //    {
+        //        TransactionId = dto.Id,
+        //        Amount = amount,
+        //        Status = dto.Success ? PaymentStatus.Completed : PaymentStatus.Failed,
+        //        CreatedAt = DateTime.UtcNow
+        //    };
+
+        //    _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().Add(payment);
+        //    await _unitOfWork.CompleteAsync();
+
+        //    return Ok(new { message = "payment saved successfully" });
+        //}
+
+
         [HttpGet("paymob-callback")]
         public async Task<IActionResult> PaymobCallback([FromQuery] PaymobCallbackDTO dto)
         {
@@ -85,11 +108,14 @@ namespace _03_APILayer.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().Add(payment);
+            await _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().AddAsync(payment);
             await _unitOfWork.CompleteAsync();
 
-            return Ok(new { message = "payment saved successfully" });
+            // Return paymentId with success
+            return Ok(new { message = "payment saved successfully", paymentId = payment.PaymentId });
         }
+
+
 
 
 
