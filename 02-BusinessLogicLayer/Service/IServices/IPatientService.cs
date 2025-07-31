@@ -42,7 +42,10 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
 
         #region
-
+        Task<List<AppointmentResponseDTO>> GetMyUpcomingAppointmentsAsync(string userId);
+        Task<List<AppointmentResponseDTO>> GetMyPastAppointmentsAsync(string userId);
+        Task<bool> CancelAppointment2Async(int appointmentId, string userId);
+        Task<AppointmentResponseDTO> BookAppointment2Async(CreateAppointmentDTO dto, string userId);
 
         //we will handle this after add AppointmentDTO
         //Task<List<AppointmentDTO>> GetAppointmentForPatientAsync(int patientId); //get all appointments for a specific patient
@@ -56,7 +59,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
 
 
-       
+
 
         #endregion
     }

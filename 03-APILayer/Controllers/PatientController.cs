@@ -1,5 +1,4 @@
 ﻿using _01_DataAccessLayer.Models;
-using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +10,7 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 namespace _03_APILayer.Controllers
 {
     //[Authorize]
+    [Authorize(Roles = "Patient")]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -72,8 +72,8 @@ namespace _03_APILayer.Controllers
             {
                 var userId = GetAppUserId();
 
-                if(userId != updatePatientDto.AppUserId)
-                    return Unauthorized("You can only update your own profile.");
+                //if (userId != updatePatientDto.UserId)
+                //  return Unauthorized("You can only update your own profile.");
 
                 var result = await _patientService.UpdateProfileAsync(updatePatientDto, userId);
                 if (!result)
@@ -250,7 +250,7 @@ namespace _03_APILayer.Controllers
             }
             catch (Exception ex)
             {
-                 return StatusCode(500, $"An error occurred while booking appointment: {ex.Message}");
+                return StatusCode(500, $"An error occurred while booking appointment: {ex.Message}");
             }
         }
 
@@ -273,5 +273,80 @@ namespace _03_APILayer.Controllers
                 return StatusCode(500, $"An error occurred while cancelling appointment: {ex.Message}");
             }
         }
+
+
+
+
+        //////////////
+        [HttpGet("appointments/upcoming")]
+        public async Task<IActionResult> GetUpcomingAppointments()
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var result = await _patientService.GetMyUpcomingAppointmentsAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"حدث خطأ أثناء جلب المواعيد القادمة: {ex.Message}");
+            }
+        }
+
+        [HttpGet("appointments/past")]
+        public async Task<IActionResult> GetPastAppointments()
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var result = await _patientService.GetMyPastAppointmentsAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"حدث خطأ أثناء جلب المواعيد السابقة: {ex.Message}");
+            }
+        }
+
+        [HttpPut("appointments/{appointmentId}/cancel")]
+        public async Task<IActionResult> CancelAppointment(int appointmentId)
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var success = await _patientService.CancelAppointment2Async(appointmentId, userId);
+
+                if (!success)
+                    return BadRequest("لم يتم العثور على الموعد أو لا يمكنك إلغاءه.");
+
+                return Ok("تم إلغاء الموعد بنجاح.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"حدث خطأ أثناء محاولة الإلغاء: {ex.Message}");
+            }
+        }
+
+        [HttpPost("appointments/book")]
+        public async Task<IActionResult> BookAppointment([FromBody] CreateAppointmentDTO dto)
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var result = await _patientService.BookAppointment2Async(dto, userId);
+
+                if (result == null)
+                    return BadRequest("فشل في حجز الموعد. تحقق من الوقت أو البيانات المدخلة.");
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"حدث خطأ أثناء حجز الموعد: {ex.Message}");
+            }
+        }
+
+
+
     }
 }

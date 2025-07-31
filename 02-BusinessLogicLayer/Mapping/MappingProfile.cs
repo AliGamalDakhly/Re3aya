@@ -76,7 +76,17 @@ namespace _02_BusinessLogicLayer.Mapping
 
             //CreateMap<LoginDTO,>
             #endregion
+            ///////////////
+            CreateMap<Appointment, AppointmentResponseDTO>()
+                    .ForMember(dest => dest.DoctorName,
+                         opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.AppUser.FullName))
+                    .ForMember(dest => dest.StartTime,
+                        opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime))
+                    .ForMember(dest => dest.EndTime,
+                        opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime));
 
+            
+            CreateMap<CreateAppointmentDTO, Appointment>();
 
             // if you would like using Auto mapping for other entity
             // add your mapping blow like the previes DTO Mapping

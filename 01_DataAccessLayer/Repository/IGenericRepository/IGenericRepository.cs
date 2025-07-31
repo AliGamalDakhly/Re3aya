@@ -20,11 +20,18 @@ namespace _01_DataAccessLayer.Repository.IGenericRepository
            Expression<Func<TEntity, bool>> predicate,
            params Expression<Func<TEntity, object>>[] includes
         );
-        //Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
-        #endregion
 
-        #region Synchronous Methods
-        TEntity Add(TEntity entity);
+        Task<List<TEntity>> GetAllIncludeAsync(
+        Expression<Func<TEntity, bool>> predicate,
+         params Expression<Func<TEntity, object>>[] includes);
+        
+
+
+            //Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+            #endregion
+
+            #region Synchronous Methods
+            TEntity Add(TEntity entity);
         TEntity Update(TEntity entity);
         bool Delete(TEntity entity);
         bool DeleteById(TKey id);

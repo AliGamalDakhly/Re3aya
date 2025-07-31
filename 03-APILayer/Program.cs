@@ -86,9 +86,9 @@ namespace _03_APILayer
                     ValidateLifetime = true, // check expiration
                     ValidateIssuerSigningKey = true,
 
-            
-                    ValidIssuer = builder.Configuration["JWT:Issuer"],
-                    ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<List<string>>(),
+
+                    ValidIssuer = builder.Configuration["JWT:IssuerIP"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
 
                 };
@@ -99,11 +99,12 @@ namespace _03_APILayer
 
             builder.Services.AddSwaggerGen(swagger =>
             {
+                //This is to generate the Default UI of Swagger Documentation
                 swagger.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Re3aya API",
-                    Description = "ITI Project API"
+                    Title = "ASP.NET 5 Web API",
+                    Description = " ITI Projrcy"
                 });
 
                 swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -113,25 +114,21 @@ namespace _03_APILayer
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Enter 'Bearer' [space] and then your valid token.\n\nExample: \"Bearer eyJhbGciOi...\""
+                    Description = "Enter 'Bearer' followed by your JWT token.\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                 });
 
                 swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-            });
+                    {
+                      new OpenApiSecurityScheme{Reference = new OpenApiReference
+                      {
+                          Type = ReferenceType.SecurityScheme,Id = "Bearer"}
+                      },
+                     new string[] {}
 
+                         }
+                     });
+            });
             #endregion
 
             // Add Authorization
@@ -146,32 +143,29 @@ namespace _03_APILayer
 
             var app = builder.Build();
 
-            // Middleware global error handler
-            app.Use(async (context, next) =>
-            {
-                try
-                {
-                    await next();
-                }
-                catch (Exception ex)
-                {
-                    context.Response.ContentType = "text/plain";
-                    await context.Response.WriteAsync("Unhandled Exception: " + ex.Message);
-                }
-            });
 
-           
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            // seeding roles here instead of adding each role in each service 
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                DefaultRolesSeeder.SeedRolesAsync(roleManager).GetAwaiter().GetResult();
+            }
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
 
+
             app.MapControllers();
 
             app.Run();
-
         }
     }
 }

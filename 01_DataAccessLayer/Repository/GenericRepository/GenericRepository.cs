@@ -150,6 +150,24 @@ namespace _01_DataAccessLayer.Repository.GenericRepository
             }
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<List<TEntity>> GetAllIncludeAsync(
+         Expression<Func<TEntity, bool>> predicate,
+          params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbSet.Where(predicate);
+
+            if (includes != null && includes.Length > 0)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
         #endregion
 
         #region Synchronous Methods

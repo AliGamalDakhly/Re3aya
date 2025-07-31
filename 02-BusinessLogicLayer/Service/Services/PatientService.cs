@@ -194,5 +194,122 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             return _mapper.Map<List<AppointmentDTO>>(appointments);
         }
+
+
+        /////////////////////////////
+        public async Task<List<AppointmentResponseDTO>> GetMyUpcomingAppointmentsAsync(string userId)
+        {
+            // 1. احصل على المريض من خلال AppUserId
+            var patient = await _unitOfWork.Repository<Patient, int>()
+                .GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+
+            if (patient == null)
+                throw new Exception("المريض غير موجود");
+
+           
+            var appointments = await _unitOfWork.Repository<Appointment, int>()
+                .GetAllIncludeAsync(
+                    a => a.PatientId == patient.PatientId &&
+                         a.DoctorTimeSlot.TimeSlot.EndTime > DateTime.Now &&
+                         a.Status != AppointmentStatus.Cancelled,
+                    a => a.DoctorTimeSlot,
+                    a => a.DoctorTimeSlot.TimeSlot,
+                    a => a.DoctorTimeSlot.Doctor,
+                    a => a.DoctorTimeSlot.Doctor.AppUser
+                );
+
+            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+            //return appointments.Select(a => new AppointmentResponseDTO
+            //{
+            //    AppointmentId = a.AppointmentId,
+            //    CreatedAt = a.CreatedAt,
+            //    Status = a.Status,
+            //    Notes = a.Notes,
+            //    StartTime = a.DoctorTimeSlot.TimeSlot.StartTime,
+            //    EndTime = a.DoctorTimeSlot.TimeSlot.EndTime,
+            //    DoctorName = a.DoctorTimeSlot.Doctor.AppUser.FullName
+            //}).ToList();
+        }
+
+
+        public async Task<List<AppointmentResponseDTO>> GetMyPastAppointmentsAsync(string userId)
+        {
+            // 1. احصل على المريض الحالي من خلال AppUserId
+            var patient = await _unitOfWork.Repository<Patient, int>()
+                .GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+
+            if (patient == null)
+                throw new Exception("المريض غير موجود");
+
+            
+            var appointments = await _unitOfWork.Repository<Appointment, int>()
+                .GetAllIncludeAsync(
+                    a => a.PatientId == patient.PatientId &&
+                         a.DoctorTimeSlot.TimeSlot.EndTime <= DateTime.Now,
+                    a => a.DoctorTimeSlot,
+                    a => a.DoctorTimeSlot.TimeSlot,
+                    a => a.DoctorTimeSlot.Doctor,
+                    a => a.DoctorTimeSlot.Doctor.AppUser
+                );
+
+            
+            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+            //return appointments.Select(a => new AppointmentResponseDTO
+            //{
+            //    AppointmentId = a.AppointmentId,
+            //    CreatedAt = a.CreatedAt,
+            //    Status = a.Status,
+            //    Notes = a.Notes,
+            //    StartTime = a.DoctorTimeSlot.TimeSlot.StartTime,
+            //    EndTime = a.DoctorTimeSlot.TimeSlot.EndTime,
+            //    DoctorName = a.DoctorTimeSlot.Doctor.AppUser.FullName
+            //}).ToList();
+        }
+
+
+        public async Task<AppointmentResponseDTO> BookAppointment2Async(CreateAppointmentDTO dto, string userId)
+        {
+            var patient = await _unitOfWork.Repository<Patient,int>()
+                .GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+
+            var doctorSlot = await _unitOfWork.Repository<DoctorTimeSlot, int>()
+                .GetFirstOrDefaultAsync(ds => ds.DoctorTimeSlotId == dto.DoctorTimeSlotId && ds.IsAvailable);
+
+            if (doctorSlot == null) throw new Exception("الوقت غير متاح");
+
+            doctorSlot.IsAvailable = false;
+
+            var payment = new Payment { Amount = 100, Status = PaymentStatus.Pending };
+            var appointment = new Appointment
+            {
+                DoctorTimeSlotId = dto.DoctorTimeSlotId,
+                PatientId = patient.PatientId,
+                Payment = payment,
+                Notes = dto.Notes
+            };
+
+            await _unitOfWork.Repository<Appointment, int>().AddAsync(appointment);
+            await _unitOfWork.CompleteAsync();
+
+            return _mapper.Map<AppointmentResponseDTO>(appointment);
+        }
+
+        public async Task<bool> CancelAppointment2Async(int appointmentId, string userId)
+        {
+            var patient = await _unitOfWork.Repository<Patient, int>()
+                .GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+
+            var appointment = await _unitOfWork.Repository<Appointment, int>()
+                .GetFirstOrDefaultAsync(a => a.AppointmentId == appointmentId && a.PatientId == patient.PatientId);
+
+            if (appointment == null || appointment.Status == AppointmentStatus.Cancelled)
+                return false;
+
+            appointment.Status = AppointmentStatus.Cancelled;
+            appointment.DoctorTimeSlot.IsAvailable = true;
+
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
     }
 }
