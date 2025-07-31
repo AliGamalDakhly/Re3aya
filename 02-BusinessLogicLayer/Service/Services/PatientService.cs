@@ -141,6 +141,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             {
                 ratingRepo.Add(rating);
             }
+            await _unitOfWork.CompleteAsync();
 
             await _doctorService.UpdateDoctorRating(rating.DoctorId);
             return await _unitOfWork.CompleteAsync() > 0;
