@@ -20,6 +20,8 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<int> CountGovernmentsAsync(Expression<Func<Government, bool>>? filter = null);
 
         Task<bool> ExistsGovernmentAsync(Expression<Func<Government, bool>> predicate);
+
+        Task<GovernmentDTO> GetGovernmentByCityIdAsync(int id);
         #endregion
 
         #region Cities
