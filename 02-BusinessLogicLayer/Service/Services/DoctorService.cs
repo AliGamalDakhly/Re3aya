@@ -284,7 +284,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             //await _addressService.UpdateAddressAsync(addressDto, doctor.a);
 
             GovernmentDTO government;
-            if (address != 0)
+            if (addressDto.CityId != 0)
             {
                 government = await _addressService.GetGovernmentByCityIdAsync(doctorDto.CityId);
             }
