@@ -169,7 +169,23 @@ namespace _02_BusinessLogicLayer.Service.Services
             var doctor = doctors.FirstOrDefault();
             var user = await _userManager.FindByIdAsync(doctor.AppUserId);
 
-            var government = await _addressService.GetGovernmentByCityIdAsync(doctor.Addresses.FirstOrDefault().CityId);
+            var address = doctor.Addresses.FirstOrDefault();
+            var cityId = address?.CityId ?? 0;
+            GovernmentDTO government;
+            if (cityId != 0)
+            {
+                government = await _addressService.GetGovernmentByCityIdAsync(cityId);
+            }
+            else
+            {
+                government = new GovernmentDTO
+                {
+                    GovernmentId = 0,
+                    Name = null
+                };
+            }
+
+
             var dto = _mapper.Map<DoctorGetDTO>(doctor);
             dto.Specialization = doctor.Specialization?.Name; // Assuming Specialization is a navigation property
             dto.SpecializationId = doctor.Specialization?.SpecializationId ?? 0; // Assuming SpecializationId is a property in Doctor
@@ -178,7 +194,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             dto.Email = user.Email;
             dto.PhoneNumber = user.PhoneNumber;
             dto.Gender = user.Gender.ToString();
-            dto.CityId = doctor.Addresses.FirstOrDefault().CityId; // Assuming Addresses is a collection and CityId is a property
+            dto.CityId = doctor.Addresses.FirstOrDefault()?.CityId ?? 0; // Assuming Addresses is a collection and CityId is a property
             dto.CityName = doctor.Addresses.FirstOrDefault()?.City?.Name; // Assuming Addresses is a collection and City is a navigation property
 
             dto.GovernmentId = government.GovernmentId; // Assuming Addresses is a collection and GovernmentId is a property
@@ -244,12 +260,43 @@ namespace _02_BusinessLogicLayer.Service.Services
                     DoctorId = doctor.DoctorId // Assuming DoctorId is an int
                 };
             }
-            var address = doctor.Addresses.FirstOrDefault().AddressId;
-            await _addressService.UpdateAddressAsync(addressDto, address);
+            int address = 0;
+
+            address = doctor.Addresses.FirstOrDefault()?.AddressId ?? 0; // Get the first address ID or 0 if not found    
+            if (address != 0)
+            {
+                await _addressService.UpdateAddressAsync(addressDto, address);
+            }
+            else
+            {
+                addressDto = new AddressDTO
+                {
+                    Location = doctorDto.location, // Assuming location is a string 
+                    DetailedAddress = doctorDto.DetailedAddress,// Assuming DetailedAddress is a strin
+                    CityId = doctorDto.CityId, // Assuming CityId is an int
+                    DoctorId = doctor.DoctorId // Assuming DoctorId is an int
+                };
+                await _addressService.AddAddressAsync(addressDto); // Add new address if no existing address found
+            }
+
+
 
             //await _addressService.UpdateAddressAsync(addressDto, doctor.a);
 
-            var government = await _addressService.GetGovernmentByCityIdAsync(doctor.Addresses.FirstOrDefault().CityId);
+            GovernmentDTO government;
+            if (addressDto.CityId != 0)
+            {
+                government = await _addressService.GetGovernmentByCityIdAsync(doctorDto.CityId);
+            }
+            else
+            {
+                government = new GovernmentDTO
+                {
+                    GovernmentId = 0,
+                    Name = null
+                };
+            }
+
             // Map to output DTO
             var output = _mapper.Map<DoctorGetDTO>(doctor);
             output.FullName = appUser.FullName;
@@ -265,7 +312,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             output.GraduationCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.GraduationCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             output.ExperienceCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ExperienceCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             output.ProfilePictureUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ProfileImage).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
-            output.CityId = doctor.Addresses.FirstOrDefault().CityId; // Assuming Addresses is a collection and CityId is a property
+            output.CityId = doctor.Addresses.FirstOrDefault()?.CityId ?? 0; // Assuming Addresses is a collection and CityId is a property
             output.CityName = doctor.Addresses.FirstOrDefault()?.City?.Name; // Assuming Addresses is a collection and City is a navigation property
             output.GovernmentId = government.GovernmentId; // Assuming Addresses is a collection and GovernmentId is a property
             output.GovernmentName = government.Name; // Assuming Addresses is a collection and Government is a navigation property
