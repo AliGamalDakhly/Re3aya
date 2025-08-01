@@ -18,15 +18,19 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
+        private readonly IDailyVideoService _dailyVideoService;
         private readonly IMapper _mapper;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IDoctorTimeSlotService doctorTimeSlotService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
+            IDailyVideoService dailyVideoService,
+            IDoctorTimeSlotService doctorTimeSlotService)
         {
 
             _unitOfWork = unitOfWork;
             _context = _unitOfWork.Repository<Appointment, int>();
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
+            _dailyVideoService = dailyVideoService;
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -225,6 +229,24 @@ namespace _02_BusinessLogicLayer.Service.Services
             var updatedAppointment = await _context.UpdateAsync(existingAppointment);
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
             return updatedAppointment != null;
+
+        }
+
+
+        public async Task<string> CreateRoomForAppointment(int appointmentId)
+        {
+            var appointment = await _context.GetByIdAsync(appointmentId);
+            if (appointment == null || appointment.VedioCallUrl != null)
+                throw new ArgumentException("Invalid appointment or already has a room");
+
+            var roomUrl = await _dailyVideoService.CreateRoomAsync(appointmentId.ToString());
+            if (roomUrl == null)
+                throw new Exception("Failed to create room");
+
+            appointment.VedioCallUrl = roomUrl;
+            await _unitOfWork.CompleteAsync();
+
+            return roomUrl;
 
         }
     }

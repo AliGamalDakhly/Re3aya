@@ -1,6 +1,7 @@
 ﻿using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace _03_APILayer.Controllers
 {
@@ -144,6 +145,24 @@ namespace _03_APILayer.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+        [HttpPost("appointments/{id}/create-room")]
+        public async Task<IActionResult> CreateRoomForAppointment(int id)
+        {
+            try
+            {
+                string roomUrl = await _appointmentService.CreateRoomForAppointment(id);
+                if (roomUrl == null)
+                    return BadRequest();
+
+                return Ok(roomUrl);
+            }   
+            catch
+            {
+                return BadRequest();
             }
         }
     }
