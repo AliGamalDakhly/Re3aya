@@ -18,6 +18,16 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public DoctorAccountStatus Status { get; set; }
         public string Specialization { get; set; }
         public int? SpecializationId { get; set; }
+        public string location { get; set; } // Assuming this is a string representation of the location
+        public string DetailedAddress { get; set; } // Assuming this is a string representation of the detailed address
+
+        public string MedicalLicenseUrl { get; set; } // URL to the medical license document
+
+        public string NationalIdUrl { get; set; } // URL to the national ID document
+        public string GraduationCertificateUrl { get; set; } // URL to the graduation certificate document
+        public string ExperienceCertificateUrl { get; set; }
+        public string ProfilePictureUrl { get; set; } // URL to the doctor's profile picture
+        public string Gender { get; set; } // Assuming this is a string representation
 
     }
 }

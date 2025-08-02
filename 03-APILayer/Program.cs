@@ -82,14 +82,15 @@ namespace _03_APILayer
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidateAudience = true,
+                    ValidateAudience = false,    //it make error
                     ValidateLifetime = true, // check expiration
                     ValidateIssuerSigningKey = true,
 
             
-                    ValidIssuer = builder.Configuration["JWT:Issuer"],
-                    ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<List<string>>(),
+                    ValidIssuer = builder.Configuration["JWT:IssuerIP"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
+                     
 
                 };
 

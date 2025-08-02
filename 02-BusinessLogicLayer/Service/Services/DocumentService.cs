@@ -1,14 +1,11 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
+using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -126,6 +123,17 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<DocumentDTO>(document);
         }
 
+        public async Task<List<DoctorDocumentsDTO>> GetDocumentsByDoctorIdAsync(int doctorId)
+        {
+            var documents = await _unitOfWork.Repository<Document, int>().GetAllAsync(new QueryOptions<Document>
+            {
+                Filter = d => d.DoctorId == doctorId
+            });
 
+            if (documents == null)
+                throw new Exception($"No documents found for doctor with ID {doctorId}.");
+            return _mapper.Map<List<DoctorDocumentsDTO>>(documents);
+
+        }
     }
 }

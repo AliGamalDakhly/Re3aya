@@ -32,6 +32,17 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.DoctorTimeSlotId, opt => opt.MapFrom(src => src.DoctorTimeSlotId))
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+
+            CreateMap<BookAppointment, Appointment>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.PaymentId));
+
+            CreateMap<Appointment, BookAppointment>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.PaymentId));
         }
     }
 }

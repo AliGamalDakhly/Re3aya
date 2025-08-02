@@ -14,10 +14,11 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public float RatingValue { get; set; }
         public double Fees { get; set; }
         public string Service { get; set; }
+        public string About { get; set; }
         public int WaitingTime { get; set; } = 30;  // in minutes
         // Related Entites
         public string Specialization { get; set; }
         public List<String> Addresses { get; set; }
-        public string ProfileImageUrl { get; set; }
+        public string ProfilePictureUrl { get; set; }
     }
 }
