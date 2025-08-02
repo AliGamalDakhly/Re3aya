@@ -8,6 +8,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
     public interface IAppointmentService
     {
         Task<string> CreateRoomForAppointment(int appointmentId);
+        Task<string> JoinRoom(int appointmentId, string appUserId);
         Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto);
         Task<BookAppointment> BookAppointmentAsync(BookAppointment bookAppointmentDto);
         Task<AppointmentDTO> GetAppointmentByIdAsync(int appointmentId);

@@ -9,6 +9,8 @@ using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
 using _01_DataAccessLayer.Enums;
+using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -20,10 +22,11 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
         private readonly IDoctorService _doctorService;
+        private readonly ITimeSlotService _timeSlotService;
         private readonly IMapper _mapper;
 
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
-            IDoctorService doctorService,
+            IDoctorService doctorService,ITimeSlotService timeSlotService,
             IDoctorTimeSlotService doctorTimeSlotService)
         {
 
@@ -32,6 +35,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
             _doctorService = doctorService;
+            _timeSlotService = timeSlotService;
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -256,6 +260,46 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             return roomUrl;
 
+        }
+
+        public async Task<string> JoinRoom(int appointmentId, string appUserId)
+        {
+            List<AppUser> users = await _unitOfWork.Repository<AppUser, string>().GetAllAsync(new QueryOptions<AppUser>
+            {
+                Includes = [a => a.Doctor, a => a.Patient],
+                Filter = a => a.Id == appUserId
+            });
+
+            AppUser appUser = users.FirstOrDefault();
+            if (appUser == null)
+                throw new Exception("Not Permitted to Join Meeting now");
+
+           
+
+            List<Appointment> appointments = await _context.GetAllAsync(new QueryOptions<Appointment>
+            {
+                Filter = a => a.AppointmentId == appointmentId,
+                Includes = [a => a.DoctorTimeSlot]
+            });
+
+            Appointment? appointment = appointments.FirstOrDefault();
+
+            if(appointment != null)
+            {
+                bool permitted = false;
+                if (appUser.Doctor != null && appointment.DoctorTimeSlot.DoctorId == appUser.Doctor.DoctorId)
+                    permitted = true;
+
+                if (appUser.Patient != null && appointment.PatientId == appUser.Patient.PatientId)
+                    permitted = true;
+
+                TimeSlotDTO timeslot = await _timeSlotService.GetByIdAsync(appointment.DoctorTimeSlot.TimeSlotId);
+
+                if(DateTime.Now >= timeslot.StartTime && DateTime.Now <= timeslot.EndTime && permitted)
+                    return appointment.VedioCallUrl;
+            }
+
+            throw new Exception("Not Permitted to Join Meeting now");
         }
     }
 }
