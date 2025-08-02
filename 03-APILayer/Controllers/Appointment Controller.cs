@@ -1,6 +1,9 @@
-﻿using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
+﻿using System.Security.Claims;
+using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace _03_APILayer.Controllers
 {
@@ -12,6 +15,14 @@ namespace _03_APILayer.Controllers
         public Appointment_Controller(IAppointmentService appointmentService)
         {
             _appointmentService = appointmentService;
+        }
+
+        private string GetAppUserId()
+        {
+            var userId = User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("User ID not found in token.");
+            return userId;
         }
 
         [HttpGet("get-all-appointments")]
@@ -144,6 +155,43 @@ namespace _03_APILayer.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+        [HttpPost("appointments/{id}/create-room")]
+        public async Task<IActionResult> CreateRoomForAppointment(int id)
+        {
+            try
+            {
+                string roomUrl = await _appointmentService.CreateRoomForAppointment(id);
+                if (roomUrl == null)
+                    return BadRequest();
+
+                return Ok(roomUrl);
+            }   
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [Authorize]
+        [HttpGet("appointment/JoinRoom/{id}")]
+        public async Task<IActionResult> JoinRoom(int id) // appointmentId
+        {
+            try
+            {
+                string appUserId = GetAppUserId();
+                if(appUserId == null)
+                    return Unauthorized();
+
+                string meetingLink = await _appointmentService.JoinRoom(id, appUserId);
+                return Ok(new { url = meetingLink }); // important: return object with "url"
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
         }
     }

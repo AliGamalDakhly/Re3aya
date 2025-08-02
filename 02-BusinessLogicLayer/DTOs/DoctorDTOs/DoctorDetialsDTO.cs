@@ -20,5 +20,8 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public string Specialization { get; set; }
         public List<String> Addresses { get; set; }
         public string ProfilePictureUrl { get; set; }
+
+        public string Location { get; set; }
+
     }
 }

@@ -1,4 +1,6 @@
-﻿using _02_BusinessLogicLayer.DTOs.AddressDTOs;
+﻿using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
+using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -120,6 +122,24 @@ namespace _03_APILayer.Controllers
                 return StatusCode(500, "Unexpected error: " + ex.Message);
             }
         }
+
+
+        [HttpGet("cityByGovernment/{id}")]
+
+        public async Task<IActionResult> GetCitiesByGovernmentId(int id)
+        {
+            try
+            {
+                List<CityDTO> cityDTOs = await _addressService.GetAllCitiesAsync(new QueryOptions<City> { Filter = c => c.GovernmentId == id });
+                // Assuming you want to map the City entities to CityDTOs.
+                return Ok(cityDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unexpected error: " + ex.Message);
+            }
+        }
+
 
         [HttpGet("addresses")]
         public async Task<IActionResult> GetAllAddresses()

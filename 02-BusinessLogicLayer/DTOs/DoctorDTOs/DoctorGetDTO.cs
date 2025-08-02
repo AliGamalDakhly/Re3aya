@@ -21,6 +21,12 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public string location { get; set; } // Assuming this is a string representation of the location
         public string DetailedAddress { get; set; } // Assuming this is a string representation of the detailed address
 
+
+        public int CityId { get; set; } // Assuming this is a string representation of the city
+        public string CityName { get; set; } // Name of the city
+        public int GovernmentId { get; set; } // Assuming this is a string representation of the government
+        public string GovernmentName { get; set; } // Name of the government
+
         public string MedicalLicenseUrl { get; set; } // URL to the medical license document
 
         public string NationalIdUrl { get; set; } // URL to the national ID document

@@ -142,6 +142,9 @@ namespace _02_BusinessLogicLayer.Service.Services
                 ratingRepo.Add(rating);
             }
 
+            await _unitOfWork.CompleteAsync();
+
+
             await _doctorService.UpdateDoctorRating(rating.DoctorId);
             return await _unitOfWork.CompleteAsync() > 0;
         }
@@ -233,30 +236,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
             if (patient == null) return new List<AppointmentResponseDTO>();
 
-            var options = new QueryOptions<Appointment>
-            {
-                Filter = a =>
-                    a.PatientId == patient.PatientId &&
-                    a.DoctorTimeSlot.TimeSlot.StartTime > DateTime.UtcNow.Date &&
-                    a.Status == AppointmentStatus.Confirmed,
-                Includes = new Expression<Func<Appointment, object>>[]
-                {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
-                }
-            };
 
-            var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
-            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
-        }
+            var appointments = await appointmentRepo.GetFirstOrDefaultAsync(
+                a => a.PatientId == patient.PatientId,
+                a => a.DoctorTimeSlot,
+                a => a.DoctorTimeSlot.TimeSlot,
+                a => a.DoctorTimeSlot.Doctor
+            );
 
-        public async Task<List<AppointmentResponseDTO>> GetPastAppointmentsAsync(string appUserId)
-        {
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return new List<AppointmentResponseDTO>();
 
             var options = new QueryOptions<Appointment>
             {
