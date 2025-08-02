@@ -1,6 +1,6 @@
-﻿using _02_BusinessLogicLayer.DTOs.DocumentDTO;
+﻿using _02_BusinessLogicLayer.DTOs.Common;
+using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _03_APILayer.Controllers
@@ -10,10 +10,20 @@ namespace _03_APILayer.Controllers
     public class DocumentController : ControllerBase
     {
         private readonly IDocumentService _documentService;
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IDoctorService _doctorService;
 
-        public DocumentController(IDocumentService documentService)
+
+        public DocumentController(
+            IDocumentService documentService,
+            ICloudinaryService cloudinaryService,
+            IDoctorService doctorService
+        )
         {
             _documentService = documentService;
+            _cloudinaryService = cloudinaryService;
+            _doctorService = doctorService;
+
         }
 
         /// <summary>
@@ -36,6 +46,24 @@ namespace _03_APILayer.Controllers
         {
             var result = await _documentService.GetAllAsync();
             return Ok(result);
+        }
+
+        [HttpGet("doctor/{doctorId}")]
+        public async Task<IActionResult> GetDocumentsByDoctorId(int doctorId)
+        {
+            var result = await _documentService.GetDocumentsByDoctorIdAsync(doctorId);
+            if (result == null || !result.Any()) return NotFound($"No documents found for doctor with ID {doctorId}.");
+            var response = result.Select(doc => new
+            {
+
+                doc.DocumentType,
+                data = new
+                {
+                    DocumentId = doc.DocumentId,
+                    FilePath = doc.FilePath
+                }
+            }).ToList();
+            return Ok(response);
         }
 
         /// <summary>
@@ -113,5 +141,113 @@ namespace _03_APILayer.Controllers
             var exists = await _documentService.ExistsDocumentAsync(id);
             return Ok(exists);
         }
+
+
+
+
+        //// ****************************************** cloudinary uploading system ***************************************************//// 
+        ///
+        /// 
+        /// <summary>
+        /// Upload document or img file to cloudinary and save to care db
+        /// </summary>
+        /// 
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> AddDocumentWithFile([FromForm] DocumentUploadDTO dto, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new GeneralResponse<string>
+                {
+                    Status = "failed",
+                    StatusCode = 400,
+                    IsSuccess = false,
+                    StatusDetails = "no file uploaded",
+                    Data = null
+                });
+            }
+
+            string fileUrl = await _cloudinaryService.UploadFileAsync(file);
+
+            var documentDto = new DocumentDTO
+            {
+                FilePath = fileUrl,
+                DocumentType = dto.DocumentType,
+                DoctorId = dto.DoctorId,
+                UploadedAt = DateTime.UtcNow,
+                IsVerified = false
+            };
+
+            var result = await _documentService.AddDocumentAsync(documentDto);
+
+            // get doctor full name
+            string? doctorName = await _doctorService.GetDoctorFullNameByIdAsync(dto.DoctorId);
+
+            var response = new GeneralResponse<object>
+            {
+                Status = "success",
+                StatusCode = 200,
+                IsSuccess = true,
+                StatusDetails = "document uploaded successfully to cloudinary and care db",
+                Data = new
+                {
+                    result.DocumentId,
+                    result.DocumentType,
+                    result.IsVerified,
+                    result.FilePath,
+                    result.UploadedAt,
+                    result.DoctorId,
+                    DoctorFullName = doctorName,
+
+                },
+                ApiUsage = "this api endpoint is under development for Re3aya|care by Abdallah Mokarb"
+            };
+
+            return CreatedAtAction(nameof(GetDocumentById), new { id = result.DocumentId }, response);
+        }
+
+
+
+        [HttpPut("upload/edit")]
+        public async Task<IActionResult> EditDocumentWithNewFile([FromForm] DocumentEditDTO dto, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new GeneralResponse<string>
+                {
+                    Status = "Failed",
+                    StatusCode = 400,
+                    IsSuccess = false,
+                    StatusDetails = "No file uploaded",
+                    Data = null
+                });
+            }
+
+            // upload new file to cloudinary
+            string newFileUrl = await _cloudinaryService.UploadFileAsync(file);
+
+            // update the link and doc type in db 
+            var updatedDoc = await _documentService.UpdateLinkOnlyAsync(dto.DocumentId, newFileUrl, dto.DocumentType);
+
+
+            return Ok(new GeneralResponse<object>
+            {
+                Status = "success",
+                StatusCode = 200,
+                IsSuccess = true,
+                StatusDetails = "document link updated successfully in DB",
+                Data = updatedDoc,
+                ApiUsage = "this api endpoint is under development for Re3aya|care by Abdallah Mokarb"
+            });
+        }
+
+
+
+
+
+
+
+
     }
 }

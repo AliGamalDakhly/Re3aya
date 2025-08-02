@@ -23,7 +23,7 @@ namespace _02_BusinessLogicLayer.DTOs.AccountDTOs
         public double Fees { get; set; }
         public DoctorService Service { get; set; }
         public string NationalId { get; set; }
-        public int SpecializationId { get; set; }
+        public int? SpecializationId { get; set; } = null;
         public string AppUserId { get; set; }
 
     }

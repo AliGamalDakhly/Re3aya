@@ -6,13 +6,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -23,7 +19,10 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly DoctorService _doctorService;
 
+        private Doctor doctorInfo;
+        private Patient patientInfo;
         public AccountService(
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager,
@@ -85,7 +84,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
-            
+
             // instead of seeding roles in program.cs, we can do it here
 
             //if (!await _roleManager.RoleExistsAsync("Patient"))
@@ -140,30 +139,93 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
+        //public async Task<LoginResponseDTO> LoginAsync(LoginDTO dto)
+        //{
+        //    var user = await _userManager.FindByNameAsync(dto.UserName);
+        //    if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+        //        throw new Exception("Username or Passowrd is invalid.");
+
+        //    var roles = await _userManager.GetRolesAsync(user);
+
+        //    var authClaims = new List<Claim>
+        //    {
+        //        new Claim(ClaimTypes.Name, user.UserName),
+        //        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        //    };
+
+        //    foreach (var role in roles)
+        //        authClaims.Add(new Claim(ClaimTypes.Role, role));
+
+        //    var authSigningKey = new SymmetricSecurityKey(
+        //        Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+
+        //    var token = new JwtSecurityToken(
+        //        issuer: _configuration["Jwt:Issuer"],
+        //        audience: _configuration["Jwt:Audience"],
+        //        expires: DateTime.UtcNow.AddHours(3),
+        //        claims: authClaims,
+        //        signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        //    );
+
+        //    return new LoginResponseDTO
+        //    {
+        //        Token = new JwtSecurityTokenHandler().WriteToken(token),
+        //        Expiration = token.ValidTo
+        //    };
+        //}
+
+
+
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO dto)
         {
             var user = await _userManager.FindByNameAsync(dto.UserName);
+
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                throw new Exception("Username or Passowrd is invalid.");
+                throw new Exception("username or Password is invalid");
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+            var role = roles.FirstOrDefault();
 
-            foreach (var role in roles)
-                authClaims.Add(new Claim(ClaimTypes.Role, role));
+
+            int? patientId = null;
+            int? doctorId = null;
+            if (role == "Doctor")
+            {
+                doctorInfo = await _unitOfWork.Repository<Doctor, int>().GetFirstOrDefaultAsync(d => d.AppUserId == user.Id);
+
+                doctorId = doctorInfo.DoctorId;
+                //if (doctor == null)
+                //    throw new Exception("Doctor profile not found.");
+            }
+            else if (role == "Patient")
+            {
+                patientInfo = await _unitOfWork.Repository<Patient, int>().GetFirstOrDefaultAsync(p => p.AppUserId == user.Id);
+                patientId = patientInfo.PatientId;
+                //if (patient == null)
+                //    throw new Exception("Patient profile not found.");
+
+            }
+
+
+            var authClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+
+    };
+
+            //foreach (var role in roles)
+            authClaims.Add(new Claim(ClaimTypes.Role, role));
 
             var authSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+                Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _configuration["JWT:IssuerIP"],
+                audience: _configuration["JWT:Audience"],
                 expires: DateTime.UtcNow.AddHours(3),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
@@ -172,9 +234,20 @@ namespace _02_BusinessLogicLayer.Service.Services
             return new LoginResponseDTO
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = token.ValidTo
+                Expiration = token.ValidTo,
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Roles = roles.ToList(),
+                doctorinfo = doctorId,
+                patientinfo = patientId
             };
         }
+
+
+
+
 
 
     }

@@ -70,7 +70,21 @@ namespace _02_BusinessLogicLayer.Service.Services
             // Use Auto Mapper to map Entity to DTO
             return _mapper.Map<RatingDTO>(rating);
         }
+        public async Task<float> GetDoctorRatingByIdAsync(int doctorId)
+        {
+            List<Rating> ratings = await _context.GetAllAsync(new QueryOptions<Rating>
+            {
+                Filter = d => d.DoctorId == doctorId
+            });
 
+            float totalRating = 0;
+            foreach (var rating in ratings) // Fixed the foreach loop by specifying the type and identifier
+            {
+                totalRating += rating.RatingValue;
+            }
+
+            return ratings.Count > 0 ? totalRating / ratings.Count : 0; // Calculate average rating
+        }
         public async Task<bool> DeleteRatingByIdAsync(int id)
         {
             // add your required logic here
@@ -116,6 +130,33 @@ namespace _02_BusinessLogicLayer.Service.Services
             var ratings = await _context.GetAllAsync(options);
             // Use Auto Mapper to map Entity to DTO
             return _mapper.Map<List<RatingDTO>>(ratings);
+        }
+
+        public async Task<List<DoctorRatingDTO>> GetAllDoctorRatings(int doctorId)
+        {
+            // add your required logic here
+            // ...
+            List<Rating> ratings = await _context.GetAllAsync(new QueryOptions<Rating>
+            {
+                Filter = r => r.DoctorId == doctorId,
+                Includes = [r => r.Patient] // if you want to include related entities
+            });
+
+            List<DoctorRatingDTO> ratingDTOs = _mapper.Map<List<DoctorRatingDTO>>(ratings);
+
+            foreach (var rating in ratings)
+            {
+                List<Patient> patients = await _unitOfWork.Repository<Patient, int>().GetAllAsync(new QueryOptions<Patient>
+                {
+                    Filter = p => p.PatientId == rating.PatientId,
+                    Includes = [p => p.AppUser]
+                });
+
+                ratingDTOs.FirstOrDefault( r => r.RatingId == rating.RatingId).PatientName = patients.FirstOrDefault().AppUser.FullName;
+            }
+
+            // Use Auto Mapper to map Entity to DTO
+            return ratingDTOs;
         }
     }
 }

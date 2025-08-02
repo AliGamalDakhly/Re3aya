@@ -1,14 +1,15 @@
 ﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
+using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
-using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 using AppointmentDTO = _02_BusinessLogicLayer.DTOs.AppointmentDTOs.AppointmentDTO;
-using _01_DataAccessLayer.Repository;
+using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -17,12 +18,17 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IGenericRepository<Patient, int> _patientRepository;
+        private readonly IRatingService _ratingService;
+        private readonly IDoctorService _doctorService;
 
-        public PatientService(IUnitOfWork unitOfWork, IMapper mapper)
+        public PatientService(IUnitOfWork unitOfWork, IMapper mapper,
+                IRatingService ratingService, IDoctorService doctorService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _patientRepository = _unitOfWork.Repository<Patient, int>();
+            _ratingService = ratingService;
+            _doctorService = doctorService;
         }
 
         public async Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null)
@@ -39,21 +45,45 @@ namespace _02_BusinessLogicLayer.Service.Services
             return await _unitOfWork.CompleteAsync() > 0;
         }
 
+        public async Task<bool> DeleteProfileAsync(string appUserId)
+        {
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return false;
+            _patientRepository.Delete(patient);
+            return await _unitOfWork.CompleteAsync() > 0;
+        }
+
         public async Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate)
         {
             return await _patientRepository.ExistsAsync(predicate);
         }
 
-        public async Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options)
+        public async Task<List<PatientDTO>> GetAllAsync()
         {
-            var patients = _patientRepository.GetAll(options);
+            List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
+            {
+                Includes = [p => p.AppUser]
+            });
+
             return _mapper.Map<List<PatientDTO>>(patients);
         }
 
         public async Task<PatientDTO> GetByIdAsync(int patientId)
         {
-            var patient = await _patientRepository.GetByIdAsync(patientId);
-            return _mapper.Map<PatientDTO>(patient);
+            List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
+            {
+                Filter = p => p.PatientId == patientId,
+                Includes = [p => p.AppUser]
+            });
+
+            Patient? patient = patients?.FirstOrDefault();
+
+            if (patient == null)
+                throw new KeyNotFoundException($"No patient found with ID {patientId}");
+
+            var patientDTO = _mapper.Map<PatientDTO>(patient);
+            patientDTO.UserId = patient.AppUser?.Id; // Ensure UserId is set from AppUser if available
+            return patientDTO;
         }
 
         public async Task<PatientDTO> RegisterAsync(PatientDTO dto)
@@ -73,9 +103,11 @@ namespace _02_BusinessLogicLayer.Service.Services
         public async Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, string userId)
         {
 
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId, p => p.AppUser);
             if (patient == null) return false;
+
             _mapper.Map(dto, patient);
+
             _patientRepository.Update(patient);
             return await _unitOfWork.CompleteAsync() > 0;
         }
@@ -88,7 +120,29 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             var rating = _mapper.Map<Rating>(dto);
             rating.PatientId = patient.PatientId;
-            ratingRepo.Add(rating);
+
+            bool exist =  await _ratingService.ExistsAsync(r => r.PatientId == rating.PatientId
+                            && r.DoctorId == rating.DoctorId);
+
+
+            if (exist) 
+            {
+                List<Rating> ratings = await ratingRepo.GetAllAsync(
+                    new QueryOptions<Rating> {
+                        Filter = r => r.PatientId == rating.PatientId 
+                            &&  r.DoctorId == rating.DoctorId
+                    });
+
+                ratings.FirstOrDefault().RatingValue = rating.RatingValue;
+                ratings.FirstOrDefault().Comment = rating.Comment;
+                ratingRepo.Update(ratings.FirstOrDefault());
+            }
+            else
+            {
+                ratingRepo.Add(rating);
+            }
+
+            await _doctorService.UpdateDoctorRating(rating.DoctorId);
             return await _unitOfWork.CompleteAsync() > 0;
         }
 
@@ -143,20 +197,88 @@ namespace _02_BusinessLogicLayer.Service.Services
             return await _unitOfWork.CompleteAsync() > 0;
         }
 
-        public async Task<List<AppointmentDTO>> GetAppointmentsAsync(string appUserId)
+        public async Task<List<AppointmentResponseDTO>> GetAppointmentsAsync(string appUserId)
         {
-            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+           
             var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return new List<AppointmentDTO>();
 
-            var appointments = await appointmentRepo.GetFirstOrDefaultAsync (
-                a => a.PatientId == patient.PatientId,
-                a => a.DoctorTimeSlot,
-                a => a.DoctorTimeSlot.TimeSlot,
-                a => a.DoctorTimeSlot.Doctor
-            );
+            if (patient == null)
+                return new List<AppointmentResponseDTO>();
 
-            return _mapper.Map<List<AppointmentDTO>>(appointments);
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a => a.PatientId == patient.PatientId,
+                Includes = new Expression<Func<Appointment, object>>[]
+                {
+            a => a.DoctorTimeSlot,
+            a => a.DoctorTimeSlot.TimeSlot,
+            a => a.DoctorTimeSlot.Doctor,
+            a => a.DoctorTimeSlot.Doctor.AppUser,
+            a => a.DoctorTimeSlot.Doctor.Specialization
+                }
+            };
+
+        
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+            var appointments = await appointmentRepo.GetAllAsync(options);
+
+        
+            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
         }
+
+
+
+        public async Task<List<AppointmentResponseDTO>> GetUpcomingAppointmentsAsync(string appUserId)
+        {
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return new List<AppointmentResponseDTO>();
+
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a =>
+                    a.PatientId == patient.PatientId &&
+                    a.DoctorTimeSlot.TimeSlot.StartTime > DateTime.UtcNow.Date &&
+                    a.Status == AppointmentStatus.Confirmed,
+                Includes = new Expression<Func<Appointment, object>>[]
+                {
+            a => a.DoctorTimeSlot,
+            a => a.DoctorTimeSlot.TimeSlot,
+            a => a.DoctorTimeSlot.Doctor,
+            a => a.DoctorTimeSlot.Doctor.AppUser,
+            a => a.DoctorTimeSlot.Doctor.Specialization
+                }
+            };
+
+            var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
+            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+        }
+
+        public async Task<List<AppointmentResponseDTO>> GetPastAppointmentsAsync(string appUserId)
+        {
+            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
+            if (patient == null) return new List<AppointmentResponseDTO>();
+
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a =>
+                    a.PatientId == patient.PatientId &&
+                    (a.DoctorTimeSlot.TimeSlot.StartTime <= DateTime.UtcNow.Date ||
+                     a.Status == AppointmentStatus.Finished ||
+                     a.Status == AppointmentStatus.Cancelled),
+                Includes = new Expression<Func<Appointment, object>>[]
+                {
+            a => a.DoctorTimeSlot,
+            a => a.DoctorTimeSlot.TimeSlot,
+            a => a.DoctorTimeSlot.Doctor,
+            a => a.DoctorTimeSlot.Doctor.AppUser,
+            a => a.DoctorTimeSlot.Doctor.Specialization
+                }
+            };
+
+            var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
+            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+        }
+
+
     }
 }

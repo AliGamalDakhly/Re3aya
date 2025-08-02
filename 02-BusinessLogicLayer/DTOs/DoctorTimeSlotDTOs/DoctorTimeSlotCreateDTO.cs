@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _02_BusinessLogicLayer.DTOs.DoctorTimeSlot
+namespace _02_BusinessLogicLayer.DTOs.DoctorTimeSlotDTOs
 {
-    public class DoctorTimeSlotDTO
+    public class DoctorTimeSlotCreateDTO
     {
         public int DoctorId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public WeekDays DayOfWeek { get; set; }
+
     }
 }

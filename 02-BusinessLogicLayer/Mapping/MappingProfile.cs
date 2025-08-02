@@ -33,8 +33,8 @@ namespace _02_BusinessLogicLayer.Mapping
                    PhoneNumber = src.PhoneNumber,
                    DateOfBirth = src.DateOfBirth,
                    Gender = src.Gender,    //this is error because it is enum in the model and string in DTO
-                   //convert to enum to solve this error
-                  // Gender = Enum.Parse<Gender>(src.Gender)
+                                           //convert to enum to solve this error
+                                           // Gender = Enum.Parse<Gender>(src.Gender)
 
                }));
 
@@ -52,7 +52,7 @@ namespace _02_BusinessLogicLayer.Mapping
                        .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.AppUser.PhoneNumber))
                        .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.AppUser.DateOfBirth))
                        .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender.ToString()));
-                       
+
 
             //for patient details
             CreateMap<Patient, PatientDetailsDTO>()
@@ -92,14 +92,30 @@ namespace _02_BusinessLogicLayer.Mapping
             CreateMap<BookAppointmentDTO, Appointment>();
             CreateMap<CancelAppointmentDTO, Appointment>();
 
+            // CreateMap<Appointment, AppointmentResponseDTO>();
+            CreateMap<Appointment, AppointmentResponseDTO>()
+       .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
+       .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.AppUser.FullName))
+       .ForMember(dest => dest.SpecializationName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Specialization.Name))
+       .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime.ToString(@"hh\:mm")))
+       .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime.ToString(@"hh\:mm")))
+       .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.CreatedAt))
+       .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+
             #endregion
 
             //********************** Specialization Dto Mapping **********************//
             #region Mapping of Specialization Entity (Ali)
             CreateMap<Specialization, SpecializationDTO>()
+                .ForMember(dest => dest.SpecializationId, opt => opt.MapFrom(src => src.SpecializationId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
+            CreateMap<SpecializationDTO, Specialization>()
+                .ForMember(dest => dest.SpecializationId, opt => opt.MapFrom(src => src.SpecializationId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
 
             //********************** Time Slot Mapping **********************//
 
@@ -119,9 +135,6 @@ namespace _02_BusinessLogicLayer.Mapping
 
             #endregion    
 
-            CreateMap<SpecializationDTO, Specialization>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
             #endregion
 
             #region Mapping of Rating Entity (Ali)

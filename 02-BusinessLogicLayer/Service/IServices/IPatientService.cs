@@ -22,11 +22,11 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> DeleteAsync(int patientId);
 
         Task<PatientDTO> GetByIdAsync(int patientId);                 
-        Task<List<PatientDTO>> GetAllAsync(QueryOptions<Patient> options);
+        Task<List<PatientDTO>> GetAllAsync();
         Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate);
         Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null);
 
-
+        Task<bool> DeleteProfileAsync(string appUserId);
 
         //Add Rating only after treatment
         Task<bool> AddRatingAsync(AddRatingDTO rating, string appUserId); //this allow patient add Rating to his doctor
@@ -37,9 +37,9 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> CancelAppointmentAsync(CancelAppointmentDTO dto, string appUserId);
 
         //get all appointments for a specific patient
-        Task<List<AppointmentDTO>> GetAppointmentsAsync(string appUserId); // by his identity
-
-
+        Task<List<AppointmentResponseDTO>> GetAppointmentsAsync(string appUserId); // by his identity
+        Task<List<AppointmentResponseDTO>> GetUpcomingAppointmentsAsync(string appUserId);
+        Task<List<AppointmentResponseDTO>> GetPastAppointmentsAsync(string appUserId);
         #region
 
 
@@ -55,7 +55,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
 
 
-       
+
 
         #endregion
     }

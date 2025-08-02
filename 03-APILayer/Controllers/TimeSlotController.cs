@@ -12,9 +12,12 @@ namespace _03_APILayer.Controllers
     public class TimeSlotController : ControllerBase
     {
         private readonly ITimeSlotService _timeSlotService;
-        public TimeSlotController(ITimeSlotService timeSlotService)
+        private readonly IDoctorTimeSlotService _doctorTimeSlotService;
+        public TimeSlotController(ITimeSlotService timeSlotService,
+            IDoctorTimeSlotService doctorTimeSlotService)
         {
             _timeSlotService = timeSlotService;
+            _doctorTimeSlotService = doctorTimeSlotService;
         }
 
         //Create TimeSlot
@@ -111,7 +114,10 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                var result = await _timeSlotService.GetAllAsync(new QueryOptions<TimeSlot>());
+                var result = await _timeSlotService.GetAllAsync(new QueryOptions<TimeSlot>
+                {
+                    Filter = ts => ts.StartTime >= DateTime.Now
+                });
                 return Ok(result);
 
             }catch(Exception ex)
@@ -120,6 +126,50 @@ namespace _03_APILayer.Controllers
             }
         }
 
+        //Get Available for specific Doctor with doctorId
+        //[HttpGet("available/{id}")]
+        //public async Task<IActionResult> GetAvailableTimeSlotsForDoctor(int id)
+        //{
+        //    try
+        //    {
+        //        var result = await _doctorTimeSlotService.AvailableDoctorTimeSlots(id);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest($"Error on Retriving All TimeSlots {ex.Message}");
+        //    }
+        //}
+
+        [HttpGet("available/{id}")]
+        public async Task<IActionResult> GetAvailableTimeSlotsForDoctor(int id, DateOnly date)
+        {
+            try
+            {
+                var result = await _doctorTimeSlotService.AvailableDoctorTimeSlots(id, date);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error on Retriving All TimeSlots {ex.Message}");
+            }
+        }
+
+
+
+        [HttpGet("isAvailable/{id}")]
+        public async Task<IActionResult> HasAvailableTImeSlots(int id, DateTime date)
+        {
+            try
+            {
+                var result = await _doctorTimeSlotService.HasAvailableTimeSlots(id, date);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error on Retriving All TimeSlots {ex.Message}");
+            }
+        }
 
 
     }
