@@ -142,6 +142,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 ratingRepo.Add(rating);
             }
 
+
             await _doctorService.UpdateDoctorRating(rating.DoctorId);
             return await _unitOfWork.CompleteAsync() > 0;
         }
@@ -233,6 +234,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
             if (patient == null) return new List<AppointmentResponseDTO>();
 
+
             var options = new QueryOptions<Appointment>
             {
                 Filter = a =>
@@ -248,6 +250,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
+
 
             var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
             return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
@@ -278,6 +281,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
             return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
         }
+
 
 
     }
