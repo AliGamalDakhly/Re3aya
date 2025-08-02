@@ -1,8 +1,10 @@
+
 using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
+
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
@@ -13,7 +15,13 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
-    public class PatientService : IPatientService
+
+    [Authorize]
+    //[Authorize(Roles = "Patient")]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PatientController : ControllerBase
+
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -68,7 +76,12 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<List<PatientDTO>>(patients);
         }
 
-        public async Task<PatientDTO> GetByIdAsync(int patientId)
+
+        // Update profile of logged-in patient
+        [Authorize]
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdatePatientDTO updatePatientDto)
+
         {
             List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
             {
@@ -76,7 +89,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 Includes = [p => p.AppUser]
             });
 
-            Patient? patient = patients?.FirstOrDefault();
+
 
             if (patient == null)
                 throw new KeyNotFoundException($"No patient found with ID {patientId}");
@@ -94,7 +107,30 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<PatientDTO>(patient);
         }
 
-        public async Task<PatientDetailsDTO?> GetProfileByIdAsync(string appUserId)
+
+        //Delete profile of logged-in patient
+        [HttpDelete("DeleteProfile")]
+        public async Task<IActionResult> DeleteProfile()
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var result = await _patientService.DeleteProfileAsync(userId);
+                if (!result)
+                    return NotFound("Patient profile not found or unauthorized");
+                return Ok("Profile deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while deleting profile: {ex.Message}");
+            }
+        }
+
+
+        // Get all patients
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAllPatients()
+
         {
             var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
             return patient == null ? null : _mapper.Map<PatientDetailsDTO>(patient);
@@ -277,6 +313,40 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
             return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+        }
+
+
+
+        // Get all appointments for the logged-in patient
+        [HttpGet("GetAllAppointments")]
+        public async Task<IActionResult> GetAllAppointments()
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var appointments = await _patientService.GetAppointmentsAsync(userId);
+                return Ok(appointments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while retrieving appointments: {ex.Message}");
+            }
+        }
+
+        [HttpGet("appointments/upcoming")]
+        public async Task<IActionResult> GetUpcomingAppointments()
+        {
+            var userId = GetAppUserId();
+            var result = await _patientService.GetUpcomingAppointmentsAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("appointments/past")]
+        public async Task<IActionResult> GetPastAppointments()
+        {
+            var userId = GetAppUserId();
+            var result = await _patientService.GetPastAppointmentsAsync(userId);
+            return Ok(result);
         }
 
 

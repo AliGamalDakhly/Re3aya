@@ -21,6 +21,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
+
         private readonly IDoctorService _doctorService;
         private readonly ITimeSlotService _timeSlotService;
         private readonly IMapper _mapper;
@@ -28,14 +29,17 @@ namespace _02_BusinessLogicLayer.Service.Services
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
             IDoctorService doctorService,ITimeSlotService timeSlotService,
             IDoctorTimeSlotService doctorTimeSlotService)
+
         {
 
             _unitOfWork = unitOfWork;
             _context = _unitOfWork.Repository<Appointment, int>();
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
+
             _doctorService = doctorService;
             _timeSlotService = timeSlotService;
+
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -123,7 +127,9 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             var doctorTimeSlots = await _doctorTimeSlotService.GetAllAsync(new QueryOptions<DoctorTimeSlot>
             {
+
                 Filter = dts => dts.TimeSlotId == bookAppointmentDto.TimeSlotId
+
                              && dts.DoctorId == bookAppointmentDto.DoctorId
                              && dts.IsAvailable == true
             });
