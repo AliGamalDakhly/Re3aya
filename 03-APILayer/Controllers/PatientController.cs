@@ -1,112 +1,108 @@
-
-using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
-using _01_DataAccessLayer.Repository;
-using _01_DataAccessLayer.Repository.IGenericRepository;
-using _01_DataAccessLayer.UnitOfWork;
-
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
-using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
-using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
-using AppointmentDTO = _02_BusinessLogicLayer.DTOs.AppointmentDTOs.AppointmentDTO;
+using System.Security.Claims;
 using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
 
-namespace _02_BusinessLogicLayer.Service.Services
+namespace _03_APILayer.Controllers
 {
-
     [Authorize]
     //[Authorize(Roles = "Patient")]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
-
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly IGenericRepository<Patient, int> _patientRepository;
-        private readonly IRatingService _ratingService;
-        private readonly IDoctorService _doctorService;
+        private readonly IPatientService _patientService;
 
-        public PatientService(IUnitOfWork unitOfWork, IMapper mapper,
-                IRatingService ratingService, IDoctorService doctorService)
+        public PatientController(IPatientService patientService)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _patientRepository = _unitOfWork.Repository<Patient, int>();
-            _ratingService = ratingService;
-            _doctorService = doctorService;
+            _patientService = patientService;
         }
 
-        public async Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null)
+        private string GetAppUserId()
         {
-            return await _patientRepository.CountAsync(filter);
+            var userId = User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("User ID not found in token.");
+            return userId;
         }
 
-        public async Task<bool> DeleteAsync(int patientId)
-        {
-            var patient = await _patientRepository.GetByIdAsync(patientId);
-            if (patient == null) return false;
 
-            _patientRepository.Delete(patient);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
-
-        public async Task<bool> DeleteProfileAsync(string appUserId)
+        // Register a new patient
+        [AllowAnonymous]
+        [HttpPost("Register")]
+        public async Task<IActionResult> AddPatient([FromBody] PatientDTO patientDto)
         {
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return false;
-            _patientRepository.Delete(patient);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
-
-        public async Task<bool> ExistsAsync(Expression<Func<Patient, bool>> predicate)
-        {
-            return await _patientRepository.ExistsAsync(predicate);
-        }
-
-        public async Task<List<PatientDTO>> GetAllAsync()
-        {
-            List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
+            try
             {
-                Includes = [p => p.AppUser]
-            });
-
-            return _mapper.Map<List<PatientDTO>>(patients);
+                var createdPatient = await _patientService.RegisterAsync(patientDto);
+                return CreatedAtAction(nameof(GetPatientById), new { id = createdPatient.PatientId }, createdPatient);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while registration: {ex.Message}");
+            }
         }
 
+        // Get a patient by ID
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPatientById(int id)
+        {
+            try
+            {
+                var patient = await _patientService.GetByIdAsync(id);
+                if (patient == null)
+                    return NotFound($"No patient found with ID {id}");
+                return Ok(patient);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while retrieving patient: {ex.Message}");
+            }
+        }
 
         // Update profile of logged-in patient
         [Authorize]
         [HttpPut("UpdateProfile")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdatePatientDTO updatePatientDto)
-
         {
-            List<Patient> patients = await _patientRepository.GetAllAsync(new QueryOptions<Patient>
+            try
             {
-                Filter = p => p.PatientId == patientId,
-                Includes = [p => p.AppUser]
-            });
+                var userId = GetAppUserId();
 
+                //if (userId != updatePatientDto.UserId)
+                //  return Unauthorized("You can only update your own profile.");
 
-
-            if (patient == null)
-                throw new KeyNotFoundException($"No patient found with ID {patientId}");
-
-            var patientDTO = _mapper.Map<PatientDTO>(patient);
-            patientDTO.UserId = patient.AppUser?.Id; // Ensure UserId is set from AppUser if available
-            return patientDTO;
+                var result = await _patientService.UpdateProfileAsync(updatePatientDto, userId);
+                if (!result)
+                    return NotFound("Patient not found or unauthorized");
+                return Ok("Profile updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while updating profile: {ex.Message}");
+            }
         }
 
-        public async Task<PatientDTO> RegisterAsync(PatientDTO dto)
+        // Delete a patient by ID
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> DeletePatient(int id)
         {
-            var patient = _mapper.Map<Patient>(dto);
-            _patientRepository.Add(patient);
-            await _unitOfWork.CompleteAsync();
-            return _mapper.Map<PatientDTO>(patient);
+            try
+            {
+                var result = await _patientService.DeleteAsync(id);
+                if (!result)
+                    return NotFound($"No patient found with ID {id}");
+                return Ok("Patient deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while deleting patient: {ex.Message}");
+            }
         }
-
 
         //Delete profile of logged-in patient
         [HttpDelete("DeleteProfile")]
@@ -130,191 +126,154 @@ namespace _02_BusinessLogicLayer.Service.Services
         // Get all patients
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllPatients()
-
         {
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            return patient == null ? null : _mapper.Map<PatientDetailsDTO>(patient);
-        }
-
-        public async Task<bool> UpdateProfileAsync(UpdatePatientDTO dto, string userId)
-        {
-
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId, p => p.AppUser);
-            if (patient == null) return false;
-
-            _mapper.Map(dto, patient);
-
-            _patientRepository.Update(patient);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
-
-        public async Task<bool> AddRatingAsync(AddRatingDTO dto, string userId)
-        {
-            var ratingRepo = _unitOfWork.Repository<Rating, int>();
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
-            if (patient == null) return false;
-
-            var rating = _mapper.Map<Rating>(dto);
-            rating.PatientId = patient.PatientId;
-
-            bool exist =  await _ratingService.ExistsAsync(r => r.PatientId == rating.PatientId
-                            && r.DoctorId == rating.DoctorId);
-
-
-            if (exist) 
+            try
             {
-                List<Rating> ratings = await ratingRepo.GetAllAsync(
-                    new QueryOptions<Rating> {
-                        Filter = r => r.PatientId == rating.PatientId 
-                            &&  r.DoctorId == rating.DoctorId
-                    });
-
-                ratings.FirstOrDefault().RatingValue = rating.RatingValue;
-                ratings.FirstOrDefault().Comment = rating.Comment;
-                ratingRepo.Update(ratings.FirstOrDefault());
+                var patients = await _patientService.GetAllAsync();
+                return Ok(patients);
             }
-            else
+            catch (Exception ex)
             {
-                ratingRepo.Add(rating);
+                return StatusCode(500, $"Error while retrieving patients: {ex.Message}");
             }
-
-            await _doctorService.UpdateDoctorRating(rating.DoctorId);
-            return await _unitOfWork.CompleteAsync() > 0;
         }
 
-        public async Task<bool> UpdateRatingAsync(UpdateRatingDTO dto, string userId)
+
+        // Check if a patient exists by a search term
+
+
+        [HttpGet("Exists")]
+        public async Task<IActionResult> PatientExists([FromQuery] string condition)
         {
-            var ratingRepo = _unitOfWork.Repository<Rating, int>();
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == userId);
-            if (patient == null) return false;
-
-            var rating = await ratingRepo.GetByIdAsync(dto.RatingId);
-            if (rating == null || rating.PatientId != patient.PatientId) return false;
-
-            _mapper.Map(dto, rating);
-            ratingRepo.Update(rating);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
-
-        public async Task<bool> BookAppointmentAsync(BookAppointmentDTO dto, string appUserId)
-        {
-            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return false;
-
-            var appointment = _mapper.Map<Appointment>(dto);
-            appointment.PatientId = patient.PatientId;
-            appointmentRepo.Add(appointment);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
-
-        public async Task<bool> CancelAppointmentAsync(CancelAppointmentDTO dto, string appUserId)
-        {
-            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return false;
-
-            var appointment = await appointmentRepo.GetFirstOrDefaultAsync(
-                a => a.AppointmentId == dto.AppointmentId && a.PatientId == patient.PatientId,
-                a => a.DoctorTimeSlot,
-                a => a.DoctorTimeSlot.TimeSlot
-            );
-
-            if (appointment == null) return false;
-
-            var now = DateTime.UtcNow;
-            var startTime = appointment.DoctorTimeSlot.TimeSlot.StartTime;
-
-            if (startTime <= now || (startTime - now).TotalHours < 24)
-                return false;
-
-            appointment.Status = AppointmentStatus.Cancelled;
-            appointmentRepo.Update(appointment);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
-
-        public async Task<List<AppointmentResponseDTO>> GetAppointmentsAsync(string appUserId)
-        {
-           
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-
-            if (patient == null)
-                return new List<AppointmentResponseDTO>();
-
-            var options = new QueryOptions<Appointment>
+            try
             {
-                Filter = a => a.PatientId == patient.PatientId,
-                Includes = new Expression<Func<Appointment, object>>[]
-                {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
-                }
-            };
-
-        
-            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
-            var appointments = await appointmentRepo.GetAllAsync(options);
-
-        
-            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
-        }
-
-
-
-        public async Task<List<AppointmentResponseDTO>> GetUpcomingAppointmentsAsync(string appUserId)
-        {
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return new List<AppointmentResponseDTO>();
-
-            var options = new QueryOptions<Appointment>
+                var exists = await _patientService.ExistsAsync(p =>
+                    p.AppUser.FullName.Contains(condition) || p.AppUser.Email.Contains(condition));
+                return Ok(exists);
+            }
+            catch (Exception ex)
             {
-                Filter = a =>
-                    a.PatientId == patient.PatientId &&
-                    a.DoctorTimeSlot.TimeSlot.StartTime > DateTime.UtcNow.Date &&
-                    a.Status == AppointmentStatus.Confirmed,
-                Includes = new Expression<Func<Appointment, object>>[]
-                {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
-                }
-            };
-
-            var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
-            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+                return StatusCode(500, $"Error while checking patient existence: {ex.Message}");
+            }
         }
 
-        public async Task<List<AppointmentResponseDTO>> GetPastAppointmentsAsync(string appUserId)
+        // Count patients 
+        [HttpGet("Count")]
+        public async Task<IActionResult> CountPatients([FromQuery] string filter = null)
         {
-            var patient = await _patientRepository.GetFirstOrDefaultAsync(p => p.AppUserId == appUserId);
-            if (patient == null) return new List<AppointmentResponseDTO>();
-
-            var options = new QueryOptions<Appointment>
+            try
             {
-                Filter = a =>
-                    a.PatientId == patient.PatientId &&
-                    (a.DoctorTimeSlot.TimeSlot.StartTime <= DateTime.UtcNow.Date ||
-                     a.Status == AppointmentStatus.Finished ||
-                     a.Status == AppointmentStatus.Cancelled),
-                Includes = new Expression<Func<Appointment, object>>[]
+                Expression<Func<Patient, bool>> predicate = p => true;
+                if (!string.IsNullOrEmpty(filter))
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                    predicate = p =>
+                        p.AppUser.FullName.Contains(filter) ||
+                        p.AppUser.Email.Contains(filter);
                 }
-            };
 
-            var appointments = await _unitOfWork.Repository<Appointment, int>().GetAllAsync(options);
-            return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+
+                var count = await _patientService.CountAsync(predicate);
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while counting patients: {ex.Message}");
+            }
         }
 
+        // Add rating to a doctor by logged-in patient
+        [HttpPost("AddRating")]
+        public async Task<IActionResult> AddRating([FromBody] AddRatingDTO dto)
+        {
+            try
+            {
+                string userId = GetAppUserId();
+                var result = await _patientService.AddRatingAsync(dto, userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while adding rating: {ex.Message}");
+            }
+        }
+
+        [HttpPut("UpdateRating")]
+        public async Task<IActionResult> UpdateRating([FromBody] UpdateRatingDTO dto)
+        {
+            try
+            {
+                var userId = GetAppUserId();
+
+
+                var result = await _patientService.UpdateRatingAsync(dto, userId);
+                if (!result)
+                    return NotFound($"No rating found with ID {dto.RatingId} or you're not authorized to update it.");
+
+                return Ok("Rating updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while updating rating: {ex.Message}");
+            }
+        }
+
+
+        // Book an appointment
+        //[HttpPost("BookAppointment")]
+        //public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentDTO dto)
+        //{
+        //    try
+        //    {
+        //        var userId = GetAppUserId();
+        //        var result = await _patientService.BookAppointmentAsync(dto, userId);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred while booking appointment: {ex.Message}");
+        //    }
+        //}
+
+        // POST: api/Patient/BookAppointment
+        [HttpPost("BookAppointment")]
+        public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentDTO dto)
+        {
+            try
+            {
+
+                var userId = GetAppUserId();
+                var success = await _patientService.BookAppointmentAsync(dto, userId);
+
+                if (success)
+                    return Ok("Appointment booked successfully with payment.");
+                else
+                    return BadRequest("Booking failed. Make sure patient exists or input is valid.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while booking appointment: {ex.Message}");
+            }
+        }
+
+
+
+        // Cancel an appointment
+        [HttpPost("CancelAppointment")]
+        public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentDTO dto)
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var result = await _patientService.CancelAppointmentAsync(dto, userId);
+                if (!result)
+                    return BadRequest("Failed to cancel appointment.");
+                return Ok("Appointment cancelled successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while cancelling appointment: {ex.Message}");
+            }
+        }
 
 
         // Get all appointments for the logged-in patient
@@ -348,7 +307,6 @@ namespace _02_BusinessLogicLayer.Service.Services
             var result = await _patientService.GetPastAppointmentsAsync(userId);
             return Ok(result);
         }
-
 
     }
 }
