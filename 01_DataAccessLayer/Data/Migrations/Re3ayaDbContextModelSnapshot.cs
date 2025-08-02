@@ -297,6 +297,7 @@ namespace _01_DataAccessLayer.Data.Migrations
                         {
                             t.HasCheckConstraint("CK_Date_LessThan20YearsAgo", "DateOfBirth <= DATEADD(YEAR, -16, GETDATE())");
                         });
+
                 });
 
             modelBuilder.Entity("_01_DataAccessLayer.Models.Appointment", b =>

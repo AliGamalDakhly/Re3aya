@@ -25,7 +25,9 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public DoctorService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager,
 
+
             IDoctorTimeSlotService doctorTimeSlotService, IMapper mapper,
+
 
             IRatingService ratingService,
             IAddressService addressService, ISpecializationService specializationService)
@@ -88,10 +90,12 @@ namespace _02_BusinessLogicLayer.Service.Services
         {
             List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
 
+
                 new QueryOptions<Doctor>
                 {
                     Includes = [d => d.Addresses, d => d.Specialization, d => d.AppUser, d => d.Documents],
                     OrderBy = d => d.RatingValue,
+
 
                     SortDirection = SortDirection.Descending,
                     Filter = d => d.Status == DoctorAccountStatus.Approved
@@ -106,10 +110,12 @@ namespace _02_BusinessLogicLayer.Service.Services
             //    doctorsDtos.FirstOrDefault(d => d.DoctorId == doctor.DoctorId).GovernemntId = city?.GovernmentId ?? 0;
 
 
+
             //}
 
 
             for (int i = 0; i < doctors.Count; i++)
+
 
             {
                 CityDTO city = await _addressService.GetCityByIdAsync(doctors[i].Addresses.FirstOrDefault()?.CityId ?? 0);
@@ -203,11 +209,13 @@ namespace _02_BusinessLogicLayer.Service.Services
             dto.PhoneNumber = user.PhoneNumber;
             dto.Gender = user.Gender.ToString();
 
+
             dto.CityId = doctor.Addresses.FirstOrDefault()?.CityId ?? 0; // Assuming Addresses is a collection and CityId is a property
             dto.CityName = doctor.Addresses.FirstOrDefault()?.City?.Name; // Assuming Addresses is a collection and City is a navigation property
 
             dto.GovernmentId = government.GovernmentId; // Assuming Addresses is a collection and GovernmentId is a property
             dto.GovernmentName = government.Name; // Assuming Addresses is a collection and Government is a navigation property
+
 
             dto.location = doctor.Addresses?.FirstOrDefault()?.Location; // Assuming Addresses is a collection and Location is a property
             dto.DetailedAddress = doctor.Addresses?.FirstOrDefault()?.DetailedAddress; // Assuming Addresses is a collection and DetailedAddress is a property
@@ -266,6 +274,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 {
                     Location = doctorDto.location, // Assuming location is a string 
                     DetailedAddress = doctorDto.DetailedAddress,// Assuming DetailedAddress is a strin
+
                     CityId = doctorDto.CityId, // Assuming CityId is an int
                     DoctorId = doctor.DoctorId // Assuming DoctorId is an int
                 };
@@ -307,6 +316,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 };
             }
 
+
             // Map to output DTO
             var output = _mapper.Map<DoctorGetDTO>(doctor);
             output.FullName = appUser.FullName;
@@ -322,6 +332,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             output.GraduationCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.GraduationCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             output.ExperienceCertificateUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ExperienceCertificate).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
             output.ProfilePictureUrl = doctor.Documents.Where(t => t.DocumentType == DocumentType.ProfileImage).Select(t => t.FilePath).FirstOrDefault(); // Assuming Documents is a collection and FilePath is a property
+
             output.CityId = doctor.Addresses.FirstOrDefault()?.CityId ?? 0; // Assuming Addresses is a collection and CityId is a property
             output.CityName = doctor.Addresses.FirstOrDefault()?.City?.Name; // Assuming Addresses is a collection and City is a navigation property
             output.GovernmentId = government.GovernmentId; // Assuming Addresses is a collection and GovernmentId is a property
@@ -355,6 +366,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.Repository<Doctor, int>().UpdateAsync(existingDoctor);
             await _unitOfWork.CompleteAsync();
         }
+
 
 
 

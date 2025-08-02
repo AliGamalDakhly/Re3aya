@@ -22,6 +22,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
 
+
         private readonly IDoctorService _doctorService;
         private readonly ITimeSlotService _timeSlotService;
         private readonly IMapper _mapper;
@@ -37,8 +38,10 @@ namespace _02_BusinessLogicLayer.Service.Services
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
 
+
             _doctorService = doctorService;
             _timeSlotService = timeSlotService;
+
 
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
@@ -128,7 +131,9 @@ namespace _02_BusinessLogicLayer.Service.Services
             var doctorTimeSlots = await _doctorTimeSlotService.GetAllAsync(new QueryOptions<DoctorTimeSlot>
             {
 
+
                 Filter = dts => dts.TimeSlotId == bookAppointmentDto.TimeSlotId
+
 
                              && dts.DoctorId == bookAppointmentDto.DoctorId
                              && dts.IsAvailable == true
@@ -147,12 +152,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _doctorTimeSlotService.UpadateDoctorTimeSlot(doctorTimeSlotDTO, doctorTimeSlotDTO.DoctorTimeSlotId);
             await _unitOfWork.CompleteAsync();
 
+
             var doctor = await _doctorService.GetDoctorByIdAsync(doctorTimeSlotDTO.DoctorId);
 
             if (doctor.Service == _01_DataAccessLayer.Enums.DoctorService.OnlineConsultion.ToString())
             {
                 await CreateRoomForAppointment(result.AppointmentId);
             }
+
 
 
             return new BookAppointment

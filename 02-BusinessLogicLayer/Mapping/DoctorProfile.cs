@@ -26,6 +26,7 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
                 .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.Documents
 
+
                 .FirstOrDefault(d => d.DocumentType == DocumentType.ProfileImage).FilePath))
 
                 .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses.Select(a => a.DetailedAddress)));
@@ -42,7 +43,9 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
                 .ForMember(dest => dest.About, opt => opt.MapFrom(src => src.AboutMe))
 
+
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Addresses.FirstOrDefault().Location))
+
 
                 .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.Documents
                             .FirstOrDefault(d => d.DocumentType == DocumentType.ProfileImage).FilePath))
