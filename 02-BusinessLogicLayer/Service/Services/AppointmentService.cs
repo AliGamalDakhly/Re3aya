@@ -8,6 +8,7 @@ using _02_BusinessLogicLayer.DTOs.DoctorTimeSlotDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
+using _01_DataAccessLayer.Enums;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -18,11 +19,11 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
-        private readonly IDailyVideoService _dailyVideoService;
+        private readonly IDoctorService _doctorService;
         private readonly IMapper _mapper;
 
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
-            IDailyVideoService dailyVideoService,
+            IDoctorService doctorService,
             IDoctorTimeSlotService doctorTimeSlotService)
         {
 
@@ -30,7 +31,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             _context = _unitOfWork.Repository<Appointment, int>();
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
-            _dailyVideoService = dailyVideoService;
+            _doctorService = doctorService;
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -136,6 +137,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _doctorTimeSlotService.UpadateDoctorTimeSlot(doctorTimeSlotDTO, doctorTimeSlotDTO.DoctorTimeSlotId);
             await _unitOfWork.CompleteAsync();
 
+            var doctor = await _doctorService.GetDoctorByIdAsync(doctorTimeSlotDTO.DoctorId);
+
+            if (doctor.Service == _01_DataAccessLayer.Enums.DoctorService.OnlineConsultion.ToString())
+            {
+                await CreateRoomForAppointment(result.AppointmentId);
+            }
+
+
             return new BookAppointment
             {
                 AppointmentId = result.AppointmentId,
@@ -239,9 +248,8 @@ namespace _02_BusinessLogicLayer.Service.Services
             if (appointment == null || appointment.VedioCallUrl != null)
                 throw new ArgumentException("Invalid appointment or already has a room");
 
-            var roomUrl = await _dailyVideoService.CreateRoomAsync(appointmentId.ToString());
-            if (roomUrl == null)
-                throw new Exception("Failed to create room");
+            string roomName = $"appointment-{appointmentId}";
+            string roomUrl = $"https://meet.jit.si/{roomName}";
 
             appointment.VedioCallUrl = roomUrl;
             await _unitOfWork.CompleteAsync();
