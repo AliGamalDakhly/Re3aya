@@ -155,10 +155,15 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync();
             return true;
         }
-        
+
         public async Task<List<AvailableDoctorTImeSlotDTO>> AvailableDoctorTimeSlots(int doctorId, DateOnly date)
         {
-            DateTime dayStart = date.ToDateTime(TimeOnly.MinValue); // 00:00
+            DateTime dayStart;
+            if (DateTime.Now.Date == date.ToDateTime(TimeOnly.MinValue).Date)
+                dayStart = DateTime.Now;
+            else
+                dayStart = date.ToDateTime(TimeOnly.MinValue); // 00:00
+
             DateTime dayEnd = date.ToDateTime(TimeOnly.MaxValue);   // 23:59:59.9999999
 
             List<DoctorTimeSlot> availableTimeSlots = await _context.GetAllAsync(new QueryOptions<DoctorTimeSlot>
