@@ -159,6 +159,30 @@ namespace _01_DataAccessLayer.Data.Context
             //    new Rating { RatingId = 1, RatingValue = 4.8f, Comment = "Great service!", DoctorId = 1, PatientId = 1 }
             //);
 
+            // Seed Specializations
+            modelBuilder.Entity<Specialization>().HasData(
+               new Specialization { SpecializationId = 1, Name = "طب القلب", Description = "تشخيص وعلاج أمراض القلب والأوعية الدموية" },
+               new Specialization { SpecializationId = 2, Name = "طب الأعصاب", Description = "تشخيص وعلاج اضطرابات الجهاز العصبي المركزي والمحيطي" },
+               new Specialization { SpecializationId = 3, Name = "طب الأطفال", Description = "رعاية الرضع والأطفال والمراهقين وعلاج أمراضهم" },
+               new Specialization { SpecializationId = 4, Name = "طب العيون", Description = "تشخيص وعلاج أمراض العيون ومشاكل الرؤية" },
+               new Specialization { SpecializationId = 5, Name = "طب الجلدية", Description = "تشخيص وعلاج أمراض الجلد والشعر والأظافر" },
+               new Specialization { SpecializationId = 6, Name = "جراحة العظام", Description = "تشخيص وعلاج إصابات وأمراض الجهاز العضلي الهيكلي" },
+               new Specialization { SpecializationId = 7, Name = "الطب الباطني", Description = "تشخيص وعلاج الأمراض الداخلية للبالغين" },
+               new Specialization { SpecializationId = 8, Name = "جراحة عامة", Description = "إجراء العمليات الجراحية المختلفة" },
+               new Specialization { SpecializationId = 9, Name = "أنف وأذن وحنجرة", Description = "تشخيص وعلاج أمراض الأنف والأذن والحنجرة" },
+               new Specialization { SpecializationId = 10, Name = "طب النساء والتوليد", Description = "رعاية صحة المرأة والحمل والولادة" },
+               new Specialization { SpecializationId = 11, Name = "طب الأورام", Description = "تشخيص وعلاج الأورام السرطانية" },
+               new Specialization { SpecializationId = 12, Name = "طب الجهاز الهضمي", Description = "تشخيص وعلاج أمراض الجهاز الهضمي" },
+               new Specialization { SpecializationId = 13, Name = "طب الروماتيزم", Description = "تشخيص وعلاج أمراض المفاصل والروماتيزم" },
+               new Specialization { SpecializationId = 14, Name = "طب المسالك البولية", Description = "تشخيص وعلاج أمراض الجهاز البولي" },
+               new Specialization { SpecializationId = 15, Name = "طب الغدد الصماء", Description = "تشخيص وعلاج اضطرابات الهرمونات والتمثيل الغذائي" },
+               new Specialization { SpecializationId = 16, Name = "طب الرئة", Description = "تشخيص وعلاج أمراض الجهاز التنفسي" },
+               new Specialization { SpecializationId = 17, Name = "طب النفسي", Description = "تشخيص وعلاج الاضطرابات النفسية والعقلية" },
+               new Specialization { SpecializationId = 18, Name = "طب التخدير", Description = "توفير التخدير الآمن للمرضى أثناء الجراحة" },
+               new Specialization { SpecializationId = 19, Name = "طب الأشعة", Description = "تشخيص الأمراض باستخدام التقنيات الإشعاعية" },
+               new Specialization { SpecializationId = 20, Name = "طب الطوارئ", Description = "رعاية الحالات الطبية الطارئة" }
+           );
+
             base.OnModelCreating(modelBuilder);
         
 
