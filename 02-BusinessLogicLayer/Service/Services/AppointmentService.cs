@@ -8,6 +8,9 @@ using _02_BusinessLogicLayer.DTOs.DoctorTimeSlotDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using System.Linq.Expressions;
+using _01_DataAccessLayer.Enums;
+using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -18,15 +21,28 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
+
+
+        private readonly IDoctorService _doctorService;
+        private readonly ITimeSlotService _timeSlotService;
         private readonly IMapper _mapper;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IDoctorTimeSlotService doctorTimeSlotService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
+            IDoctorService doctorService,ITimeSlotService timeSlotService,
+            IDoctorTimeSlotService doctorTimeSlotService)
+
         {
 
             _unitOfWork = unitOfWork;
             _context = _unitOfWork.Repository<Appointment, int>();
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
+
+
+            _doctorService = doctorService;
+            _timeSlotService = timeSlotService;
+
+
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -114,7 +130,11 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             var doctorTimeSlots = await _doctorTimeSlotService.GetAllAsync(new QueryOptions<DoctorTimeSlot>
             {
+
+
                 Filter = dts => dts.TimeSlotId == bookAppointmentDto.TimeSlotId
+
+
                              && dts.DoctorId == bookAppointmentDto.DoctorId
                              && dts.IsAvailable == true
             });
@@ -131,6 +151,16 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             await _doctorTimeSlotService.UpadateDoctorTimeSlot(doctorTimeSlotDTO, doctorTimeSlotDTO.DoctorTimeSlotId);
             await _unitOfWork.CompleteAsync();
+
+
+            var doctor = await _doctorService.GetDoctorByIdAsync(doctorTimeSlotDTO.DoctorId);
+
+            if (doctor.Service == _01_DataAccessLayer.Enums.DoctorService.OnlineConsultion.ToString())
+            {
+                await CreateRoomForAppointment(result.AppointmentId);
+            }
+
+
 
             return new BookAppointment
             {
@@ -226,6 +256,63 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
             return updatedAppointment != null;
 
+        }
+
+
+        public async Task<string> CreateRoomForAppointment(int appointmentId)
+        {
+            var appointment = await _context.GetByIdAsync(appointmentId);
+            if (appointment == null || appointment.VedioCallUrl != null)
+                throw new ArgumentException("Invalid appointment or already has a room");
+
+            string roomName = $"appointment-{appointmentId}";
+            string roomUrl = $"https://meet.jit.si/{roomName}";
+
+            appointment.VedioCallUrl = roomUrl;
+            await _unitOfWork.CompleteAsync();
+
+            return roomUrl;
+
+        }
+
+        public async Task<string> JoinRoom(int appointmentId, string appUserId)
+        {
+            List<AppUser> users = await _unitOfWork.Repository<AppUser, string>().GetAllAsync(new QueryOptions<AppUser>
+            {
+                Includes = [a => a.Doctor, a => a.Patient],
+                Filter = a => a.Id == appUserId
+            });
+
+            AppUser appUser = users.FirstOrDefault();
+            if (appUser == null)
+                throw new Exception("Not Permitted to Join Meeting now");
+
+           
+
+            List<Appointment> appointments = await _context.GetAllAsync(new QueryOptions<Appointment>
+            {
+                Filter = a => a.AppointmentId == appointmentId,
+                Includes = [a => a.DoctorTimeSlot]
+            });
+
+            Appointment? appointment = appointments.FirstOrDefault();
+
+            if(appointment != null)
+            {
+                bool permitted = false;
+                if (appUser.Doctor != null && appointment.DoctorTimeSlot.DoctorId == appUser.Doctor.DoctorId)
+                    permitted = true;
+
+                if (appUser.Patient != null && appointment.PatientId == appUser.Patient.PatientId)
+                    permitted = true;
+
+                TimeSlotDTO timeslot = await _timeSlotService.GetByIdAsync(appointment.DoctorTimeSlot.TimeSlotId);
+
+                if(DateTime.Now >= timeslot.StartTime && DateTime.Now <= timeslot.EndTime && permitted)
+                    return appointment.VedioCallUrl;
+            }
+
+            throw new Exception("Not Permitted to Join Meeting now");
         }
     }
 }
