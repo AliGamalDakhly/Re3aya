@@ -21,15 +21,14 @@ namespace _02_BusinessLogicLayer.Service.Services
         // this will be used to access the repository methods
         private readonly IGenericRepository<Appointment, int> _context;
         private readonly IDoctorTimeSlotService _doctorTimeSlotService;
-
-
         private readonly IDoctorService _doctorService;
         private readonly ITimeSlotService _timeSlotService;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
+        public AppointmentService(IUnitOfWork unitOfWork,UserManager<AppUser> userManager,
             IDoctorService doctorService,ITimeSlotService timeSlotService,
-            IDoctorTimeSlotService doctorTimeSlotService)
+            IDoctorTimeSlotService doctorTimeSlotService, IMapper mapper)
 
         {
 
@@ -37,12 +36,9 @@ namespace _02_BusinessLogicLayer.Service.Services
             _context = _unitOfWork.Repository<Appointment, int>();
             _mapper = mapper;
             _doctorTimeSlotService = doctorTimeSlotService;
-
-
             _doctorService = doctorService;
             _timeSlotService = timeSlotService;
-
-
+            _userManager = userManager;
         }
         public async Task<AppointmentDTO> AddAppointmentAsync(AppointmentDTO appointmentDto)
         {
@@ -314,5 +310,26 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             throw new Exception("Not Permitted to Join Meeting now");
         }
+
+
+        public async Task<string> AddNotesAsync(string notes, int appointmentId, string appUserId)
+        {
+            AppUser? user = await _userManager.FindByIdAsync(appUserId);
+            if (user == null)
+                throw new UnauthorizedAccessException();
+
+            bool isAuth = await _userManager.IsInRoleAsync(user, "Doctor");
+            if(!isAuth)
+                throw new UnauthorizedAccessException();
+
+            var existingAppointment = await _context.GetByIdAsync(appointmentId);
+            if (existingAppointment == null)
+                throw new ArgumentException("Appointment Not Found");
+
+            existingAppointment.Notes = notes;
+            await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
+            return notes;
+        }
+
     }
 }
