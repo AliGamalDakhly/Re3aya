@@ -3,7 +3,6 @@ using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace _03_APILayer.Controllers
 {
@@ -12,6 +11,7 @@ namespace _03_APILayer.Controllers
     public class Appointment_Controller : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
+
         public Appointment_Controller(IAppointmentService appointmentService)
         {
             _appointmentService = appointmentService;
@@ -194,5 +194,25 @@ namespace _03_APILayer.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [Authorize]
+        [HttpPost("appointment/AddNotes/{id}")]
+        public async Task<IActionResult> AddNotes(int id, [FromBody] AddNotesDTO notesDto) // appointmentId
+        {
+            try
+            {
+                string appUserId = GetAppUserId();
+                if (appUserId == null)
+                    return Unauthorized();
+
+                string meetingLink = await _appointmentService.AddNotesAsync( notesDto.Notes, id, appUserId );
+                return Ok(new { url = meetingLink }); // important: return object with "url"
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }

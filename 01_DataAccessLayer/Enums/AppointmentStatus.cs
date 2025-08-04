@@ -10,6 +10,7 @@ namespace _01_DataAccessLayer.Enums
     {
         Confirmed,
         Cancelled,
-        Finished
+        Finished,
+        NonAttendence
     }
 }

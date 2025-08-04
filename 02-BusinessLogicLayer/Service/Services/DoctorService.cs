@@ -363,7 +363,6 @@ namespace _02_BusinessLogicLayer.Service.Services
             Doctor existingDoctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
 
             existingDoctor.RatingValue = newRatingVal;
-            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(existingDoctor);
             await _unitOfWork.CompleteAsync();
         }
 
