@@ -314,17 +314,28 @@ namespace _02_BusinessLogicLayer.Service.Services
 
         public async Task<string> AddNotesAsync(string notes, int appointmentId, string appUserId)
         {
-            AppUser? user = await _userManager.FindByIdAsync(appUserId);
-            if (user == null)
-                throw new UnauthorizedAccessException();
+            List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>()
+                .GetAllAsync(new QueryOptions<Doctor>
+                {
+                    Filter = d => d.AppUserId == appUserId
+                });
 
-            bool isAuth = await _userManager.IsInRoleAsync(user, "Doctor");
-            if(!isAuth)
-                throw new UnauthorizedAccessException();
+            Doctor? doctor = doctors.FirstOrDefault();
 
-            var existingAppointment = await _context.GetByIdAsync(appointmentId);
+            if (doctor == null)
+                throw new UnauthorizedAccessException("UnAuthorized to add notes to this appointment");
+
+            var existingAppointments = await _context.GetAllAsync(new QueryOptions<Appointment>
+            {
+                Filter = a => a.AppointmentId == appointmentId,
+                Includes = [a => a.DoctorTimeSlot]
+            });
+            var existingAppointment = existingAppointments.FirstOrDefault();
             if (existingAppointment == null)
                 throw new ArgumentException("Appointment Not Found");
+
+            if (doctor.DoctorId != existingAppointment.DoctorTimeSlot.DoctorId)
+                throw new UnauthorizedAccessException("UnAuthorized to add notes to this appointment");
 
             existingAppointment.Notes = notes;
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
