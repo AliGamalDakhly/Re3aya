@@ -1,4 +1,6 @@
+
 ﻿using _01_DataAccessLayer.Models;
+
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +11,8 @@ using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppoi
 
 namespace _03_APILayer.Controllers
 {
-
+    [Authorize]
+    //[Authorize(Roles = "Patient")]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -273,5 +276,39 @@ namespace _03_APILayer.Controllers
                 return StatusCode(500, $"An error occurred while cancelling appointment: {ex.Message}");
             }
         }
+
+
+        // Get all appointments for the logged-in patient
+        [HttpGet("GetAllAppointments")]
+        public async Task<IActionResult> GetAllAppointments()
+        {
+            try
+            {
+                var userId = GetAppUserId();
+                var appointments = await _patientService.GetAppointmentsAsync(userId);
+                return Ok(appointments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while retrieving appointments: {ex.Message}");
+            }
+        }
+
+        [HttpGet("appointments/upcoming")]
+        public async Task<IActionResult> GetUpcomingAppointments()
+        {
+            var userId = GetAppUserId();
+            var result = await _patientService.GetUpcomingAppointmentsAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("appointments/past")]
+        public async Task<IActionResult> GetPastAppointments()
+        {
+            var userId = GetAppUserId();
+            var result = await _patientService.GetPastAppointmentsAsync(userId);
+            return Ok(result);
+        }
+
     }
 }

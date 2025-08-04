@@ -14,6 +14,7 @@ namespace _01_DataAccessLayer.Models
         public AppointmentStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string Notes { get; set; }
+        public string? VedioCallUrl { get; set; }
 
 
         public int PatientId { get; set; }

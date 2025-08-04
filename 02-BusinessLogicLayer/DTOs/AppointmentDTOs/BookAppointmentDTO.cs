@@ -20,5 +20,9 @@ namespace _02_BusinessLogicLayer.DTOs.AppointmentDTOs
         public int AppointmentId { get; set; }
         public int DoctorTimeSlotId { get; set; }
 
+
+        public string? VedioCallUrl { get; set; }
+
+
     }
 }

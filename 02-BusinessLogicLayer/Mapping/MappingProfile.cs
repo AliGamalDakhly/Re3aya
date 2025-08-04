@@ -92,6 +92,17 @@ namespace _02_BusinessLogicLayer.Mapping
             CreateMap<BookAppointmentDTO, Appointment>();
             CreateMap<CancelAppointmentDTO, Appointment>();
 
+            // CreateMap<Appointment, AppointmentResponseDTO>();
+            CreateMap<Appointment, AppointmentResponseDTO>()
+       .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
+       .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.AppUser.FullName))
+       .ForMember(dest => dest.SpecializationName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Specialization.Name))
+       .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime.ToString(@"hh\:mm")))
+       .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime.ToString(@"hh\:mm")))
+       .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.CreatedAt))
+       .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+
             #endregion
 
             //********************** Specialization Dto Mapping **********************//

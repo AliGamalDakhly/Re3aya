@@ -37,9 +37,9 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<bool> CancelAppointmentAsync(CancelAppointmentDTO dto, string appUserId);
 
         //get all appointments for a specific patient
-        Task<List<AppointmentDTO>> GetAppointmentsAsync(string appUserId); // by his identity
-
-
+        Task<List<AppointmentResponseDTO>> GetAppointmentsAsync(string appUserId); // by his identity
+        Task<List<AppointmentResponseDTO>> GetUpcomingAppointmentsAsync(string appUserId);
+        Task<List<AppointmentResponseDTO>> GetPastAppointmentsAsync(string appUserId);
         #region
 
 
@@ -55,7 +55,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
 
 
-       
+
 
         #endregion
     }

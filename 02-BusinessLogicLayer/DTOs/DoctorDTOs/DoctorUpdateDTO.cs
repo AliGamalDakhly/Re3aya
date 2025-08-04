@@ -19,6 +19,8 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public string DetailedAddress { get; set; }
 
         public int CityId { get; set; } // Assuming this is a string representation of the city
+
+
         public string Gender { get; set; } // Assuming this is a string representation
 
 
