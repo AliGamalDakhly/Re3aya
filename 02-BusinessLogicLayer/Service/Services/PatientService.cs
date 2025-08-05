@@ -211,11 +211,11 @@ namespace _02_BusinessLogicLayer.Service.Services
                 Filter = a => a.PatientId == patient.PatientId,
                 Includes = new Expression<Func<Appointment, object>>[]
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                    a => a.DoctorTimeSlot,
+                    a => a.DoctorTimeSlot.TimeSlot,
+                    a => a.DoctorTimeSlot.Doctor,
+                    a => a.DoctorTimeSlot.Doctor.AppUser,
+                    a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
 
@@ -243,11 +243,12 @@ namespace _02_BusinessLogicLayer.Service.Services
                     a.Status == AppointmentStatus.Confirmed,
                 Includes = new Expression<Func<Appointment, object>>[]
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                     a => a.DoctorTimeSlot,
+                     a => a.DoctorTimeSlot.TimeSlot,
+                     a => a.DoctorTimeSlot.Doctor,
+                     
+                     a => a.DoctorTimeSlot.Doctor.AppUser,
+                     a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
 
@@ -270,11 +271,11 @@ namespace _02_BusinessLogicLayer.Service.Services
                      a.Status == AppointmentStatus.Cancelled),
                 Includes = new Expression<Func<Appointment, object>>[]
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                   a => a.DoctorTimeSlot,
+                   a => a.DoctorTimeSlot.TimeSlot,
+                   a => a.DoctorTimeSlot.Doctor,
+                   a => a.DoctorTimeSlot.Doctor.AppUser,
+                   a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
 

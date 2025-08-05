@@ -53,6 +53,9 @@ namespace _03_APILayer
             builder.Services.AddScoped<IDoctorTimeSlotService, DoctorTimeSlotService>();
 
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+            builder.Services.AddScoped<IAiService, AiService>();
+            builder.Services.AddScoped<IMedicalSuggest, MedicalSuggest>();
+            builder.Services.AddScoped<IRagService, RagService>();
 
 
 
