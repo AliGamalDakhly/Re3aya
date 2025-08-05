@@ -20,6 +20,7 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly DoctorService _doctorService;
+        private readonly SignInManager<AppUser> _signInManager;
 
         private Doctor doctorInfo;
         private Patient patientInfo;
@@ -28,6 +29,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
             IUnitOfWork unitOfWork,
+            SignInManager<AppUser> signInManager,
             IMapper mapper)
         {
             _userManager = userManager;
@@ -35,6 +37,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             _configuration = configuration;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _signInManager = signInManager;
         }
 
         public async Task<string> RegisterDoctorAsync(DoctorRegisterDTO dto)
@@ -181,8 +184,21 @@ namespace _02_BusinessLogicLayer.Service.Services
         {
             var user = await _userManager.FindByNameAsync(dto.UserName);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                throw new Exception("username or Password is invalid");
+            if (user == null)
+                throw new Exception("اسم المستخدم أو كلمة المرور غير صحيحة");
+
+            var result = await _signInManager.PasswordSignInAsync(
+                dto.UserName,
+                dto.Password,
+                isPersistent: false,
+                lockoutOnFailure: true
+            );
+
+            if (result.IsLockedOut)
+                throw new Exception("تم قفل الحساب مؤقتًا. حاول لاحقًا.");
+
+            if (!result.Succeeded)
+                throw new Exception("اسم المستخدم أو كلمة المرور غير صحيحة");
 
             var roles = await _userManager.GetRolesAsync(user);
 
