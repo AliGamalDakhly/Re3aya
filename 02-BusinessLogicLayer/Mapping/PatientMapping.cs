@@ -24,6 +24,7 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.AppUser.PhoneNumber))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.AppUser.DateOfBirth))
+                .ForMember(dest => dest.IsLocked, opt => opt.MapFrom(src => src.AppUser.LockoutEnd == null ? false : true))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.AppUser.Gender.ToString()));
 
 
