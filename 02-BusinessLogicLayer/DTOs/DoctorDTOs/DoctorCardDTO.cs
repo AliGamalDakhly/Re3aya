@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using _01_DataAccessLayer.Enums;
-
-namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
+﻿namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
 {
     public class DoctorCardDTO
     {
         public int DoctorId { get; set; }
 
         // fetch this From AppUser
-        public string FullName { get; set; }  
-        public int? ExpYears { get; set; }   
+        public string FullName { get; set; }
+        public int? ExpYears { get; set; }
         public float RatingValue { get; set; }
         public double Fees { get; set; }
         public string DoctorService { get; set; }
@@ -28,7 +21,7 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
 
         public int GovernemntId { get; set; } // ID of the government where the doctor is located
         public int SpecializationId { get; set; } // ID of the doctor's specialization
-        
+        public DateTime CreatedAt { get; set; } // Date when the doctor was created in the system
 
         public bool HasAvailableTimeSlots { get; set; }
         public bool HasAvailableTimeSlotsToday { get; set; }

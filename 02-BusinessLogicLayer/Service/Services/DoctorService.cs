@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using _01_DataAccessLayer.Enums;
+﻿using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
@@ -8,7 +7,6 @@ using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {

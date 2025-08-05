@@ -9,7 +9,7 @@ namespace _02_BusinessLogicLayer.Service.Services
     public class MedicalSuggest : IMedicalSuggest
     {
         private readonly HttpClient _httpClient;
-        private const string ApiKey = "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";
+        private const string ApiKey = "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";
         private const string ApiUrl = "https://openrouter.ai/api/v1/chat/completions";
         private const string Model = "openrouter/horizon-beta";
 

@@ -25,12 +25,9 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.SpecializationId, opt => opt.MapFrom(src => src.SpecializationId))
                 .ForMember(dest => dest.RatingValue, opt => opt.MapFrom(src => src.RatingValue))
                 .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.Documents
-
-
                 .FirstOrDefault(d => d.DocumentType == DocumentType.ProfileImage).FilePath))
-
-                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses.Select(a => a.DetailedAddress)));
-
+                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses.Select(a => a.DetailedAddress)))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.AppUser.CreatedAt));
 
 
             CreateMap<Doctor, DoctorDetialsDTO>()
