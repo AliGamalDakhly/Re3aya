@@ -150,10 +150,23 @@ namespace _03_APILayer.Controllers
         }
 
 
-        [HttpGet("{id}/with-view")]
+
+        [HttpGet("{id}/view")]
+        public IActionResult TrackDoctorView(int id)
+        {
+            if (_doctorViewCounts.ContainsKey(id))
+                _doctorViewCounts[id]++;
+            else
+                _doctorViewCounts[id] = 1;
+
+            return Ok(new { doctorId = id, views = _doctorViewCounts[id] });
+        }
+
+
+        [HttpGet("{id}/view-v2")]
         public async Task<IActionResult> GetDoctorByIdWithViewCount(int id)
         {
-            // حساب الزيارة
+             
             if (_doctorViewCounts.ContainsKey(id))
                 _doctorViewCounts[id]++;
             else
@@ -171,15 +184,13 @@ namespace _03_APILayer.Controllers
         }
 
 
-        [HttpGet("{id}/view")]
-        public IActionResult TrackDoctorView(int id)
-        {
-            if (_doctorViewCounts.ContainsKey(id))
-                _doctorViewCounts[id]++;
-            else
-                _doctorViewCounts[id] = 1;
 
-            return Ok(new { doctorId = id, views = _doctorViewCounts[id] });
+
+        [HttpGet("doctor/{doctorId}/appointments")]
+        public async Task<IActionResult> GetDoctorAppointments(int doctorId)
+        {
+            var appointments = await _doctorService.GetAppointmentsByDoctorIdAsync(doctorId);
+            return Ok(appointments);
         }
 
 

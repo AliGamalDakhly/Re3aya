@@ -1,10 +1,12 @@
-﻿using System.Numerics;
+﻿using System.Linq.Expressions;
+using System.Numerics;
 using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
+using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -383,6 +385,33 @@ namespace _02_BusinessLogicLayer.Service.Services
             return true;
         }
 
+
+
+
+        public async Task<List<AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
+        {
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a => a.DoctorTimeSlot.DoctorId == doctorId,
+                Includes = new Expression<Func<Appointment, object>>[]
+               {
+                    a => a.Patient,
+                    a => a.Patient.AppUser,
+                    a => a.DoctorTimeSlot,
+                    a => a.DoctorTimeSlot.TimeSlot,
+                    a => a.DoctorTimeSlot.Doctor,
+                    a => a.DoctorTimeSlot.Doctor.AppUser,
+                    a => a.DoctorTimeSlot.Doctor.Specialization,
+                    a => a.Payment 
+               }
+            };
+
+
+            var appointments = await appointmentRepo.GetAllAsync(options);
+            return _mapper.Map<List<AppointmentWithPatientDTO>>(appointments);
+        }
 
 
 

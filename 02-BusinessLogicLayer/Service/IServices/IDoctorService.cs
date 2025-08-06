@@ -1,6 +1,7 @@
 ﻿using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
+using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 
 namespace _02_BusinessLogicLayer.Service.IServices
 {
@@ -23,6 +24,9 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
 
         Task<bool> UpdateDoctorBalanceAsync(int doctorId, double amountToAdd);
+
+        Task<List<AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId);
+
 
     }
 }
