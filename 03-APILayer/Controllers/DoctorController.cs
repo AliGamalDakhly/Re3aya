@@ -1,8 +1,6 @@
 ﻿using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
-using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _03_APILayer.Controllers
@@ -24,12 +22,19 @@ namespace _03_APILayer.Controllers
         #region Doctor Endpoints
 
         /// <summary>
-        /// Get all doctors
+        /// Get all  active doctors
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAllDoctors()
         {
             var doctors = await _doctorService.GetAllAsync();
+            return Ok(doctors);
+        }
+
+        [HttpGet("allDoctors")]
+        public async Task<IActionResult> GetAllDoctorsWithDetails()
+        {
+            var doctors = await _doctorService.GetAllDoctorsAsync();
             return Ok(doctors);
         }
 

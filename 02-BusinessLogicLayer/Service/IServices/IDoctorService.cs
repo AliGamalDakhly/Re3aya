@@ -1,6 +1,4 @@
-﻿using _01_DataAccessLayer.Models;
-using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
-using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
+﻿using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
 
 namespace _02_BusinessLogicLayer.Service.IServices
 {
@@ -20,5 +18,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<string?> GetDoctorFullNameByIdAsync(int doctorId);
 
         Task UpdateDoctorRating(int doctorId);
+
+        Task<List<DoctorSmallInfoDto>> GetAllDoctorsAsync();
     }
 }

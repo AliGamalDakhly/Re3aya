@@ -65,7 +65,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
 
-            doctor.Status = DoctorAccountStatus.Deactivated;
+            doctor.Status = DoctorAccountStatus.Pending;
 
             await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
             await _unitOfWork.CompleteAsync();
@@ -131,23 +131,35 @@ namespace _02_BusinessLogicLayer.Service.Services
             return doctorsDtos;
         }
 
-        //public async Task<List<DoctorGetDTO>> GetAllAsync()
-        //{
-        //    var doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync();
-        //    var result = new List<DoctorGetDTO>();
+        public async Task<List<DoctorSmallInfoDto>> GetAllDoctorsAsync()
+        {
+            List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
 
-        //    foreach (var doctor in doctors)
-        //    {
-        //        var user = await _userManager.FindByIdAsync(doctor.AppUserId);
-        //        var dto = _mapper.Map<DoctorGetDTO>(doctor);
-        //        dto.FullName = user.FullName;
-        //        dto.Email = user.Email;
-        //        dto.PhoneNumber = user.PhoneNumber;
-        //        result.Add(dto);
-        //    }
 
-        //    return result;
-        //}
+                new QueryOptions<Doctor>
+                {
+                    Includes = [d => d.AppUser, d => d.Documents],
+                    OrderBy = d => d.AppUser.CreatedAt,
+
+
+                    SortDirection = SortDirection.Descending
+
+                });
+            var result = _mapper.Map<List<DoctorSmallInfoDto>>(doctors); ;
+
+            //foreach (var doctor in doctors)
+            //{
+            //    var user = await _userManager.FindByIdAsync(doctor.AppUserId);
+            //    var dto = _mapper.Map<DoctorGetDTO>(doctor);
+            //    dto.FullName = user.FullName;
+            //    dto.Email = user.Email;
+            //    dto.PhoneNumber = user.PhoneNumber;
+            //    dto.ProfilePictureUrl =
+            //    result.Add(dto);
+            //}
+
+            return result;
+        }
 
 
 
