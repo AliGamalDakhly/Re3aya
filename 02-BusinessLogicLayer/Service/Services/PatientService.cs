@@ -7,6 +7,7 @@ using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.DTOs.RatingDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using System.Linq.Expressions;
 using AppointmentDTO = _02_BusinessLogicLayer.DTOs.AppointmentDTOs.AppointmentDTO;
 using CancelAppointmentDTO = _02_BusinessLogicLayer.DTOs.PatientDTOs.CancelAppointmentDTO;
@@ -20,8 +21,10 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly IGenericRepository<Patient, int> _patientRepository;
         private readonly IRatingService _ratingService;
         private readonly IDoctorService _doctorService;
+        private readonly UserManager<AppUser> _userManager;
 
         public PatientService(IUnitOfWork unitOfWork, IMapper mapper,
+                UserManager<AppUser> userManager,
                 IRatingService ratingService, IDoctorService doctorService)
         {
             _unitOfWork = unitOfWork;
@@ -29,6 +32,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             _patientRepository = _unitOfWork.Repository<Patient, int>();
             _ratingService = ratingService;
             _doctorService = doctorService;
+            _userManager = userManager;
         }
 
         public async Task<int> CountAsync(Expression<Func<Patient, bool>>? filter = null)
@@ -211,11 +215,11 @@ namespace _02_BusinessLogicLayer.Service.Services
                 Filter = a => a.PatientId == patient.PatientId,
                 Includes = new Expression<Func<Appointment, object>>[]
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                    a => a.DoctorTimeSlot,
+                    a => a.DoctorTimeSlot.TimeSlot,
+                    a => a.DoctorTimeSlot.Doctor,
+                    a => a.DoctorTimeSlot.Doctor.AppUser,
+                    a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
 
@@ -243,11 +247,12 @@ namespace _02_BusinessLogicLayer.Service.Services
                     a.Status == AppointmentStatus.Confirmed,
                 Includes = new Expression<Func<Appointment, object>>[]
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                     a => a.DoctorTimeSlot,
+                     a => a.DoctorTimeSlot.TimeSlot,
+                     a => a.DoctorTimeSlot.Doctor,
+                     
+                     a => a.DoctorTimeSlot.Doctor.AppUser,
+                     a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
 
@@ -270,11 +275,11 @@ namespace _02_BusinessLogicLayer.Service.Services
                      a.Status == AppointmentStatus.Cancelled),
                 Includes = new Expression<Func<Appointment, object>>[]
                 {
-            a => a.DoctorTimeSlot,
-            a => a.DoctorTimeSlot.TimeSlot,
-            a => a.DoctorTimeSlot.Doctor,
-            a => a.DoctorTimeSlot.Doctor.AppUser,
-            a => a.DoctorTimeSlot.Doctor.Specialization
+                   a => a.DoctorTimeSlot,
+                   a => a.DoctorTimeSlot.TimeSlot,
+                   a => a.DoctorTimeSlot.Doctor,
+                   a => a.DoctorTimeSlot.Doctor.AppUser,
+                   a => a.DoctorTimeSlot.Doctor.Specialization
                 }
             };
 
@@ -282,7 +287,29 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<List<AppointmentResponseDTO>>(appointments);
         }
 
+        public async Task<bool> ToggleAccountLock(int patientId)
+        {
+            Patient patient = await _patientRepository.GetByIdAsync(patientId);
+            AppUser? appUser = await _userManager.FindByIdAsync(patient.AppUserId);
 
+            if (appUser == null)
+                throw new ArgumentException("User Not FOund");
+
+            if (appUser.LockoutEnd != null && appUser.LockoutEnd > DateTime.UtcNow)
+            {
+                // Unlock
+                appUser.LockoutEnd = null;
+            }
+            else
+            {
+                // Lock for 100 years
+                appUser.LockoutEnd = DateTime.UtcNow.AddYears(100);
+            }
+
+            var result = await _userManager.UpdateAsync(appUser);
+
+            return result.Succeeded;
+        }
 
     }
 }

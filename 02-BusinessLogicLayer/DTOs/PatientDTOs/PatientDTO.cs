@@ -23,7 +23,7 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
         public string UserName { get; set; }
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-
+        public bool IsLocked { get; set; }
        
         #endregion
     }

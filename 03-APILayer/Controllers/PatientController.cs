@@ -126,6 +126,7 @@ namespace _03_APILayer.Controllers
 
 
         // Get all patients
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllPatients()
         {
@@ -310,5 +311,19 @@ namespace _03_APILayer.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("ToggleAccount/{id}")]
+        public async Task<IActionResult> ToggleAccount(int id)
+        {
+            try
+            {
+                var result = await _patientService.ToggleAccountLock(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error while Toggle account lock: {ex.Message}");
+            }
+        }
     }
 }

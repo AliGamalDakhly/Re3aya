@@ -9,8 +9,11 @@ namespace _03_APILayer.Controllers
     [ApiController]
     public class DoctorController : ControllerBase
     {
+        private static readonly Dictionary<int, int> _doctorViewCounts = new Dictionary<int, int>();
+
         private readonly IDoctorService _doctorService;
         private readonly IDocumentService _documentService;
+
 
 
         public DoctorController(IDoctorService doctorService, IDocumentService documentService)
@@ -121,6 +124,81 @@ namespace _03_APILayer.Controllers
             var exists = await _doctorService.ExistsDoctorAsync(id);
             return Ok(exists);
         }
+
+
+
+        /// <summary>
+        /// update balance for doctor after every appointment
+        /// </summary>
+        [HttpPut("{doctorId}/balance")]
+        public async Task<IActionResult> UpdateDoctorBalance(int doctorId, [FromQuery] double amount)
+        {
+            if (amount <= 0)
+                return BadRequest("amount must be greater than zero");
+
+            // deducted 10%  
+            double companyShare = amount * 0.10;
+            double doctorAmount = amount - companyShare;
+
+            var success = await _doctorService.UpdateDoctorBalanceAsync(doctorId, doctorAmount);
+            if (!success)
+                return NotFound($"doctor with ID {doctorId} not found");
+
+            return Ok(new
+            {
+                Message = $"doctor balance increased by {doctorAmount}, 10% deducted for care|Re3aya company",
+                DoctorId = doctorId,
+                OriginalAmount = amount,
+                DoctorReceived = doctorAmount,
+                CompanyShare = companyShare
+            });
+        }
+
+
+
+        [HttpGet("{id}/view")]
+        public IActionResult TrackDoctorView(int id)
+        {
+            if (_doctorViewCounts.ContainsKey(id))
+                _doctorViewCounts[id]++;
+            else
+                _doctorViewCounts[id] = 1;
+
+            return Ok(new { doctorId = id, views = _doctorViewCounts[id] });
+        }
+
+
+        [HttpGet("{id}/view-v2")]
+        public async Task<IActionResult> GetDoctorByIdWithViewCount(int id)
+        {
+             
+            if (_doctorViewCounts.ContainsKey(id))
+                _doctorViewCounts[id]++;
+            else
+                _doctorViewCounts[id] = 1;
+
+            var doctor = await _doctorService.GetDoctorByIdAsync(id);
+            if (doctor == null)
+                return NotFound();
+
+            return Ok(new
+            {
+                doctor,
+                ViewCount = _doctorViewCounts[id]
+            });
+        }
+
+
+
+
+        [HttpGet("doctor/{doctorId}/appointments")]
+        public async Task<IActionResult> GetDoctorAppointments(int doctorId)
+        {
+            var appointments = await _doctorService.GetAppointmentsByDoctorIdAsync(doctorId);
+            return Ok(appointments);
+        }
+
+
 
         #endregion
 

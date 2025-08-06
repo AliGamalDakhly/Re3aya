@@ -40,6 +40,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<List<AppointmentResponseDTO>> GetAppointmentsAsync(string appUserId); // by his identity
         Task<List<AppointmentResponseDTO>> GetUpcomingAppointmentsAsync(string appUserId);
         Task<List<AppointmentResponseDTO>> GetPastAppointmentsAsync(string appUserId);
+        Task<bool> ToggleAccountLock(int patientId);
         #region
 
 
