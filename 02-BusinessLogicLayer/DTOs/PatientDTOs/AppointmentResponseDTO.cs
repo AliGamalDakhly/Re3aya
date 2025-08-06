@@ -18,7 +18,7 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
         public string EndTime { get; set; }
 
         public DateTime Date { get; set; }
-        public string? videoCallUrl { get; set; }
+        public string? VideoCallUrl { get; set; }
         public string? Notes { get; set; }
         public string Status { get; set; } 
     }
