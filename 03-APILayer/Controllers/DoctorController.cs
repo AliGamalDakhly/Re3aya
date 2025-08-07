@@ -176,13 +176,29 @@ namespace _03_APILayer.Controllers
 
             return Ok(new
             {
-                Message = $"doctor balance increased by {doctorAmount}, 10% deducted for care|Re3aya company",
+                Message = $"doctor balance increased by {doctorAmount} EGP, 10% deducted for care|Re3aya company",
                 DoctorId = doctorId,
                 OriginalAmount = amount,
                 DoctorReceived = doctorAmount,
                 CompanyShare = companyShare
             });
         }
+
+
+        [HttpPost("{doctorId}/deduct-balance")]
+        public async Task<IActionResult> DeductDoctorBalance(int doctorId, [FromBody] double amount)
+        {
+            // deducted 10%  
+            double discountedAmount = amount * 0.9;
+
+            var result = await _doctorService.DeductDoctorBalanceAsync(doctorId, discountedAmount);
+            if (!result)
+                return BadRequest("insufficient funds or doctor not available");
+
+            return Ok(new { message = $"deducted {discountedAmount} EGP - 10% deducted applied for care|Re3aya company" });
+        }
+
+
 
 
 

@@ -7,6 +7,8 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
         public int AppointmentId { get; set; }
 
         public string DoctorName { get; set; }
+        public string DoctorId { get; set; }
+
         public string SpecializationName { get; set; }
         public string StartTime { get; set; }
         public string EndTime { get; set; }

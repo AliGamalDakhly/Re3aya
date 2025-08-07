@@ -29,6 +29,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<List<DoctorSmallInfoDto>> GetAllDoctorsAsync();
 
         Task<bool> UpdateDoctorBalanceAsync(int doctorId, double amountToAdd);
+        Task<bool> DeductDoctorBalanceAsync(int doctorId, double amountToDeduct);
 
         Task<List<AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId);
 
