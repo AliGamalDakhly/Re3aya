@@ -1,6 +1,4 @@
-﻿using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
-using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 
 namespace _02_BusinessLogicLayer.Service.IServices
@@ -10,8 +8,14 @@ namespace _02_BusinessLogicLayer.Service.IServices
         //Task<DoctorGetDTO> AddDoctorAsync(DoctorRegisterDTO doctorDto);
         Task<bool> DeleteDoctorByIdAsync(int id);
         //Task<bool> DeleteDoctorAsync(Doctor doctor);
-        Task<bool> ActivateDoctorAccountAsync(int doctorId);
-        Task<bool> DeActivateDoctorAccountAsync(int doctorId);
+        Task<bool> ApproveDoctorAccountAsync(int doctorId);
+        Task<bool> SuspendDoctorAccountAsync(int doctorId);
+        Task<bool> RejectDoctorAccountAsync(int doctorId);
+
+        Task<bool> PendingDoctorAccountAsync(int doctorId);
+
+
+        Task<bool> DeactivatedDoctorAccountAsync(int doctorId);
         Task<DoctorGetDTO> UpdateDoctorAsync(int id, DoctorUpdateDTO doctorDto);
         Task<List<DoctorCardDTO>> GetAllAsync();
         Task<DoctorGetDTO> GetDoctorByIdAsync(int id);
@@ -22,6 +26,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
         Task UpdateDoctorRating(int doctorId);
 
+        Task<List<DoctorSmallInfoDto>> GetAllDoctorsAsync();
 
         Task<bool> UpdateDoctorBalanceAsync(int doctorId, double amountToAdd);
 

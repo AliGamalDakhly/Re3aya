@@ -1,8 +1,6 @@
 ﻿using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
-using _02_BusinessLogicLayer.DTOs.DoctorTimeSlot;
 using _02_BusinessLogicLayer.DTOs.DocumentDTO;
 using _02_BusinessLogicLayer.Service.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _03_APILayer.Controllers
@@ -27,12 +25,19 @@ namespace _03_APILayer.Controllers
         #region Doctor Endpoints
 
         /// <summary>
-        /// Get all doctors
+        /// Get all  active doctors
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAllDoctors()
         {
             var doctors = await _doctorService.GetAllAsync();
+            return Ok(doctors);
+        }
+
+        [HttpGet("allDoctors")]
+        public async Task<IActionResult> GetAllDoctorsWithDetails()
+        {
+            var doctors = await _doctorService.GetAllDoctorsAsync();
             return Ok(doctors);
         }
 
@@ -81,10 +86,40 @@ namespace _03_APILayer.Controllers
         /// <summary>
         /// Activate a doctor account
         /// </summary>
-        [HttpPut("{id}/activate")]
+        [HttpPut("{id}/approve")]
         public async Task<IActionResult> ActivateDoctor(int id)
         {
-            var success = await _doctorService.ActivateDoctorAccountAsync(id);
+            var success = await _doctorService.ApproveDoctorAccountAsync(id);
+            if (!success) return NotFound($"Doctor with ID {id} not found.");
+            return NoContent();
+        }
+        /// <summary>
+        /// Activate a doctor account
+        /// </summary>
+        [HttpPut("{id}/suspend")]
+        public async Task<IActionResult> SuspendDoctor(int id)
+        {
+            var success = await _doctorService.SuspendDoctorAccountAsync(id);
+            if (!success) return NotFound($"Doctor with ID {id} not found.");
+            return NoContent();
+        }
+        /// <summary>
+        /// Activate a doctor account
+        /// </summary>
+        [HttpPut("{id}/reject")]
+        public async Task<IActionResult> RejectDoctor(int id)
+        {
+            var success = await _doctorService.RejectDoctorAccountAsync(id);
+            if (!success) return NotFound($"Doctor with ID {id} not found.");
+            return NoContent();
+        }
+        /// <summary>
+        /// Activate a doctor account
+        /// </summary>
+        [HttpPut("{id}/pending")]
+        public async Task<IActionResult> PendingDoctor(int id)
+        {
+            var success = await _doctorService.PendingDoctorAccountAsync(id);
             if (!success) return NotFound($"Doctor with ID {id} not found.");
             return NoContent();
         }
@@ -95,7 +130,7 @@ namespace _03_APILayer.Controllers
         [HttpPut("{id}/deactivate")]
         public async Task<IActionResult> DeactivateDoctor(int id)
         {
-            var success = await _doctorService.DeActivateDoctorAccountAsync(id);
+            var success = await _doctorService.DeactivatedDoctorAccountAsync(id);
             if (!success) return NotFound($"Doctor with ID {id} not found.");
             return NoContent();
         }
@@ -166,7 +201,7 @@ namespace _03_APILayer.Controllers
         [HttpGet("{id}/view-v2")]
         public async Task<IActionResult> GetDoctorByIdWithViewCount(int id)
         {
-             
+
             if (_doctorViewCounts.ContainsKey(id))
                 _doctorViewCounts[id]++;
             else
