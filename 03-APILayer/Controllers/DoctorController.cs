@@ -86,10 +86,40 @@ namespace _03_APILayer.Controllers
         /// <summary>
         /// Activate a doctor account
         /// </summary>
-        [HttpPut("{id}/activate")]
+        [HttpPut("{id}/approve")]
         public async Task<IActionResult> ActivateDoctor(int id)
         {
-            var success = await _doctorService.ActivateDoctorAccountAsync(id);
+            var success = await _doctorService.ApproveDoctorAccountAsync(id);
+            if (!success) return NotFound($"Doctor with ID {id} not found.");
+            return NoContent();
+        }
+        /// <summary>
+        /// Activate a doctor account
+        /// </summary>
+        [HttpPut("{id}/suspend")]
+        public async Task<IActionResult> SuspendDoctor(int id)
+        {
+            var success = await _doctorService.SuspendDoctorAccountAsync(id);
+            if (!success) return NotFound($"Doctor with ID {id} not found.");
+            return NoContent();
+        }
+        /// <summary>
+        /// Activate a doctor account
+        /// </summary>
+        [HttpPut("{id}/reject")]
+        public async Task<IActionResult> RejectDoctor(int id)
+        {
+            var success = await _doctorService.RejectDoctorAccountAsync(id);
+            if (!success) return NotFound($"Doctor with ID {id} not found.");
+            return NoContent();
+        }
+        /// <summary>
+        /// Activate a doctor account
+        /// </summary>
+        [HttpPut("{id}/pending")]
+        public async Task<IActionResult> PendingDoctor(int id)
+        {
+            var success = await _doctorService.PendingDoctorAccountAsync(id);
             if (!success) return NotFound($"Doctor with ID {id} not found.");
             return NoContent();
         }
@@ -100,7 +130,7 @@ namespace _03_APILayer.Controllers
         [HttpPut("{id}/deactivate")]
         public async Task<IActionResult> DeactivateDoctor(int id)
         {
-            var success = await _doctorService.DeActivateDoctorAccountAsync(id);
+            var success = await _doctorService.DeactivatedDoctorAccountAsync(id);
             if (!success) return NotFound($"Doctor with ID {id} not found.");
             return NoContent();
         }
@@ -171,7 +201,7 @@ namespace _03_APILayer.Controllers
         [HttpGet("{id}/view-v2")]
         public async Task<IActionResult> GetDoctorByIdWithViewCount(int id)
         {
-             
+
             if (_doctorViewCounts.ContainsKey(id))
                 _doctorViewCounts[id]++;
             else

@@ -1,7 +1,4 @@
 using _01_DataAccessLayer.Enums;
-using System.Linq.Expressions;
-using System.Numerics;
-using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
@@ -11,6 +8,7 @@ using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using System.Linq.Expressions;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -46,7 +44,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
-        public async Task<bool> ActivateDoctorAccountAsync(int doctorId)
+        public async Task<bool> ApproveDoctorAccountAsync(int doctorId)
         {
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
@@ -57,14 +55,30 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync();
             return true;
         }
-
-
-        public async Task<int> CountDoctorsAsync()
+        public async Task<bool> SuspendDoctorAccountAsync(int doctorId)
         {
-            return await _unitOfWork.Repository<Doctor, int>().CountAsync();
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null) return false;
+
+            doctor.Status = DoctorAccountStatus.Suspended;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+        public async Task<bool> RejectDoctorAccountAsync(int doctorId)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null) return false;
+
+            doctor.Status = DoctorAccountStatus.Rejected;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
 
-        public async Task<bool> DeActivateDoctorAccountAsync(int doctorId)
+        public async Task<bool> PendingDoctorAccountAsync(int doctorId)
         {
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
@@ -74,6 +88,24 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
             await _unitOfWork.CompleteAsync();
             return true;
+        }
+
+        public async Task<bool> DeactivatedDoctorAccountAsync(int doctorId)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null) return false;
+
+            doctor.Status = DoctorAccountStatus.Deactivated;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+
+        public async Task<int> CountDoctorsAsync()
+        {
+            return await _unitOfWork.Repository<Doctor, int>().CountAsync();
         }
 
         public async Task<bool> DeleteDoctorByIdAsync(int id)
@@ -416,7 +448,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                     a => a.DoctorTimeSlot.Doctor,
                     a => a.DoctorTimeSlot.Doctor.AppUser,
                     a => a.DoctorTimeSlot.Doctor.Specialization,
-                    a => a.Payment 
+                    a => a.Payment
                }
             };
 
