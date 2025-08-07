@@ -83,7 +83,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
 
-            doctor.Status = DoctorAccountStatus.Pending;
+            doctor.Status = DoctorAccountStatus.Deactivated;
 
             await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
             await _unitOfWork.CompleteAsync();
