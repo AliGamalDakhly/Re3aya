@@ -429,6 +429,21 @@ namespace _02_BusinessLogicLayer.Service.Services
         }
 
 
+        public async Task<bool> DeductDoctorBalanceAsync(int doctorId, double amountToDeduct)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null || doctor.Balance < amountToDeduct)
+                return false;
+
+            doctor.Balance -= amountToDeduct;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
+
+
 
 
         public async Task<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
