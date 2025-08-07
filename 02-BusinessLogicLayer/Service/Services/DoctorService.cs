@@ -432,7 +432,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
-        public async Task<List<AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
+        public async Task<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
         {
             var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
 
@@ -454,7 +454,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
             var appointments = await appointmentRepo.GetAllAsync(options);
-            return _mapper.Map<List<AppointmentWithPatientDTO>>(appointments);
+            return _mapper.Map<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>>(appointments);
         }
 
 

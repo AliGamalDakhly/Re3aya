@@ -1,16 +1,17 @@
 ﻿using _01_DataAccessLayer.Enums;
+using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.Repository.IGenericRepository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorTimeSlotDTOs;
+using _02_BusinessLogicLayer.DTOs.PatientDTOs;
+using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
-using System.Linq.Expressions;
-using _01_DataAccessLayer.Enums;
-using _02_BusinessLogicLayer.DTOs.TimeSlotDTOs;
 using Microsoft.AspNetCore.Identity;
+using System.Linq.Expressions;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -26,8 +27,8 @@ namespace _02_BusinessLogicLayer.Service.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AppointmentService(IUnitOfWork unitOfWork,UserManager<AppUser> userManager,
-            IDoctorService doctorService,ITimeSlotService timeSlotService,
+        public AppointmentService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager,
+            IDoctorService doctorService, ITimeSlotService timeSlotService,
             IDoctorTimeSlotService doctorTimeSlotService, IMapper mapper)
 
         {
@@ -283,7 +284,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             if (appUser == null)
                 throw new Exception("Not Permitted to Join Meeting now");
 
-           
+
 
             List<Appointment> appointments = await _context.GetAllAsync(new QueryOptions<Appointment>
             {
@@ -293,7 +294,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
             Appointment? appointment = appointments.FirstOrDefault();
 
-            if(appointment != null)
+            if (appointment != null)
             {
                 bool permitted = false;
                 if (appUser.Doctor != null && appointment.DoctorTimeSlot.DoctorId == appUser.Doctor.DoctorId)
@@ -304,7 +305,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
                 TimeSlotDTO timeslot = await _timeSlotService.GetByIdAsync(appointment.DoctorTimeSlot.TimeSlotId);
 
-                if(DateTime.Now >= timeslot.StartTime && DateTime.Now <= timeslot.EndTime && permitted)
+                if (DateTime.Now >= timeslot.StartTime && DateTime.Now <= timeslot.EndTime && permitted)
                     return appointment.VedioCallUrl;
             }
 
@@ -341,6 +342,35 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync(); // it executes "SaveChanges"
             return notes;
         }
+
+
+
+
+        public async Task<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>> GetAppointmentsByPatientIdAsync(int patientId)
+        {
+            var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
+
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a => a.PatientId == patientId,
+                Includes = new Expression<Func<Appointment, object>>[]
+                {
+                a => a.Patient,
+                a => a.Patient.AppUser,
+                a => a.DoctorTimeSlot,
+                a => a.DoctorTimeSlot.TimeSlot,
+                a => a.DoctorTimeSlot.Doctor,
+                a => a.DoctorTimeSlot.Doctor.AppUser,
+                a => a.DoctorTimeSlot.Doctor.Specialization,
+                a => a.Payment
+                }
+            };
+
+            var appointments = await appointmentRepo.GetAllAsync(options);
+            return _mapper.Map<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>>(appointments);
+        }
+
+
 
     }
 }

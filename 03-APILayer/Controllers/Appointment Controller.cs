@@ -169,7 +169,7 @@ namespace _03_APILayer.Controllers
                     return BadRequest();
 
                 return Ok(roomUrl);
-            }   
+            }
             catch
             {
                 return BadRequest();
@@ -183,7 +183,7 @@ namespace _03_APILayer.Controllers
             try
             {
                 string appUserId = GetAppUserId();
-                if(appUserId == null)
+                if (appUserId == null)
                     return Unauthorized();
 
                 string meetingLink = await _appointmentService.JoinRoom(id, appUserId);
@@ -205,7 +205,7 @@ namespace _03_APILayer.Controllers
                 if (appUserId == null)
                     return Unauthorized();
 
-                string meetingLink = await _appointmentService.AddNotesAsync( notesDto.Notes, id, appUserId );
+                string meetingLink = await _appointmentService.AddNotesAsync(notesDto.Notes, id, appUserId);
                 return Ok(new { url = meetingLink }); // important: return object with "url"
             }
             catch (Exception ex)
@@ -213,6 +213,17 @@ namespace _03_APILayer.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+
+
+
+        [HttpGet("patient/{id}/appointments")]
+        public async Task<IActionResult> GetAppointmentsByPatientId(int id)
+        {
+            var appointments = await _appointmentService.GetAppointmentsByPatientIdAsync(id);
+            return Ok(appointments);
+        }
+
 
     }
 }
