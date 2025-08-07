@@ -4,7 +4,6 @@ using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
-using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -83,7 +82,7 @@ namespace _02_BusinessLogicLayer.Service.Services
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
 
-            doctor.Status = DoctorAccountStatus.Deactivated;
+            doctor.Status = DoctorAccountStatus.Pending;
 
             await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
             await _unitOfWork.CompleteAsync();
