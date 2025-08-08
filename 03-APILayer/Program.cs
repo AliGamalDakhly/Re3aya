@@ -56,6 +56,7 @@ namespace _03_APILayer
             builder.Services.AddScoped<IAiService, AiService>();
             builder.Services.AddScoped<IMedicalSuggest, MedicalSuggest>();
             builder.Services.AddScoped<IRagService, RagService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
 
 
 
