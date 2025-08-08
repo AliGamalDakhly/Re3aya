@@ -1,6 +1,7 @@
 ﻿using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
+using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using System.Linq.Expressions;
 
 namespace _02_BusinessLogicLayer.Service.IServices
@@ -24,5 +25,9 @@ namespace _02_BusinessLogicLayer.Service.IServices
         Task<int> CountAsync(Expression<Func<Appointment, bool>>? filter = null);
         Task<bool> ExistsAsync(Expression<Func<Appointment, bool>> predicate);
         Task<string> AddNotesAsync(string notes, int appointmentId, string appUserId);
+
+
+        Task<List<AppointmentWithPatientDTO>> GetAppointmentsByPatientIdAsync(int patientId);
+
     }
 }

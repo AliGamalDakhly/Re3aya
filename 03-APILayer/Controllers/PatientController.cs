@@ -1,8 +1,9 @@
 
-﻿using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Models;
 
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
+using _02_BusinessLogicLayer.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
@@ -18,10 +19,13 @@ namespace _03_APILayer.Controllers
     public class PatientController : ControllerBase
     {
         private readonly IPatientService _patientService;
+        private readonly IAppointmentService _appointmentService;
 
-        public PatientController(IPatientService patientService)
+        public PatientController(IPatientService patientService, IAppointmentService appointmentService)
         {
             _patientService = patientService;
+            _appointmentService = appointmentService;
+
         }
 
         private string GetAppUserId()
@@ -325,5 +329,17 @@ namespace _03_APILayer.Controllers
                 return StatusCode(500, $"Error while Toggle account lock: {ex.Message}");
             }
         }
+
+
+
+        [HttpGet("{patientId}/appointments")]
+        public async Task<IActionResult> GetAppointmentsByPatientId(int patientId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsByPatientIdAsync(patientId);
+            return Ok(appointments);
+        }
+
+
+
     }
 }

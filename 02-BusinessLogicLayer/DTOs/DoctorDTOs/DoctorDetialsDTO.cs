@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
+﻿namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
 {
     public class DoctorDetialsDTO
     {
@@ -20,9 +14,8 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorDTOs
         public string Specialization { get; set; }
         public List<String> Addresses { get; set; }
         public string ProfilePictureUrl { get; set; }
-
-
         public string Location { get; set; }
+        public DateTime CreatedAt { get; set; }
 
     }
 }

@@ -1,16 +1,13 @@
-﻿using System.Linq.Expressions;
-using System.Numerics;
 using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _01_DataAccessLayer.UnitOfWork;
 using _02_BusinessLogicLayer.DTOs.AddressDTOs;
 using _02_BusinessLogicLayer.DTOs.DoctorDTOs;
-using _02_BusinessLogicLayer.DTOs.PatientDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Linq.Expressions;
 
 namespace _02_BusinessLogicLayer.Service.Services
 {
@@ -46,7 +43,7 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
-        public async Task<bool> ActivateDoctorAccountAsync(int doctorId)
+        public async Task<bool> ApproveDoctorAccountAsync(int doctorId)
         {
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
@@ -57,14 +54,42 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.CompleteAsync();
             return true;
         }
-
-
-        public async Task<int> CountDoctorsAsync()
+        public async Task<bool> SuspendDoctorAccountAsync(int doctorId)
         {
-            return await _unitOfWork.Repository<Doctor, int>().CountAsync();
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null) return false;
+
+            doctor.Status = DoctorAccountStatus.Suspended;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+        public async Task<bool> RejectDoctorAccountAsync(int doctorId)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null) return false;
+
+            doctor.Status = DoctorAccountStatus.Rejected;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
 
-        public async Task<bool> DeActivateDoctorAccountAsync(int doctorId)
+        public async Task<bool> PendingDoctorAccountAsync(int doctorId)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null) return false;
+
+            doctor.Status = DoctorAccountStatus.Pending;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> DeactivatedDoctorAccountAsync(int doctorId)
         {
             var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null) return false;
@@ -74,6 +99,12 @@ namespace _02_BusinessLogicLayer.Service.Services
             await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
             await _unitOfWork.CompleteAsync();
             return true;
+        }
+
+
+        public async Task<int> CountDoctorsAsync()
+        {
+            return await _unitOfWork.Repository<Doctor, int>().CountAsync();
         }
 
         public async Task<bool> DeleteDoctorByIdAsync(int id)
@@ -135,23 +166,35 @@ namespace _02_BusinessLogicLayer.Service.Services
             return doctorsDtos;
         }
 
-        //public async Task<List<DoctorGetDTO>> GetAllAsync()
-        //{
-        //    var doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync();
-        //    var result = new List<DoctorGetDTO>();
+        public async Task<List<DoctorSmallInfoDto>> GetAllDoctorsAsync()
+        {
+            List<Doctor> doctors = await _unitOfWork.Repository<Doctor, int>().GetAllAsync(
 
-        //    foreach (var doctor in doctors)
-        //    {
-        //        var user = await _userManager.FindByIdAsync(doctor.AppUserId);
-        //        var dto = _mapper.Map<DoctorGetDTO>(doctor);
-        //        dto.FullName = user.FullName;
-        //        dto.Email = user.Email;
-        //        dto.PhoneNumber = user.PhoneNumber;
-        //        result.Add(dto);
-        //    }
 
-        //    return result;
-        //}
+                new QueryOptions<Doctor>
+                {
+                    Includes = [d => d.AppUser, d => d.Documents],
+                    OrderBy = d => d.AppUser.CreatedAt,
+
+
+                    SortDirection = SortDirection.Descending
+
+                });
+            var result = _mapper.Map<List<DoctorSmallInfoDto>>(doctors); ;
+
+            //foreach (var doctor in doctors)
+            //{
+            //    var user = await _userManager.FindByIdAsync(doctor.AppUserId);
+            //    var dto = _mapper.Map<DoctorGetDTO>(doctor);
+            //    dto.FullName = user.FullName;
+            //    dto.Email = user.Email;
+            //    dto.PhoneNumber = user.PhoneNumber;
+            //    dto.ProfilePictureUrl =
+            //    result.Add(dto);
+            //}
+
+            return result;
+        }
 
 
 
@@ -386,9 +429,24 @@ namespace _02_BusinessLogicLayer.Service.Services
         }
 
 
+        public async Task<bool> DeductDoctorBalanceAsync(int doctorId, double amountToDeduct)
+        {
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null || doctor.Balance < amountToDeduct)
+                return false;
+
+            doctor.Balance -= amountToDeduct;
+
+            await _unitOfWork.Repository<Doctor, int>().UpdateAsync(doctor);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
 
 
-        public async Task<List<AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
+
+
+        public async Task<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
         {
             var appointmentRepo = _unitOfWork.Repository<Appointment, int>();
 
@@ -404,13 +462,13 @@ namespace _02_BusinessLogicLayer.Service.Services
                     a => a.DoctorTimeSlot.Doctor,
                     a => a.DoctorTimeSlot.Doctor.AppUser,
                     a => a.DoctorTimeSlot.Doctor.Specialization,
-                    a => a.Payment 
+                    a => a.Payment
                }
             };
 
 
             var appointments = await appointmentRepo.GetAllAsync(options);
-            return _mapper.Map<List<AppointmentWithPatientDTO>>(appointments);
+            return _mapper.Map<List<DTOs.PatientDTOs.AppointmentWithPatientDTO>>(appointments);
         }
 
 
