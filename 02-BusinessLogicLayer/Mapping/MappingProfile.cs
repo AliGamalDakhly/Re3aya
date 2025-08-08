@@ -100,8 +100,15 @@ namespace _02_BusinessLogicLayer.Mapping
        .ForMember(dest => dest.SpecializationName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Specialization.Name))
        .ForMember(dest => dest.VideoCallUrl, opt => opt.MapFrom(src => src.VedioCallUrl))
        .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
-       .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime.ToString(@"hh\:mm")))
-       .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime.ToString(@"hh\:mm")))
+       //.ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime.ToString(@"hh\:mm")))
+       //.ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime.ToString(@"hh\:mm")))
+       .ForMember(dest => dest.StartTime,
+             opt => opt.MapFrom(src =>
+            src.DoctorTimeSlot.TimeSlot.StartTime.ToString("yyyy-MM-dd HH:mm")))
+
+         .ForMember(dest => dest.EndTime,
+        opt => opt.MapFrom(src =>
+            src.DoctorTimeSlot.TimeSlot.EndTime.ToString("yyyy-MM-dd HH:mm")))
        .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.CreatedAt))
        .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 

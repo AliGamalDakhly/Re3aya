@@ -265,7 +265,7 @@ namespace _03_APILayer.Controllers
 
 
         // Cancel an appointment
-        [HttpPost("CancelAppointment")]
+        [HttpPatch("CancelAppointment")]
         public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentDTO dto)
         {
             try
