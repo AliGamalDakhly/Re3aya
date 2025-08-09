@@ -274,7 +274,7 @@ namespace _03_APILayer.Controllers
                 var result = await _patientService.CancelAppointmentAsync(dto, userId);
                 if (!result)
                     return BadRequest("Failed to cancel appointment.");
-                return Ok("Appointment cancelled successfully.");
+                return Ok(new { Message = "Appointment cancelled successfully." });
             }
             catch (Exception ex)
             {
