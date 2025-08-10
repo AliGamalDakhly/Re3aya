@@ -63,7 +63,9 @@ namespace _02_BusinessLogicLayer.Mapping
                 .ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient.AppUser.FullName))
                 .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.Payment.PaymentId))
                 .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.Payment.TransactionId))
-                .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Payment.Amount));
+                .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Payment.Amount))
+                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.Payment.Status.ToString()));
+
 
 
 

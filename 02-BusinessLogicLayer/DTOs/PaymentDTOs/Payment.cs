@@ -46,6 +46,10 @@ namespace _02_BusinessLogicLayer.DTOs.PaymentDTOs
 
 
 
-
+    public class UpdatePaymentStatusDTO
+    {
+        public int TransactionId { get; set; }
+        public PaymentStatus Status { get; set; }
+    }
 
 }

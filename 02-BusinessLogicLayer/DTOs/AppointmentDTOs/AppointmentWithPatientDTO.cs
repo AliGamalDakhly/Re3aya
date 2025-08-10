@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _01_DataAccessLayer.Enums;
+using System;
 
 namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
 {
@@ -21,6 +22,8 @@ namespace _02_BusinessLogicLayer.DTOs.PatientDTOs
         public int PaymentId { get; set; }
         public string TransactionId { get; set; }
         public double Amount { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
+
 
 
     }
