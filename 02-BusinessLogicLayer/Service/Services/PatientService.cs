@@ -198,6 +198,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                 return false;
 
             appointment.Status = AppointmentStatus.Cancelled;
+            appointment.DoctorTimeSlot.IsAvailable = true; 
             appointmentRepo.Update(appointment);
             return await _unitOfWork.CompleteAsync() > 0;
         }
