@@ -13,7 +13,6 @@
         {
             public int DoctorId { get; set; }
             public string Specialization { get; set; }
-            public List<Availability> Availability { get; set; }
             public string Text { get; set; }
         }
 
