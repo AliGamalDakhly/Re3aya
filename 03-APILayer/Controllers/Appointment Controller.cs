@@ -225,5 +225,55 @@ namespace _03_APILayer.Controllers
         }
 
 
+        // Doctor's side of appointments
+
+        //[Authorize]
+        [HttpGet("doctor/my-appointments")]
+        public async Task<IActionResult> GetDoctorAppointments()
+        {
+            try
+            {
+                string appUserId = GetAppUserId();
+                if (string.IsNullOrEmpty(appUserId)) return Unauthorized();
+
+                var appointments = await _appointmentService.GetAppointmentsByDoctorAppUserIdAsync(appUserId);
+                return Ok(appointments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+
+
+        //[Authorize]
+        [HttpPut("doctor/appointments/{id}/status")]
+        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] UpdateAppointmentStatusDTO dto)
+        {
+            try
+            {
+                string appUserId = GetAppUserId();
+                if (string.IsNullOrEmpty(appUserId)) return Unauthorized();
+
+                var success = await _appointmentService.UpdateAppointmentStatusAsync(id, dto.Status, appUserId);
+                if (!success) return NotFound();
+
+                return Ok(new { message = "Status updated" });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+
+
+
     }
 }

@@ -372,5 +372,71 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
+        #region Doctor’s side of appointments
+
+        public async Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
+        {
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a => a.DoctorTimeSlot != null && a.DoctorTimeSlot.DoctorId == doctorId,
+                Includes = new Expression<Func<Appointment, object>>[]
+                {
+            a => a.Patient,
+            a => a.Patient.AppUser,
+            a => a.DoctorTimeSlot,
+            a => a.DoctorTimeSlot.TimeSlot,
+            a => a.DoctorTimeSlot.Doctor
+                }
+            };
+
+            var appointments = await _context.GetAllAsync(options);
+            return _mapper.Map<List<AppointmentWithDoctorDTO>>(appointments);
+        }
+
+        public async Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorAppUserIdAsync(string appUserId)
+        {
+            // get doctor by appUserId
+            var doctors = await _unitOfWork.Repository<Doctor, int>()
+                .GetAllAsync(new QueryOptions<Doctor> { Filter = d => d.AppUserId == appUserId });
+
+            var doctor = doctors.FirstOrDefault();
+            if (doctor == null) return new List<AppointmentWithDoctorDTO>();
+
+            return await GetAppointmentsByDoctorIdAsync(doctor.DoctorId);
+        }
+
+        public async Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, string appUserId)
+        {
+            // verify doctor exists
+            var doctors = await _unitOfWork.Repository<Doctor, int>()
+                .GetAllAsync(new QueryOptions<Doctor> { Filter = d => d.AppUserId == appUserId });
+
+            var doctor = doctors.FirstOrDefault();
+            if (doctor == null)
+                throw new UnauthorizedAccessException("Not authorized");
+
+            // load appointment with DoctorTimeSlot
+            var appointments = await _context.GetAllAsync(new QueryOptions<Appointment>
+            {
+                Filter = a => a.AppointmentId == appointmentId,
+                Includes = new Expression<Func<Appointment, object>>[] { a => a.DoctorTimeSlot }
+            });
+
+            var appointment = appointments.FirstOrDefault();
+            if (appointment == null)
+                return false;
+
+            if (appointment.DoctorTimeSlot == null || appointment.DoctorTimeSlot.DoctorId != doctor.DoctorId)
+                throw new UnauthorizedAccessException("Not authorized to modify this appointment");
+
+            appointment.Status = status;
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        #endregion
+
+
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using _01_DataAccessLayer.Models;
+﻿using _01_DataAccessLayer.Enums;
+using _01_DataAccessLayer.Models;
 using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
@@ -28,6 +29,12 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
 
         Task<List<AppointmentWithPatientDTO>> GetAppointmentsByPatientIdAsync(int patientId);
+
+
+        //  Doctor’s side of appointments
+        Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorIdAsync(int doctorId);
+        Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorAppUserIdAsync(string appUserId);
+        Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, string appUserId);
 
     }
 }

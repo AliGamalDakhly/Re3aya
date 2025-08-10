@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using _01_DataAccessLayer.Enums;
 using _01_DataAccessLayer.Models;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.DTOs.PatientDTOs;
@@ -67,6 +68,28 @@ namespace _02_BusinessLogicLayer.Mapping
 
 
 
+
+            CreateMap<Appointment, AppointmentWithDoctorDTO>()
+            .ForMember(dest => dest.PatientName,
+                       opt => opt.MapFrom(src => src.Patient.AppUser.FullName))
+            .ForMember(dest => dest.PatientEmail,
+                       opt => opt.MapFrom(src => src.Patient.AppUser.Email))
+            .ForMember(dest => dest.StartTime,
+                       opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime))
+            .ForMember(dest => dest.EndTime,
+                       opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime))
+            .ForMember(dest => dest.DayOfWeek,
+                       opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.DayOfWeek))
+            .ForMember(dest => dest.VideoCallUrl,
+                       opt => opt.MapFrom(src =>
+                           src.DoctorTimeSlot.Doctor.Service == DoctorService.OnlineConsultion
+                               ? src.VedioCallUrl
+                               : null
+                       ));
+
+
+
+            CreateMap<UpdateAppointmentStatusDTO, Appointment>();
 
 
 
