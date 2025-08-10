@@ -219,6 +219,7 @@ namespace _02_BusinessLogicLayer.Service.Services
                     a => a.DoctorTimeSlot,
                     a => a.DoctorTimeSlot.TimeSlot,
                     a => a.DoctorTimeSlot.Doctor,
+                    a => a.DoctorTimeSlot.Doctor.Addresses,
                     a => a.DoctorTimeSlot.Doctor.AppUser,
                     a => a.DoctorTimeSlot.Doctor.Specialization
                 }
