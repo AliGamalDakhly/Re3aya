@@ -125,13 +125,35 @@ namespace _02_BusinessLogicLayer.Service.Services
         {
             var slots = await _unitOfWork.Repository<DoctorTimeSlot, int>().GetAllAsync(new QueryOptions<DoctorTimeSlot>
             {
-                Includes = [dts => dts.TimeSlot],
+                Includes = [dts => dts.TimeSlot, dts => dts.Appointment],
                 Filter = dts =>
                     dts.DoctorId == doctorId &&
                     dts.TimeSlot.StartTime >= DateTime.Now
             });
 
-            return _mapper.Map<List<DoctorTimeSlotDTO>>(slots);
+            List<DoctorTimeSlotDTO> doctorTimeSlotDtos = _mapper.Map<List<DoctorTimeSlotDTO>>(slots);
+            for(int i =0; i < slots.Count; i++)
+            {
+                if (slots[i].Appointment == null)
+                {
+                    doctorTimeSlotDtos[i].IsBooked = false;
+                    continue;
+                }
+                
+                else if(slots[i].Appointment.Status == AppointmentStatus.Cancelled)
+                {
+                    doctorTimeSlotDtos[i].IsBooked = false;
+                    continue;
+                }
+
+                else if (slots[i].Appointment.Status == AppointmentStatus.Confirmed)
+                {
+                    doctorTimeSlotDtos[i].IsBooked = true;
+                    continue;
+                }
+            }
+
+            return doctorTimeSlotDtos;
         }
 
         public async Task<bool> ActivateDoctorTimeSlotAsyncAsync(int doctorTimeSlotId)
