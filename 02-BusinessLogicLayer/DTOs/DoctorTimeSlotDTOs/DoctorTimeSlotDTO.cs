@@ -16,5 +16,6 @@ namespace _02_BusinessLogicLayer.DTOs.DoctorTimeSlot
         public DateTime EndTime { get; set; }
         public string DayOfWeek { get; set; }
         public bool IsAvailable { get; set; }
+        public bool IsBooked { get; set; }
     }
 }
