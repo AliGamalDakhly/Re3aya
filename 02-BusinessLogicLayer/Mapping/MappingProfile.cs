@@ -94,23 +94,29 @@ namespace _02_BusinessLogicLayer.Mapping
 
             // CreateMap<Appointment, AppointmentResponseDTO>();
             CreateMap<Appointment, AppointmentResponseDTO>()
-       .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
-       .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.AppUser.FullName))
-       //.ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient.AppUser.FullName))
-       .ForMember(dest => dest.SpecializationName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Specialization.Name))
-       .ForMember(dest => dest.VideoCallUrl, opt => opt.MapFrom(src => src.VedioCallUrl))
-       .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
-       //.ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime.ToString(@"hh\:mm")))
-       //.ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime.ToString(@"hh\:mm")))
-       .ForMember(dest => dest.StartTime,
-             opt => opt.MapFrom(src =>
-            src.DoctorTimeSlot.TimeSlot.StartTime.ToString("yyyy-MM-dd HH:mm")))
+               .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
+               .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.AppUser.FullName))
+               .ForMember(dest => dest.DoctorLocation, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Addresses[0].Location))
+               .ForMember(dest => dest.DoctorDetailedAddress, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Addresses[0].DetailedAddress))
+               .ForMember(dest => dest.DoctorPhoneNumber, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.AppUser.PhoneNumber))
 
-         .ForMember(dest => dest.EndTime,
-        opt => opt.MapFrom(src =>
-            src.DoctorTimeSlot.TimeSlot.EndTime.ToString("yyyy-MM-dd HH:mm")))
-       .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.CreatedAt))
-       .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+
+               //.ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient.AppUser.FullName))
+               .ForMember(dest => dest.SpecializationName, opt => opt.MapFrom(src => src.DoctorTimeSlot.Doctor.Specialization.Name))
+               .ForMember(dest => dest.VideoCallUrl, opt => opt.MapFrom(src => src.VedioCallUrl))
+               .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+               //.ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.StartTime.ToString(@"hh\:mm")))
+               //.ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.DoctorTimeSlot.TimeSlot.EndTime.ToString(@"hh\:mm")))
+               .ForMember(dest => dest.StartTime,
+                     opt => opt.MapFrom(src =>
+                    src.DoctorTimeSlot.TimeSlot.StartTime.ToString("yyyy-MM-dd HH:mm")))
+
+                 .ForMember(dest => dest.EndTime,
+                opt => opt.MapFrom(src =>
+                    src.DoctorTimeSlot.TimeSlot.EndTime.ToString("yyyy-MM-dd HH:mm")))
+               .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.CreatedAt))
+               .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
 
             #endregion

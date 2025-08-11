@@ -68,29 +68,7 @@ namespace _03_APILayer.Controllers
 
 
 
-
-        //[HttpGet("paymob-callback")]
-        //public async Task<IActionResult> PaymobCallback([FromQuery] PaymobCallbackDTO dto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    double amount = Convert.ToDouble(dto.AmountCents) / 100.0;
-
-        //    var payment = new _01_DataAccessLayer.Models.Payment
-        //    {
-        //        TransactionId = dto.Id,
-        //        Amount = amount,
-        //        Status = dto.Success ? PaymentStatus.Completed : PaymentStatus.Failed,
-        //        CreatedAt = DateTime.UtcNow
-        //    };
-
-        //    _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().Add(payment);
-        //    await _unitOfWork.CompleteAsync();
-
-        //    return Ok(new { message = "payment saved successfully" });
-        //}
-
+ 
 
         [HttpGet("paymob-callback")]
         public async Task<IActionResult> PaymobCallback([FromQuery] PaymobCallbackDTO dto)
@@ -111,8 +89,7 @@ namespace _03_APILayer.Controllers
             await _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>().AddAsync(payment);
             await _unitOfWork.CompleteAsync();
 
-            // Return paymentId with success
-            return Ok(new { message = "payment saved successfully", paymentId = payment.PaymentId });
+             return Ok(new { message = "payment saved successfully", paymentId = payment.PaymentId });
         }
 
 
@@ -168,6 +145,31 @@ namespace _03_APILayer.Controllers
         }
 
 
+
+
+        [HttpPatch("update")]
+        public async Task<IActionResult> UpdatePaymentStatus([FromBody] UpdatePaymentStatusDTO dto)
+        {
+            var paymentRepo = _unitOfWork.Repository<_01_DataAccessLayer.Models.Payment, int>();
+
+
+            var payment = await paymentRepo.GetFirstOrDefaultAsync(p => p.TransactionId == dto.TransactionId);
+
+            if (payment == null)
+                return NotFound(new { error = "payment not found" });
+
+
+            payment.Status = dto.Status;
+
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(new
+            {
+                message = "payment status updated successfully",
+                paymentId = payment.PaymentId,
+                newStatus = payment.Status.ToString()
+            });
+        }
 
 
 
