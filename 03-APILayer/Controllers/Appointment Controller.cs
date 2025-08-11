@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+﻿using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace _03_APILayer.Controllers
 {
@@ -223,6 +225,45 @@ namespace _03_APILayer.Controllers
             var appointments = await _appointmentService.GetAppointmentsByPatientIdAsync(id);
             return Ok(appointments);
         }
+
+
+        // Doctor's side of appointments
+
+        
+        //[Authorize(Roles = "Doctor")]
+        [HttpGet("doctor/{doctorId}/appointments")]
+        public async Task<IActionResult> GetDoctorAppointments(int doctorId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsByDoctorIdAsync(doctorId);
+
+            if (appointments == null || !appointments.Any())
+                return NotFound("No appointments found for this doctor.");
+
+            return Ok(appointments);
+        }
+
+        //[Authorize]
+        [HttpPut("doctor/appointments/{id}/status")]
+        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] UpdateAppointmentStatusDTO dto)
+        {
+            try
+            {
+                var success = await _appointmentService.UpdateAppointmentStatusAsync(id, dto.Status, dto.DoctorId);
+                if (!success)
+                    return NotFound();
+
+                return Ok(new { message = "Status updated" });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
 
 
     }

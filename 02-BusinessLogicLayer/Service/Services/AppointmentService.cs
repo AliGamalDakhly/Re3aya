@@ -372,5 +372,58 @@ namespace _02_BusinessLogicLayer.Service.Services
 
 
 
+        #region Doctor’s side of appointments
+
+        public async Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorIdAsync(int doctorId)
+        {
+            var options = new QueryOptions<Appointment>
+            {
+                Filter = a => a.DoctorTimeSlot != null && a.DoctorTimeSlot.DoctorId == doctorId,
+                Includes = new Expression<Func<Appointment, object>>[]
+                {
+            a => a.Patient,
+            a => a.Patient.AppUser,
+            a => a.DoctorTimeSlot,
+            a => a.DoctorTimeSlot.TimeSlot,
+            a => a.DoctorTimeSlot.Doctor
+                }
+            };
+
+            var appointments = await _context.GetAllAsync(options);
+            return _mapper.Map<List<AppointmentWithDoctorDTO>>(appointments);
+        }
+
+
+
+        public async Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, int doctorId)
+        {
+            // verify doctor exists
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
+            if (doctor == null)
+                throw new UnauthorizedAccessException("Doctor not found");
+
+            // load appointment with DoctorTimeSlot
+            var appointments = await _context.GetAllAsync(new QueryOptions<Appointment>
+            {
+                Filter = a => a.AppointmentId == appointmentId,
+                Includes = new Expression<Func<Appointment, object>>[] { a => a.DoctorTimeSlot }
+            });
+
+            var appointment = appointments.FirstOrDefault();
+            if (appointment == null)
+                return false;
+
+            if (appointment.DoctorTimeSlot == null || appointment.DoctorTimeSlot.DoctorId != doctor.DoctorId)
+                throw new UnauthorizedAccessException("Not authorized to modify this appointment");
+
+            appointment.Status = status;
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        #endregion
+
+
+
     }
 }
