@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+﻿using _01_DataAccessLayer.Models;
+using _01_DataAccessLayer.Repository;
 using _02_BusinessLogicLayer.DTOs.AppointmentDTOs;
 using _02_BusinessLogicLayer.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace _03_APILayer.Controllers
 {
@@ -227,25 +229,18 @@ namespace _03_APILayer.Controllers
 
         // Doctor's side of appointments
 
-        //[Authorize]
-        [HttpGet("doctor/my-appointments")]
-        public async Task<IActionResult> GetDoctorAppointments()
+        
+        //[Authorize(Roles = "Doctor")]
+        [HttpGet("doctor/{doctorId}/appointments")]
+        public async Task<IActionResult> GetDoctorAppointments(int doctorId)
         {
-            try
-            {
-                string appUserId = GetAppUserId();
-                if (string.IsNullOrEmpty(appUserId)) return Unauthorized();
+            var appointments = await _appointmentService.GetAppointmentsByDoctorIdAsync(doctorId);
 
-                var appointments = await _appointmentService.GetAppointmentsByDoctorAppUserIdAsync(appUserId);
-                return Ok(appointments);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
+            if (appointments == null || !appointments.Any())
+                return NotFound("No appointments found for this doctor.");
+
+            return Ok(appointments);
         }
-
-
 
         //[Authorize]
         [HttpPut("doctor/appointments/{id}/status")]
@@ -253,11 +248,9 @@ namespace _03_APILayer.Controllers
         {
             try
             {
-                string appUserId = GetAppUserId();
-                if (string.IsNullOrEmpty(appUserId)) return Unauthorized();
-
-                var success = await _appointmentService.UpdateAppointmentStatusAsync(id, dto.Status, appUserId);
-                if (!success) return NotFound();
+                var success = await _appointmentService.UpdateAppointmentStatusAsync(id, dto.Status, dto.DoctorId);
+                if (!success)
+                    return NotFound();
 
                 return Ok(new { message = "Status updated" });
             }
@@ -270,8 +263,6 @@ namespace _03_APILayer.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-
 
 
 

@@ -33,8 +33,7 @@ namespace _02_BusinessLogicLayer.Service.IServices
 
         //  Doctor’s side of appointments
         Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorIdAsync(int doctorId);
-        Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorAppUserIdAsync(string appUserId);
-        Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, string appUserId);
+        Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, int doctorId);
 
     }
 }

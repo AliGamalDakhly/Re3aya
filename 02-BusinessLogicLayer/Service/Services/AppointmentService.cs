@@ -393,27 +393,14 @@ namespace _02_BusinessLogicLayer.Service.Services
             return _mapper.Map<List<AppointmentWithDoctorDTO>>(appointments);
         }
 
-        public async Task<List<AppointmentWithDoctorDTO>> GetAppointmentsByDoctorAppUserIdAsync(string appUserId)
-        {
-            // get doctor by appUserId
-            var doctors = await _unitOfWork.Repository<Doctor, int>()
-                .GetAllAsync(new QueryOptions<Doctor> { Filter = d => d.AppUserId == appUserId });
 
-            var doctor = doctors.FirstOrDefault();
-            if (doctor == null) return new List<AppointmentWithDoctorDTO>();
 
-            return await GetAppointmentsByDoctorIdAsync(doctor.DoctorId);
-        }
-
-        public async Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, string appUserId)
+        public async Task<bool> UpdateAppointmentStatusAsync(int appointmentId, AppointmentStatus status, int doctorId)
         {
             // verify doctor exists
-            var doctors = await _unitOfWork.Repository<Doctor, int>()
-                .GetAllAsync(new QueryOptions<Doctor> { Filter = d => d.AppUserId == appUserId });
-
-            var doctor = doctors.FirstOrDefault();
+            var doctor = await _unitOfWork.Repository<Doctor, int>().GetByIdAsync(doctorId);
             if (doctor == null)
-                throw new UnauthorizedAccessException("Not authorized");
+                throw new UnauthorizedAccessException("Doctor not found");
 
             // load appointment with DoctorTimeSlot
             var appointments = await _context.GetAllAsync(new QueryOptions<Appointment>

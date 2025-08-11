@@ -10,5 +10,6 @@ namespace _02_BusinessLogicLayer.DTOs.AppointmentDTOs
     public class UpdateAppointmentStatusDTO
     {
         public AppointmentStatus Status { get; set; }
+        public int DoctorId { get; set; }
     }
 }
